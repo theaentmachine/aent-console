@@ -11,9 +11,9 @@ class Hercule
      */
     public static function setHandledEvents(array $events): void
     {
-        $command = 'hercule set:handled-events';
+        $command = ['hercule', 'set:handled-events'];
         foreach ($events as $event) {
-            $command .= " $event";
+            $command[] = $event;
         }
 
         $process = new Process($command);

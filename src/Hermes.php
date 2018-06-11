@@ -7,9 +7,9 @@ class Hermes
 {
     public static function dispatch(string $event, ?string $payload = null): void
     {
-        $command = "hermes dispatch $event";
+        $command = ['hermes', 'dispatch', $event];
         if (!empty($payload)) {
-            $command .= " $payload";
+            $command[] = $payload;
         }
 
         $process = new Process($command);
@@ -21,9 +21,9 @@ class Hermes
 
     public static function reply(string $event, ?string $payload = null): void
     {
-        $command = "hermes reply $event";
+        $command = ['hermes', 'reply', $event];
         if (!empty($payload)) {
-            $command .= " $payload";
+            $command[] = $payload;
         }
 
         $process = new Process($command);
