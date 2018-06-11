@@ -49,5 +49,10 @@
     "cs-check": "phpcs",
     "phpstan": "phpstan analyse src -c phpstan.neon --level=7 --no-progress -vvv",
     "phpunit": "phpunit"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0-dev"
+    }
   }
 }
