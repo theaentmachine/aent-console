@@ -32,7 +32,7 @@ abstract class EventCommand extends Command
     {
         $this
             ->setName($this->getEventName())
-            ->setDescription('Handle the "'.$this->getEventName().'" event')
+            ->setDescription('Handle the "' . $this->getEventName() . '" event')
             ->addArgument('payload', InputArgument::OPTIONAL, 'The event payload');
     }
 
