@@ -19,6 +19,11 @@ class Hermes
         $process->mustRun();
     }
 
+    public static function dispatchJson(string $event, array $payload): void
+    {
+        self::dispatch($event, \json_encode($payload));
+    }
+
     public static function reply(string $event, ?string $payload = null): void
     {
         $command = ['hermes', 'reply', $event];
@@ -31,5 +36,10 @@ class Hermes
         $process->setTty(true);
 
         $process->mustRun();
+    }
+
+    public static function replyJson(string $event, array $payload): void
+    {
+        self::reply($event, \json_encode($payload));
     }
 }
