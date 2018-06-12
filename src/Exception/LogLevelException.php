@@ -1,9 +1,6 @@
 <?php
 namespace TheAentMachine\Exception;
 
-use TheAentMachine\Enum\PheromoneEnum;
-use TheAentMachine\LogLevelConfigurator;
-
 class LogLevelException extends AenthillException
 {
     public static function invalidLogLevel(string $wrongLogLevel): self
