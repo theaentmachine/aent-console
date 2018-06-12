@@ -19,6 +19,9 @@ class Hermes
         $process->mustRun();
     }
 
+    /**
+     * @param mixed[] $payload
+     */
     public static function dispatchJson(string $event, array $payload): void
     {
         self::dispatch($event, \json_encode($payload));
@@ -38,6 +41,9 @@ class Hermes
         $process->mustRun();
     }
 
+    /**
+     * @param mixed[] $payload
+     */
     public static function replyJson(string $event, array $payload): void
     {
         self::reply($event, \json_encode($payload));
