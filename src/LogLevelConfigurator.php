@@ -7,8 +7,6 @@ use TheAentMachine\Exception\LogLevelException;
 
 class LogLevelConfigurator
 {
-    const PHEROMONE_LOG_LEVEL = 'PHEROMONE_LOG_LEVEL';
-
     /** @var array */
     private $levels = [
         'DEBUG' => OutputInterface::VERBOSITY_DEBUG,
@@ -35,15 +33,7 @@ class LogLevelConfigurator
      */
     public function configureLogLevel(): void
     {
-        $logLevel = getenv(self::PHEROMONE_LOG_LEVEL);
-
-        if ($logLevel === false) {
-            throw LogLevelException::emptyLogLevel();
-        }
-
-        if (!array_key_exists($logLevel, $this->levels)) {
-            throw LogLevelException::invalidLogLevel($logLevel);
-        }
+        $logLevel = Pheromone::getLogLevel();
 
         $this->output->setVerbosity($this->levels[$logLevel]);
     }

@@ -13,6 +13,6 @@ class LogLevelException extends AenthillException
 
     public static function emptyLogLevel(): self
     {
-        return new self('Could not find environment variable ' . LogLevelConfigurator::PHEROMONE_LOG_LEVEL);
+        return new self('Could not find environment variable PHEROMONE_LOG_LEVEL');
     }
 }
