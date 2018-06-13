@@ -3,8 +3,6 @@
 
 namespace TheAentMachine\Registry;
 
-
-
 use GuzzleHttp\Client;
 
 class RegistryClient
@@ -21,7 +19,7 @@ class RegistryClient
 
         $response = \GuzzleHttp\json_decode($res->getBody(), true);
 
-        $tags = \array_map(function(array $item) {
+        $tags = \array_map(function (array $item) {
             return $item['name'];
         }, $response);
 
