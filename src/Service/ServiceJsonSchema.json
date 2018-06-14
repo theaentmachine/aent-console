@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Test if service",
-  "description": "Test if the data is a valid service",
+  "title": "Test if Service",
+  "description": "Test if the data is a valid Service",
 
   "type": "object",
   "properties": {
@@ -37,7 +37,8 @@
               "target":{
                 "type": ["number", "string"]
               }
-            }
+            },
+            "required": ["target"]
           }
         },
         "labels": {
