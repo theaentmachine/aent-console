@@ -9,23 +9,23 @@ use TheAentMachine\Service\Exception\ServiceException;
 class Service implements \JsonSerializable
 {
     /** @var string */
-    protected $serviceName = '';
+    private $serviceName = '';
     /** @var string */
-    protected $image = '';
+    private $image = '';
     /** @var int[] */
-    protected $internalPorts = [];
+    private $internalPorts = [];
     /** @var string[] */
-    protected $dependsOn = [];
+    private $dependsOn = [];
     /** @var mixed[] */
-    protected $ports = [];
+    private $ports = [];
     /** @var mixed[] */
-    protected $labels = [];
+    private $labels = [];
     /** @var mixed[] */
-    protected $environment = [];
+    private $environment = [];
     /** @var mixed[] */
-    protected $volumes = [];
+    private $volumes = [];
     /** @var \stdClass */
-    protected $validatorSchema;
+    private $validatorSchema;
 
     /**
      * Service constructor.
@@ -184,6 +184,38 @@ class Service implements \JsonSerializable
     }
 
     /**
+     * @param string $serviceName
+     */
+    public function setServiceName(string $serviceName): void
+    {
+        $this->serviceName = $serviceName;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImage(string $image): void
+    {
+        $this->image = $image;
+    }
+
+    /**
+     * @param int[] $internalPorts
+     */
+    public function setInternalPorts(array $internalPorts): void
+    {
+        $this->internalPorts = $internalPorts;
+    }
+
+    /**
+     * @param string[] $dependsOn
+     */
+    public function setDependsOn(array $dependsOn): void
+    {
+        $this->dependsOn = $dependsOn;
+    }
+
+    /**
      * @param int $internalPort
      */
     public function addInternalPort(int $internalPort): void
@@ -200,129 +232,54 @@ class Service implements \JsonSerializable
     }
 
     /**
-     * @param mixed $port
+     * @param string $source
+     * @param string $target
      */
-    public function addPort(array $port): void
+    public function addPort(string $source, string $target): void
     {
         $this->ports[] = array(
-            'source' => $port['source'] ?? '',  //optional
-            'target' => $port['target'],
+            'source' => $source,
+            'target' => $target,
         );
     }
 
     /**
-     * @param mixed $label
+     * @param string $key
+     * @param string $value
      */
-    public function addLabel(array $label): void
+    public function addLabel(string $key, string $value): void
     {
         $this->labels[] = array(
-            'key' => $label['key'],
-            'values' => $label['values'] ?? '', //optional
+            'key' => $key,
+            'values' => $value,
         );
     }
 
     /**
-     * @param mixed $environment
+     * @param string $key
+     * @param string $value
      */
-    public function addEnvironment(array $environment): void
+    public function addEnvironment(string $key, string $value): void
     {
         $this->environment[] = array(
-            'key' => $environment['key'],
-            'values' => $environment['values'] ?? '', //optional
+            'key' => $key,
+            'values' => $value,
         );
     }
 
     /**
-     * @param mixed $volume
+     * @param string $type
+     * @param string $source
+     * @param string $target
+     * @param bool|null $readONly
      */
-    public function addVolume(array $volume): void
+    public function addVolume(string $type, string $source, string $target, ?bool $readONly): void
     {
         $this->volumes[] = array(
-            'type' => $volume['type'],
-            'source' => $volume['source'],
-            'target' => $volume['target'],
-            'readOnly' => $volume['readOnly'] ?? null,
+            'type' => $type,
+            'source' => $source,
+            'target' => $target,
+            'readOnly' => $readONly,
         );
     }
-
-    /**
-     * @param string $serviceName
-     * @return Service
-     */
-    public function setServiceName(string $serviceName): Service
-    {
-        $this->serviceName = $serviceName;
-        return $this;
-    }
-
-    /**
-     * @param string $image
-     * @return Service
-     */
-    public function setImage(string $image): Service
-    {
-        $this->image = $image;
-        return $this;
-    }
-
-    /**
-     * @param int[] $internalPorts
-     * @return Service
-     */
-    public function setInternalPorts(array $internalPorts): Service
-    {
-        $this->internalPorts = $internalPorts;
-        return $this;
-    }
-
-    /**
-     * @param string[] $dependsOn
-     * @return Service
-     */
-    public function setDependsOn(array $dependsOn): Service
-    {
-        $this->dependsOn = $dependsOn;
-        return $this;
-    }
-
-    /**
-     * @param mixed[] $ports
-     * @return Service
-     */
-    public function setPorts(array $ports): Service
-    {
-        $this->ports = $ports;
-        return $this;
-    }
-
-    /**
-     * @param mixed[] $labels
-     * @return Service
-     */
-    public function setLabels(array $labels): Service
-    {
-        $this->labels = $labels;
-        return $this;
-    }
-
-    /**
-     * @param mixed[] $environment
-     * @return Service
-     */
-    public function setEnvironment(array $environment): Service
-    {
-        $this->environment = $environment;
-        return $this;
-    }
-
-    /**
-     * @param mixed[] $volumes
-     * @return Service
-     */
-    public function setVolumes(array $volumes): Service
-    {
-        $this->volumes = $volumes;
-        return $this;
-    }
-
 }
