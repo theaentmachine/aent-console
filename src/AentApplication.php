@@ -4,6 +4,7 @@
 namespace TheAentMachine;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 /**
@@ -26,6 +27,10 @@ class AentApplication extends Application
     public function find($name)
     {
         try {
+            if (!$this->has($name)) {
+                return $this->voidCommand;
+            }
+
             return parent::find($name);
         } catch (CommandNotFoundException $e) {
             return $this->voidCommand;
