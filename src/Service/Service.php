@@ -40,7 +40,7 @@ class Service implements \JsonSerializable
         $this->labels = array();
         $this->environment = array();
         $this->volumes = array();
-        $this->validatorSchema = json_decode(file_get_contents('/src/Service/ServiceJsonSchema.json'), false);
+        $this->validatorSchema = json_decode(file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
 
     /**
