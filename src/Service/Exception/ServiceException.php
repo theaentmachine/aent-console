@@ -12,9 +12,9 @@ class ServiceException extends \Exception
      */
     public static function invalidServiceData(ValidationError $vError): ServiceException
     {
-        $massage = 'Invalid service data' . PHP_EOL
+        $message = 'Invalid service data' . PHP_EOL
             . 'Error: ' . $vError->keyword() . PHP_EOL
             . json_encode($vError->keywordArgs(), JSON_PRETTY_PRINT);
-        return new self($massage);
+        return new self($message);
     }
 }
