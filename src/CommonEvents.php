@@ -29,7 +29,8 @@ class CommonEvents
      */
     public function canDispatchServiceOrFail(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
     {
-        $canHandle = Hercule::canHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
+        // Disableing this whole piece of code until we can properly add an Aent from a container
+        /*$canHandle = Hercule::canHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
 
         if (!$canHandle) {
             $output->writeln('<error>Heads up!</error>');
@@ -52,6 +53,6 @@ class CommonEvents
             } else {
                 throw CannotHandleEventException::cannotHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
             }
-        }
+        }*/
     }
 }
