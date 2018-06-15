@@ -58,11 +58,10 @@ abstract class EventCommand extends Command
      */
     private function getAllEventNames(): array
     {
-        return array_map(function(EventCommand $event) {
+        return array_map(function (EventCommand $event) {
             return $event->getEventName();
-        }, \array_filter($this->getApplication()->all(), function(Command $command) {
+        }, \array_filter($this->getApplication()->all(), function (Command $command) {
             return $command instanceof EventCommand;
         }));
-
     }
 }
