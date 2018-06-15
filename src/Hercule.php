@@ -1,6 +1,7 @@
 <?php
 namespace TheAentMachine;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 class Hercule
@@ -54,5 +55,31 @@ class Hercule
     public static function canHandleEvent(string $handledEvent): bool
     {
         return count(self::findAentsByHandledEvent($handledEvent)) > 0;
+    }
+
+    /**
+     * Registers a new Aent in Aenthill
+     */
+    public static function addAent(string $aent): void
+    {
+        $containerProjectDir = Pheromone::getContainerProjectDirectory();
+
+        $aenthillJSONstr = file_get_contents($containerProjectDir . '/aenthill.json');
+        $aenthillJSON = \GuzzleHttp\json_decode($aenthillJSONstr, true);
+
+        $aents = array();
+        if (isset($aenthillJSON['aents'])) {
+            foreach ($aenthillJSON['aents'] as $aentDescriptor) {
+                if ($aentDescriptor['image'] === $aent) {
+                    // Aent already there. Let's return.
+                    return;
+                }
+            }
+        }
+
+        $aents['aents'][]['image'] = $aent;
+
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($containerProjectDir . '/aenthill.json', $aents);
     }
 }
