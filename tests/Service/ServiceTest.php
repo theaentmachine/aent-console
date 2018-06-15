@@ -9,7 +9,7 @@ use TheAentMachine\Service\Service;
 
 class ServiceTest extends TestCase
 {
-    private const PAYLOAD = <<< 'JSON'
+    private const VALID_PAYLOAD = <<< 'JSON'
 {
   "serviceName" : "foo",
   "service": {
@@ -39,14 +39,68 @@ class ServiceTest extends TestCase
 }
 JSON;
 
-    /**
-     * @throws ServiceException
-     */
-    public function testCheckValidity() : void
+    private const MISSING_SERVICE_NAME_PAYLOAD = <<< 'JSON'
+{
+  "service": {
+    "internalPorts": [80]
+  }
+}
+JSON;
+
+    private const UNKNOWN_ENV_VARIABLE_TYPE_PAYLOAD = <<< 'JSON'
+{
+  "serviceName": "foo",
+  "service": {
+    "environment": {
+      "FOO": {
+        "value": "fooo",
+        "type": "YIKES_THATS_SOME_BAD_TYPE_HERE"
+      }
+    }
+  }
+}
+JSON;
+
+    private const UNKNOWN_VOLUME_TYPE_PAYLOAD = <<< 'JSON'
+{
+  "serviceName": "foo",
+  "service": {
+    "volumes": [
+      {
+        "type": "AGAIN?WTF",
+        "source": "foo"
+      }
+    ]
+  }
+}
+JSON;
+
+    public function testValidPayload() : void
     {
-        $p = json_decode(self::PAYLOAD, true);
-        $service = Service::parsePayload($p);
-        $json = json_encode($service->jsonSerialize(), JSON_PRETTY_PRINT);
-        $this->assertNotEmpty($json);
+        $array = json_decode(self::VALID_PAYLOAD, true);
+        $service = Service::parsePayload($array);
+        $out = $service->jsonSerialize();
+        $this->assertEquals($array, $out);
+    }
+
+    public function testMissingServiceNamePayload() : void
+    {
+        $this->expectException(ServiceException::class);
+        $array = json_decode(self::MISSING_SERVICE_NAME_PAYLOAD, true);
+        Service::parsePayload($array)->jsonSerialize();
+    }
+
+    public function testUnknownEnvVariableTypePayload() : void
+    {
+        $this->expectException(ServiceException::class);
+        $array = json_decode(self::UNKNOWN_ENV_VARIABLE_TYPE_PAYLOAD, true);
+        Service::parsePayload($array)->jsonSerialize();
+    }
+
+    public function testUnknownVolumeTypePayload() : void
+    {
+        $this->expectException(ServiceException::class);
+        $array = json_decode(self::UNKNOWN_VOLUME_TYPE_PAYLOAD, true);
+        Service::parsePayload($array)->jsonSerialize();
     }
 }

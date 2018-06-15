@@ -4,6 +4,7 @@ namespace TheAentMachine\Service;
 
 use Opis\JsonSchema\ValidationError;
 use Opis\JsonSchema\Validator;
+use TheAentMachine\Service\Enum\EnvVariableTypeEnum;
 use TheAentMachine\Service\Enum\VolumeTypeEnum;
 use TheAentMachine\Service\Environment\EnvVariable;
 use TheAentMachine\Service\Exception\ServiceException;
@@ -278,10 +279,26 @@ class Service implements \JsonSerializable
      * @param string $key
      * @param string $value
      * @param string $type
+     * @throws ServiceException
      */
     private function addEnvVar(string $key, string $value, string $type): void
     {
-        $this->environment[$key] = new EnvVariable($value, $type);
+        switch ($type) {
+            case EnvVariableTypeEnum::SHARED_ENV_VARIABLE:
+                $this->addSharedEnvVariable($key, $value);
+                break;
+            case EnvVariableTypeEnum::SHARED_SECRET:
+                $this->addSharedSecret($key, $value);
+                break;
+            case EnvVariableTypeEnum::IMAGE_ENV_VARIABLE:
+                $this->addImageEnvVariable($key, $value);
+                break;
+            case EnvVariableTypeEnum::CONTAINER_ENV_VARIABLE:
+                $this->addContainerEnvVariable($key, $value);
+                break;
+            default:
+                throw ServiceException::unknownEnvVariableType($type);
+        }
     }
 
     /**
@@ -290,7 +307,7 @@ class Service implements \JsonSerializable
      */
     public function addSharedEnvVariable(string $key, string $value): void
     {
-        $this->addEnvVar($key, $value, 'sharedEnvVariable');
+        $this->environment[$key] = new EnvVariable($value, 'sharedEnvVariable');
     }
 
     /**
@@ -299,7 +316,7 @@ class Service implements \JsonSerializable
      */
     public function addSharedSecret(string $key, string $value): void
     {
-        $this->addEnvVar($key, $value, 'sharedSecret');
+        $this->environment[$key] = new EnvVariable($value, 'sharedSecret');
     }
 
     /**
@@ -308,7 +325,7 @@ class Service implements \JsonSerializable
      */
     public function addImageEnvVariable(string $key, string $value): void
     {
-        $this->addEnvVar($key, $value, 'imageEnvVariable');
+        $this->environment[$key] = new EnvVariable($value, 'imageEnvVariable');
     }
 
     /**
@@ -317,17 +334,17 @@ class Service implements \JsonSerializable
      */
     public function addContainerEnvVariable(string $key, string $value): void
     {
-        $this->addEnvVar($key, $value, 'containerEnvVariable');
+        $this->environment[$key] = new EnvVariable($value, 'containerEnvVariable');
     }
 
     /**
      * @param string $type
      * @param string $source
      * @param string $target
-     * @param bool|null $readOnly
+     * @param bool $readOnly
      * @throws ServiceException
      */
-    private function addVolume(string $type, string $source, string $target, ?bool $readOnly): void
+    private function addVolume(string $type, string $source, string $target = '', bool $readOnly = false): void
     {
         switch ($type) {
             case VolumeTypeEnum::NAMED_VOLUME:
@@ -347,9 +364,9 @@ class Service implements \JsonSerializable
     /**
      * @param string $source
      * @param string $target
-     * @param bool|null $readOnly
+     * @param bool $readOnly
      */
-    public function addNamedVolume(string $source, string $target, ?bool $readOnly): void
+    public function addNamedVolume(string $source, string $target, bool $readOnly = false): void
     {
         $this->volumes[] = new NamedVolume($source, $target, $readOnly);
     }
@@ -357,9 +374,9 @@ class Service implements \JsonSerializable
     /**
      * @param string $source
      * @param string $target
-     * @param bool|null $readOnly
+     * @param bool $readOnly
      */
-    public function addBindVolume(string $source, string $target, ?bool $readOnly): void
+    public function addBindVolume(string $source, string $target, bool $readOnly = false): void
     {
         $this->volumes[] = new BindVolume($source, $target, $readOnly);
     }
