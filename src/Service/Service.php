@@ -4,7 +4,12 @@ namespace TheAentMachine\Service;
 
 use Opis\JsonSchema\ValidationError;
 use Opis\JsonSchema\Validator;
+use TheAentMachine\Service\Enum\VolumeTypeEnum;
+use TheAentMachine\Service\Environment\EnvVariable;
 use TheAentMachine\Service\Exception\ServiceException;
+use TheAentMachine\Service\Volume\BindVolume;
+use TheAentMachine\Service\Volume\NamedVolume;
+use TheAentMachine\Service\Volume\TmpfsVolume;
 
 class Service implements \JsonSerializable
 {
@@ -52,8 +57,16 @@ class Service implements \JsonSerializable
             $service->dependsOn = $s['dependsOn'] ?? array();
             $service->ports = $s['ports'] ?? array();
             $service->labels = $s['labels'] ?? array();
-            $service->environment = $s['environment'] ?? array();
-            $service->volumes = $s['volumes'] ?? array();
+            if (!empty($s['environment'])) {
+                foreach ($s['environment'] as $key => $env) {
+                    $service->addEnvVar($key, $env['value'], $env['type']);
+                }
+            }
+            if (!empty($s['volumes'])) {
+                foreach ($s['volumes'] as $vol) {
+                    $service->addVolume($vol['type'], $vol['source'], $vol['target'] ?? '', $vol['readOnly'] ?? null);
+                }
+            }
         }
         return $service;
     }
@@ -68,18 +81,23 @@ class Service implements \JsonSerializable
      */
     public function jsonSerialize(): array
     {
+        $jsonSerializeMap = function (\JsonSerializable $obj): array {
+            return $obj->jsonSerialize();
+        };
+
         $array = self::arrayFilterRec(array(
             'serviceName' => $this->serviceName,
-            'service' => array(
+            'service' => [
                 'image' => $this->image,
                 'internalPorts' => $this->internalPorts,
                 'dependsOn' => $this->dependsOn,
                 'ports' => $this->ports,
                 'labels' => $this->labels,
-                'environment' => $this->environment,
-                'volumes' => $this->volumes,
-            )
+                'environment' => array_map($jsonSerializeMap, $this->environment),
+                'volumes' => array_map($jsonSerializeMap, $this->volumes),
+            ]
         ));
+
         $this->checkValidity($array);
         return $array;
     }
@@ -118,6 +136,7 @@ class Service implements \JsonSerializable
         }
         return array_filter($input);
     }
+
 
     /**
      * @return string
@@ -232,10 +251,10 @@ class Service implements \JsonSerializable
     }
 
     /**
-     * @param string $source
-     * @param string $target
+     * @param int $source
+     * @param int $target
      */
-    public function addPort(string $source, string $target): void
+    public function addPort(int $source, int $target): void
     {
         $this->ports[] = array(
             'source' => $source,
@@ -258,28 +277,98 @@ class Service implements \JsonSerializable
     /**
      * @param string $key
      * @param string $value
+     * @param string $type
      */
-    public function addEnvironment(string $key, string $value): void
+    private function addEnvVar(string $key, string $value, string $type): void
     {
-        $this->environment[] = array(
-            'key' => $key,
-            'values' => $value,
-        );
+        $this->environment[$key] = new EnvVariable($value, $type);
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     */
+    public function addSharedEnvVariable(string $key, string $value): void
+    {
+        $this->addEnvVar($key, $value, 'sharedEnvVariable');
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     */
+    public function addSharedSecret(string $key, string $value): void
+    {
+        $this->addEnvVar($key, $value, 'sharedSecret');
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     */
+    public function addImageEnvVariable(string $key, string $value): void
+    {
+        $this->addEnvVar($key, $value, 'imageEnvVariable');
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     */
+    public function addContainerEnvVariable(string $key, string $value): void
+    {
+        $this->addEnvVar($key, $value, 'containerEnvVariable');
     }
 
     /**
      * @param string $type
      * @param string $source
      * @param string $target
-     * @param bool|null $readONly
+     * @param bool|null $readOnly
+     * @throws ServiceException
      */
-    public function addVolume(string $type, string $source, string $target, ?bool $readONly): void
+    private function addVolume(string $type, string $source, string $target, ?bool $readOnly): void
     {
-        $this->volumes[] = array(
-            'type' => $type,
-            'source' => $source,
-            'target' => $target,
-            'readOnly' => $readONly,
-        );
+        switch ($type) {
+            case VolumeTypeEnum::NAMED_VOLUME:
+                $this->addNamedVolume($source, $target, $readOnly);
+                break;
+            case VolumeTypeEnum::BIND_VOLUME:
+                $this->addBindVolume($source, $target, $readOnly);
+                break;
+            case VolumeTypeEnum::TMPFS_VOLUME:
+                $this->addTmpfsVolume($source);
+                break;
+            default:
+                throw ServiceException::unknownVolumeType($type);
+        }
+    }
+
+    /**
+     * @param string $source
+     * @param string $target
+     * @param bool|null $readOnly
+     */
+    public function addNamedVolume(string $source, string $target, ?bool $readOnly): void
+    {
+        $this->volumes[] = new NamedVolume($source, $target, $readOnly);
+    }
+
+    /**
+     * @param string $source
+     * @param string $target
+     * @param bool|null $readOnly
+     */
+    public function addBindVolume(string $source, string $target, ?bool $readOnly): void
+    {
+        $this->volumes[] = new BindVolume($source, $target, $readOnly);
+    }
+
+    /**
+     * @param string $source
+     */
+    public function addTmpfsVolume(string $source): void
+    {
+        $this->volumes[] = new TmpfsVolume($source);
     }
 }
