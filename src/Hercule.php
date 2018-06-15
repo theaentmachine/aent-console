@@ -81,5 +81,7 @@ class Hercule
 
         $filesystem = new Filesystem();
         $filesystem->dumpFile($containerProjectDir . '/aenthill.json', \json_encode($aents, \JSON_PRETTY_PRINT));
+
+        // TODO: we need to be able to call ADD in Hercule here.
     }
 }
