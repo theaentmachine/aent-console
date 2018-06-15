@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Test if Service",
+  "description": "Test if the data is a valid Service",
+
+  "type": "object",
+  "properties": {
+    "serviceName": {
+      "type": "string"
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "string"
+        },
+        "internalPorts": {
+          "type": "array",
+          "items": {
+            "type": ["number", "string"]
+          }
+        },
+        "dependsOn": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": ["number", "string"]
+              },
+              "target":{
+                "type": ["number", "string"]
+              }
+            },
+            "required": ["target"]
+          }
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "value":{
+                "type": "string"
+              }
+            },
+            "required": ["key"]
+          }
+        },
+        "environment": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "value":{
+                "type": "string"
+              }
+            },
+            "required": ["key"]
+          }
+        },
+        "volumes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "oneOf": [
+                  {"const": "volume"},
+                  {"const": "bind"},
+                  {"const": "tmpfs"}
+                ]
+              },
+              "source":{
+                "type": "string"
+              },
+              "target":{
+                "type": "string"
+              },
+              "readOnly":{
+                "type": "boolean"
+              }
+            },
+            "required": ["type", "source"]
+          }
+        }
+      }
+    }
+  },
+  "required": ["serviceName", "service"]
+}
