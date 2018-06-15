@@ -65,7 +65,7 @@ class Service implements \JsonSerializable
             }
             if (!empty($s['volumes'])) {
                 foreach ($s['volumes'] as $vol) {
-                    $service->addVolume($vol['type'], $vol['source'], $vol['target'] ?? '', $vol['readOnly'] ?? null);
+                    $service->addVolume($vol['type'], $vol['source'], $vol['target'] ?? '', $vol['readOnly'] ?? false);
                 }
             }
         }
