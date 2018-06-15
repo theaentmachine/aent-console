@@ -8,18 +8,18 @@ class NamedVolume extends Volume
 {
     /** @var string */
     private $target;
-    /** @var bool|null */
+    /** @var bool */
     protected $readOnly;
 
     /**
      * BindVolume constructor.
      * @param string $source
-     * @param bool|null $readOnly
+     * @param bool $readOnly
      * @param string $target
      */
-    public function __construct(string $source, string $target, ?bool $readOnly)
+    public function __construct(string $source, string $target, bool $readOnly = false)
     {
-        parent::__construct(VolumeTypeEnum::NAMED_VOLUME, $source);
+        parent::__construct($source);
         $this->target = $target;
         $this->readOnly = $readOnly;
     }
@@ -27,33 +27,9 @@ class NamedVolume extends Volume
     /**
      * @return string
      */
-    public function getTarget(): string
+    public static function getType(): string
     {
-        return $this->target;
-    }
-
-    /**
-     * @param string $target
-     */
-    public function setTarget(string $target): void
-    {
-        $this->target = $target;
-    }
-
-    /**
-     * @return bool|null
-     */
-    public function isReadOnly(): ?bool
-    {
-        return $this->readOnly;
-    }
-
-    /**
-     * @param bool|null $readOnly
-     */
-    public function setReadOnly(?bool $readOnly): void
-    {
-        $this->readOnly = $readOnly;
+        return VolumeTypeEnum::NAMED_VOLUME;
     }
 
     /**
@@ -66,7 +42,7 @@ class NamedVolume extends Volume
     public function jsonSerialize(): array
     {
         return array(
-            'type' => $this->type,
+            'type' => self::getType(),
             'source' => $this->source,
             'target' => $this->target,
             'readOnly' => $this->readOnly,

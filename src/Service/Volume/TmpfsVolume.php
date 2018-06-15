@@ -7,12 +7,11 @@ use TheAentMachine\Service\Enum\VolumeTypeEnum;
 class TmpfsVolume extends Volume
 {
     /**
-     * BindVolume constructor.
-     * @param string $source
+     * @return string
      */
-    public function __construct(string $source)
+    public static function getType(): string
     {
-        parent::__construct(VolumeTypeEnum::TMPFS_VOLUME, $source);
+        return VolumeTypeEnum::TMPFS_VOLUME;
     }
 
     /**
@@ -25,7 +24,7 @@ class TmpfsVolume extends Volume
     public function jsonSerialize(): array
     {
         return array(
-            'type' => $this->type,
+            'type' => self::getType(),
             'source' => $this->source,
         );
     }

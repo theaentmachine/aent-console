@@ -1,0 +1,11 @@
+tasks:
+
+  - use: lint
+    run:
+      - composer run cs-fix
+
+  - use: ci
+    run:
+      - composer run cs-check
+      - composer run phpstan
+      - composer run phpunit
