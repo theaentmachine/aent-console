@@ -80,6 +80,6 @@ class Hercule
         $aents['aents'][]['image'] = $aent;
 
         $filesystem = new Filesystem();
-        $filesystem->dumpFile($containerProjectDir . '/aenthill.json', $aents);
+        $filesystem->dumpFile($containerProjectDir . '/aenthill.json', \json_encode($aents, \JSON_PRETTY_PRINT));
     }
 }

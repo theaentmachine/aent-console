@@ -3,7 +3,6 @@
 
 namespace TheAentMachine\Exception;
 
-
 class CannotHandleEventException extends AenthillException
 {
     public static function cannotHandleEvent(string $eventName): self

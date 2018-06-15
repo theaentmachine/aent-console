@@ -3,8 +3,8 @@
 
 namespace TheAentMachine;
 
-
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use TheAentMachine\Exception\CannotHandleEventException;
@@ -17,9 +17,9 @@ class CommonEvents
     /**
      * @throws CannotHandleEventException
      */
-    public function dispatchService(Service $service, QuestionHelper $helper, OutputInterface $output): void
+    public function dispatchService(Service $service, QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
     {
-        $this->canDispatchServiceOrFail($helper, $output);
+        $this->canDispatchServiceOrFail($helper, $input, $output);
 
         Hermes::dispatchJson(self::NEW_DOCKER_SERVICE_INFO, $service);
     }
@@ -27,7 +27,7 @@ class CommonEvents
     /**
      * @throws CannotHandleEventException
      */
-    public function canDispatchServiceOrFail(QuestionHelper $helper, OutputInterface $output): void
+    public function canDispatchServiceOrFail(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
     {
         $canHandle = Hercule::canHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
 
@@ -40,12 +40,12 @@ class CommonEvents
                 $value = \strtolower(trim($value));
 
                 if ($value !== 'y' && $value !== 'n') {
-                    throw new \Exception('Please type "y" or "n"');
+                    throw new \InvalidArgumentException('Please type "y" or "n"');
                 }
 
                 return $value;
             });
-            $answer = $helper->ask($this->input, $this->output, $question);
+            $answer = $helper->ask($input, $output, $question);
 
             if ($answer === 'y') {
                 Hercule::addAent('theaentmachine/aent-docker-compose');
