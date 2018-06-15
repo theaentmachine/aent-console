@@ -49,7 +49,6 @@
   },
   "scripts": {
     "ci": [
-      "@cs-fix",
       "@cs-check",
       "@phpstan",
       "@phpunit"
