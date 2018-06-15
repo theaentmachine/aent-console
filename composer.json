@@ -48,6 +48,12 @@
     }
   },
   "scripts": {
+    "ci": [
+      "@cs-fix",
+      "@cs-check",
+      "@phpstan",
+      "@phpunit"
+    ],
     "cs-fix": "phpcbf",
     "cs-check": "phpcs",
     "phpstan": "phpstan analyse src -c phpstan.neon --level=7 --no-progress -vvv",
