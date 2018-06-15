@@ -9,7 +9,7 @@ class TmpfsVolume extends Volume
     /**
      * @return string
      */
-    public static function getType(): string
+    public function getType(): string
     {
         return VolumeTypeEnum::TMPFS_VOLUME;
     }
@@ -24,7 +24,7 @@ class TmpfsVolume extends Volume
     public function jsonSerialize(): array
     {
         return array(
-            'type' => self::getType(),
+            'type' => $this->getType(),
             'source' => $this->source,
         );
     }
