@@ -38,6 +38,9 @@ abstract class EventCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
+        // Let's send the list of caught events to Hercule
+        Hercule::setHandledEvents($this->getAllEventNames());
+
         $logLevelConfigurator = new LogLevelConfigurator($output);
         $logLevelConfigurator->configureLogLevel();
 
@@ -48,5 +51,17 @@ abstract class EventCommand extends Command
         $this->output = $output;
 
         $this->executeEvent($payload);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getAllEventNames(): array
+    {
+        return array_map(function (EventCommand $event) {
+            return $event->getEventName();
+        }, \array_filter($this->getApplication()->all(), function (Command $command) {
+            return $command instanceof EventCommand;
+        }));
     }
 }
