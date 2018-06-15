@@ -2,7 +2,6 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Test if Service",
   "description": "Test if the data is a valid Service",
-
   "type": "object",
   "properties": {
     "serviceName": {
@@ -17,7 +16,10 @@
         "internalPorts": {
           "type": "array",
           "items": {
-            "type": ["number", "string"]
+            "type": [
+              "number",
+              "string"
+            ]
           }
         },
         "dependsOn": {
@@ -32,43 +34,59 @@
             "type": "object",
             "properties": {
               "source": {
-                "type": ["number", "string"]
+                "type": [
+                  "number"
+                ]
               },
-              "target":{
-                "type": ["number", "string"]
+              "target": {
+                "type": [
+                  "number"
+                ]
               }
             },
-            "required": ["target"]
+            "required": [
+              "source"
+            ]
           }
         },
         "labels": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": {
-                "type": "string"
-              },
-              "value":{
-                "type": "string"
+          "type": "object",
+          "patternProperties": {
+            "^.*$": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string"
+                }
               }
             },
-            "required": ["key"]
+            "additionalProperties": false
           }
         },
         "environment": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": {
-                "type": "string"
+          "type": "object",
+          "patternProperties": {
+            "^.*$": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "sharedEnvVariable",
+                    "sharedSecret",
+                    "imageEnvVariable",
+                    "containerEnvVariable"
+                  ]
+                }
               },
-              "value":{
-                "type": "string"
-              }
+              "required": [
+                "type"
+              ]
             },
-            "required": ["key"]
+            "additionalProperties": false
           }
         },
         "volumes": {
@@ -78,27 +96,33 @@
             "properties": {
               "type": {
                 "type": "string",
-                "oneOf": [
-                  {"const": "volume"},
-                  {"const": "bind"},
-                  {"const": "tmpfs"}
+                "enum": [
+                  "volume",
+                  "bind",
+                  "tmpfs"
                 ]
               },
-              "source":{
+              "source": {
                 "type": "string"
               },
-              "target":{
+              "target": {
                 "type": "string"
               },
-              "readOnly":{
+              "readOnly": {
                 "type": "boolean"
               }
             },
-            "required": ["type", "source"]
+            "required": [
+              "type",
+              "source"
+            ]
           }
         }
       }
     }
   },
-  "required": ["serviceName", "service"]
+  "required": [
+    "serviceName",
+    "service"
+  ]
 }

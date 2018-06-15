@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class RegistryClientTest extends TestCase
 {
-    public function testImageTags()
+    public function testImageTags() : void
     {
         $client = new RegistryClient();
         $tags = $client->getImageTagsOnDockerHub('thecodingmachine/php');
