@@ -20,10 +20,13 @@ class Hermes
     }
 
     /**
-     * @param mixed[] $payload
+     * @param mixed[]|object $payload
      */
-    public static function dispatchJson(string $event, array $payload): void
+    public static function dispatchJson(string $event, $payload): void
     {
+        if (\is_object($payload) && !$payload instanceof \JsonSerializable) {
+            throw new \RuntimeException('Payload object should implement JsonSerializable. Got an instance of '.\get_class($payload));
+        }
         self::dispatch($event, \json_encode($payload));
     }
 
