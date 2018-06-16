@@ -51,4 +51,40 @@ class Hermes
     {
         self::reply($event, \json_encode($payload));
     }
+
+    /**
+     * @param string[] $images
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public static function setDependencies(array $images): void
+    {
+        $command = ['hermes', 'set:dependencies'];
+        foreach ($images as $image) {
+            $command[] = $image;
+        }
+
+        $process = new Process($command);
+        $process->enableOutput();
+        $process->setTty(true);
+
+        $process->mustRun();
+    }
+
+    /**
+     * @param string[] $events
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public static function setHandledEvents(array $events): void
+    {
+        $command = ['hermes', 'set:handled-events'];
+        foreach ($events as $event) {
+            $command[] = $event;
+        }
+
+        $process = new Process($command);
+        $process->enableOutput();
+        $process->setTty(true);
+
+        $process->mustRun();
+    }
 }
