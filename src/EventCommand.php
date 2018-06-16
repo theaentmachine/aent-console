@@ -39,7 +39,7 @@ abstract class EventCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         // Let's send the list of caught events to Hercule
-        Hercule::setHandledEvents($this->getAllEventNames());
+        Hermes::setHandledEvents($this->getAllEventNames());
 
         $logLevelConfigurator = new LogLevelConfigurator($output);
         $logLevelConfigurator->configureLogLevel();
