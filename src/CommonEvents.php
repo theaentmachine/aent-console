@@ -29,8 +29,7 @@ class CommonEvents
      */
     public function canDispatchServiceOrFail(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
     {
-        // Disableing this whole piece of code until we can properly add an Aent from a container
-        /*$canHandle = Hercule::canHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
+        $canHandle = Hermes::canHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
 
         if (!$canHandle) {
             $output->writeln('<error>Heads up!</error>');
@@ -49,10 +48,10 @@ class CommonEvents
             $answer = $helper->ask($input, $output, $question);
 
             if ($answer === 'y') {
-                Hercule::addAent('theaentmachine/aent-docker-compose');
+                Hermes::setDependencies(['theaentmachine/aent-docker-compose']);
             } else {
                 throw CannotHandleEventException::cannotHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
             }
-        }*/
+        }
     }
 }
