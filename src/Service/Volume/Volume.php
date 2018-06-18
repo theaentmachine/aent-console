@@ -19,5 +19,13 @@ abstract class Volume implements \JsonSerializable
     /**
      * @return string
      */
-    abstract public static function getType(): string;
+    public function getSource(): string
+    {
+        return $this->source;
+    }
+
+    /**
+     * @return string
+     */
+    abstract public function getType(): string;
 }

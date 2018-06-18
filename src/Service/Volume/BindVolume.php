@@ -9,7 +9,7 @@ class BindVolume extends Volume
     /** @var string */
     private $target;
     /** @var bool */
-    protected $readOnly;
+    private $readOnly;
 
     /**
      * BindVolume constructor.
@@ -27,9 +27,25 @@ class BindVolume extends Volume
     /**
      * @return string
      */
-    public static function getType(): string
+    public function getType(): string
     {
         return VolumeTypeEnum::BIND_VOLUME;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTarget(): string
+    {
+        return $this->target;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isReadOnly(): bool
+    {
+        return $this->readOnly;
     }
 
 
@@ -43,7 +59,7 @@ class BindVolume extends Volume
     public function jsonSerialize(): array
     {
         return array(
-            'type' => self::getType(),
+            'type' => $this->getType(),
             'source' => $this->source,
             'target' => $this->target,
             'readOnly' => $this->readOnly,
