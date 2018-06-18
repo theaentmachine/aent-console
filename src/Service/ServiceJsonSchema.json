@@ -13,12 +13,19 @@
         "image": {
           "type": "string"
         },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string"
+            ]
+          }
+        },
         "internalPorts": {
           "type": "array",
           "items": {
             "type": [
-              "number",
-              "string"
+              "number"
             ]
           }
         },

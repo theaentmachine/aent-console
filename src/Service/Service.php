@@ -18,6 +18,8 @@ class Service implements \JsonSerializable
     private $serviceName = '';
     /** @var string|null */
     private $image = null;
+    /** @var string[] */
+    private $command = [];
     /** @var int[] */
     private $internalPorts = [];
     /** @var string[] */
@@ -48,16 +50,17 @@ class Service implements \JsonSerializable
      */
     public static function parsePayload(array $payload): Service
     {
-        $service = new Service();
+        $service = new self();
         $service->checkValidity($payload);
         $service->serviceName = $payload['serviceName'] ?? '';
-        $s = $payload['service'] ?? array();
+        $s = $payload['service'] ?? [];
         if (!empty($s)) {
             $service->image = $s['image'] ?? '';
-            $service->internalPorts = $s['internalPorts'] ?? array();
-            $service->dependsOn = $s['dependsOn'] ?? array();
-            $service->ports = $s['ports'] ?? array();
-            $service->labels = $s['labels'] ?? array();
+            $service->command = $s['command'] ?? [];
+            $service->internalPorts = $s['internalPorts'] ?? [];
+            $service->dependsOn = $s['dependsOn'] ?? [];
+            $service->ports = $s['ports'] ?? [];
+            $service->labels = $s['labels'] ?? [];
             if (!empty($s['environment'])) {
                 foreach ($s['environment'] as $key => $env) {
                     $service->addEnvVar($key, $env['value'], $env['type']);
@@ -90,6 +93,7 @@ class Service implements \JsonSerializable
             'serviceName' => $this->serviceName,
             'service' => array_filter([
                 'image' => $this->image,
+                'command' => $this->command,
                 'internalPorts' => $this->internalPorts,
                 'dependsOn' => $this->dependsOn,
                 'ports' => $this->ports,
@@ -137,6 +141,14 @@ class Service implements \JsonSerializable
     public function getImage(): ?string
     {
         return $this->image;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getCommand(): array
+    {
+        return $this->command;
     }
 
     /**
@@ -204,6 +216,14 @@ class Service implements \JsonSerializable
     }
 
     /**
+     * @param string[] $command
+     */
+    public function setCommand(array $command): void
+    {
+        $this->command = $command;
+    }
+
+    /**
      * @param int[] $internalPorts
      */
     public function setInternalPorts(array $internalPorts): void
@@ -217,6 +237,14 @@ class Service implements \JsonSerializable
     public function setDependsOn(array $dependsOn): void
     {
         $this->dependsOn = $dependsOn;
+    }
+
+    /**
+     * @param string $command
+     */
+    public function addCommand(string $command) : void
+    {
+        $this->command[] = $command;
     }
 
     /**
