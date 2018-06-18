@@ -71,7 +71,7 @@ class CommonEvents
             $message['virtualHost'] = $virtualHost;
         }
 
-        Hermes::dispatchJson(self::NEW_DOCKER_SERVICE_INFO, $message);
+        Hermes::dispatchJson(self::NEW_VIRTUAL_HOST, $message);
     }
 
     /**
