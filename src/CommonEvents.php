@@ -59,7 +59,7 @@ class CommonEvents
     /**
      * @throws CannotHandleEventException
      */
-    public function dispatchNewVirtualHost(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $serviceName, string $virtualPort, string $virtualHost = null): void
+    public function dispatchNewVirtualHost(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $serviceName, int $virtualPort = 80, string $virtualHost = null): void
     {
         $this->canDispatchVirtualHostOrFail($helper, $input, $output);
 
