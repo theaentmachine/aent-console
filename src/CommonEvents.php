@@ -13,6 +13,7 @@ use TheAentMachine\Service\Service;
 class CommonEvents
 {
     private const NEW_DOCKER_SERVICE_INFO = 'NEW_DOCKER_SERVICE_INFO';
+    private const NEW_VIRTUAL_HOST = 'NEW_VIRTUAL_HOST';
 
     /**
      * @throws CannotHandleEventException
@@ -51,6 +52,55 @@ class CommonEvents
                 Hermes::setDependencies(['theaentmachine/aent-docker-compose']);
             } else {
                 throw CannotHandleEventException::cannotHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
+            }
+        }
+    }
+
+    /**
+     * @throws CannotHandleEventException
+     */
+    public function dispatchNewVirtualHost(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $serviceName, string $virtualPort, string $virtualHost = null): void
+    {
+        $this->canDispatchVirtualHostOrFail($helper, $input, $output);
+
+        $message = [
+            'service' => $serviceName,
+            'virtualPort' => $virtualPort
+        ];
+        if ($virtualHost !== null) {
+            $message['virtualHost'] = $virtualHost;
+        }
+
+        Hermes::dispatchJson(self::NEW_DOCKER_SERVICE_INFO, $message);
+    }
+
+    /**
+     * @throws CannotHandleEventException
+     */
+    public function canDispatchVirtualHostOrFail(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
+    {
+        $canHandle = Hermes::canHandleEvent(self::NEW_VIRTUAL_HOST);
+
+        if (!$canHandle) {
+            $output->writeln('<error>Heads up!</error>');
+            $output->writeln('It seems that Aenthill does not know how to bind your container to a domain name. You need to install a reverse proxy for this.');
+            $output->writeln('Traefik is a good reverse proxy. We have an Aent to add Traefik to your project: <info>theaentmachine/aent-traefik</info>.');
+            $question = new Question('Do you want me to add this Aent for you? (y/n) ', 'y');
+            $question->setValidator(function (string $value) {
+                $value = \strtolower(trim($value));
+
+                if ($value !== 'y' && $value !== 'n') {
+                    throw new \InvalidArgumentException('Please type "y" or "n"');
+                }
+
+                return $value;
+            });
+            $answer = $helper->ask($input, $output, $question);
+
+            if ($answer === 'y') {
+                Hermes::setDependencies(['theaentmachine/aent-traefik']);
+            } else {
+                throw CannotHandleEventException::cannotHandleEvent(self::NEW_VIRTUAL_HOST);
             }
         }
     }
