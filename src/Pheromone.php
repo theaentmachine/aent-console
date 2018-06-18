@@ -4,7 +4,7 @@
 namespace TheAentMachine;
 
 use TheAentMachine\Exception\LogLevelException;
-use TheAentMachine\Exception\MissingEnvironementVariableException;
+use TheAentMachine\Exception\MissingEnvironmentVariableException;
 
 /**
  * Utility class to access the Aent configuration settings (stored in environment variables)
@@ -42,7 +42,7 @@ class Pheromone
     {
         $value = \getenv($variableName);
         if ($value === false) {
-            throw MissingEnvironementVariableException::missingEnv($variableName);
+            throw MissingEnvironmentVariableException::missingEnv($variableName);
         }
         return $value;
     }
