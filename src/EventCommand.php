@@ -61,7 +61,7 @@ abstract class EventCommand extends Command
         return array_map(function (EventCommand $event) {
             return $event->getEventName();
         }, \array_filter($this->getApplication()->all(), function (Command $command) {
-            return $command instanceof EventCommand;
+            return $command instanceof EventCommand && !$command->isHidden();
         }));
     }
 }
