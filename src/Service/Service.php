@@ -55,7 +55,7 @@ class Service implements \JsonSerializable
         $service->serviceName = $payload['serviceName'] ?? '';
         $s = $payload['service'] ?? [];
         if (!empty($s)) {
-            $service->image = $s['image'] ?? '';
+            $service->image = $s['image'] ?? null;
             $service->command = $s['command'] ?? [];
             $service->internalPorts = $s['internalPorts'] ?? [];
             $service->dependsOn = $s['dependsOn'] ?? [];
