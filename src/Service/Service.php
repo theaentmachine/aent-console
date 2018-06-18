@@ -16,8 +16,8 @@ class Service implements \JsonSerializable
 {
     /** @var string */
     private $serviceName = '';
-    /** @var string */
-    private $image = '';
+    /** @var string|null */
+    private $image = null;
     /** @var int[] */
     private $internalPorts = [];
     /** @var string[] */
@@ -86,9 +86,9 @@ class Service implements \JsonSerializable
             return $obj->jsonSerialize();
         };
 
-        $array = self::arrayFilterRec(array(
+        $array = array(
             'serviceName' => $this->serviceName,
-            'service' => [
+            'service' => array_filter([
                 'image' => $this->image,
                 'internalPorts' => $this->internalPorts,
                 'dependsOn' => $this->dependsOn,
@@ -96,8 +96,8 @@ class Service implements \JsonSerializable
                 'labels' => $this->labels,
                 'environment' => array_map($jsonSerializeMap, $this->environment),
                 'volumes' => array_map($jsonSerializeMap, $this->volumes),
-            ]
-        ));
+            ])
+        );
 
         $this->checkValidity($array);
         return $array;
@@ -124,22 +124,6 @@ class Service implements \JsonSerializable
     }
 
     /**
-     * Delete all key/value pairs with empty value by recursively using array_filter
-     * @param array $input
-     * @return mixed[] array
-     */
-    private static function arrayFilterRec(array $input): array
-    {
-        foreach ($input as &$value) {
-            if (\is_array($value)) {
-                $value = self::arrayFilterRec($value);
-            }
-        }
-        return array_filter($input);
-    }
-
-
-    /**
      * @return string
      */
     public function getServiceName(): string
@@ -148,9 +132,9 @@ class Service implements \JsonSerializable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getImage(): string
+    public function getImage(): ?string
     {
         return $this->image;
     }
@@ -212,9 +196,9 @@ class Service implements \JsonSerializable
     }
 
     /**
-     * @param string $image
+     * @param string|null $image
      */
-    public function setImage(string $image): void
+    public function setImage(?string $image): void
     {
         $this->image = $image;
     }
