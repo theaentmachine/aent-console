@@ -14,6 +14,7 @@ class ServiceTest extends TestCase
   "serviceName" : "foo",
   "service": {
     "image"         : "foo",
+    "command"       : ["foo", "-bar", "-baz", "--qux"],
     "internalPorts" : [1, 2, 3],
     "dependsOn"     : ["foo", "bar"],
     "ports"         : [{"source": 80, "target": 8080}],

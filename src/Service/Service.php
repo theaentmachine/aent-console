@@ -16,8 +16,10 @@ class Service implements \JsonSerializable
 {
     /** @var string */
     private $serviceName = '';
-    /** @var string */
-    private $image = '';
+    /** @var string|null */
+    private $image = null;
+    /** @var string[] */
+    private $command = [];
     /** @var int[] */
     private $internalPorts = [];
     /** @var string[] */
@@ -48,16 +50,17 @@ class Service implements \JsonSerializable
      */
     public static function parsePayload(array $payload): Service
     {
-        $service = new Service();
+        $service = new self();
         $service->checkValidity($payload);
         $service->serviceName = $payload['serviceName'] ?? '';
-        $s = $payload['service'] ?? array();
+        $s = $payload['service'] ?? [];
         if (!empty($s)) {
-            $service->image = $s['image'] ?? '';
-            $service->internalPorts = $s['internalPorts'] ?? array();
-            $service->dependsOn = $s['dependsOn'] ?? array();
-            $service->ports = $s['ports'] ?? array();
-            $service->labels = $s['labels'] ?? array();
+            $service->image = $s['image'] ?? null;
+            $service->command = $s['command'] ?? [];
+            $service->internalPorts = $s['internalPorts'] ?? [];
+            $service->dependsOn = $s['dependsOn'] ?? [];
+            $service->ports = $s['ports'] ?? [];
+            $service->labels = $s['labels'] ?? [];
             if (!empty($s['environment'])) {
                 foreach ($s['environment'] as $key => $env) {
                     $service->addEnvVar($key, $env['value'], $env['type']);
@@ -86,18 +89,19 @@ class Service implements \JsonSerializable
             return $obj->jsonSerialize();
         };
 
-        $array = self::arrayFilterRec(array(
+        $array = array(
             'serviceName' => $this->serviceName,
-            'service' => [
+            'service' => array_filter([
                 'image' => $this->image,
+                'command' => $this->command,
                 'internalPorts' => $this->internalPorts,
                 'dependsOn' => $this->dependsOn,
                 'ports' => $this->ports,
                 'labels' => $this->labels,
                 'environment' => array_map($jsonSerializeMap, $this->environment),
                 'volumes' => array_map($jsonSerializeMap, $this->volumes),
-            ]
-        ));
+            ])
+        );
 
         $this->checkValidity($array);
         return $array;
@@ -124,22 +128,6 @@ class Service implements \JsonSerializable
     }
 
     /**
-     * Delete all key/value pairs with empty value by recursively using array_filter
-     * @param array $input
-     * @return mixed[] array
-     */
-    private static function arrayFilterRec(array $input): array
-    {
-        foreach ($input as &$value) {
-            if (\is_array($value)) {
-                $value = self::arrayFilterRec($value);
-            }
-        }
-        return array_filter($input);
-    }
-
-
-    /**
      * @return string
      */
     public function getServiceName(): string
@@ -148,11 +136,19 @@ class Service implements \JsonSerializable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getImage(): string
+    public function getImage(): ?string
     {
         return $this->image;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getCommand(): array
+    {
+        return $this->command;
     }
 
     /**
@@ -212,11 +208,19 @@ class Service implements \JsonSerializable
     }
 
     /**
-     * @param string $image
+     * @param string|null $image
      */
-    public function setImage(string $image): void
+    public function setImage(?string $image): void
     {
         $this->image = $image;
+    }
+
+    /**
+     * @param string[] $command
+     */
+    public function setCommand(array $command): void
+    {
+        $this->command = $command;
     }
 
     /**
@@ -233,6 +237,14 @@ class Service implements \JsonSerializable
     public function setDependsOn(array $dependsOn): void
     {
         $this->dependsOn = $dependsOn;
+    }
+
+    /**
+     * @param string $command
+     */
+    public function addCommand(string $command) : void
+    {
+        $this->command[] = $command;
     }
 
     /**
