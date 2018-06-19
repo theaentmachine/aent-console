@@ -104,4 +104,13 @@ JSON;
         $array = json_decode(self::UNKNOWN_VOLUME_TYPE_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
+
+    public function testLabels(): void
+    {
+        $service = new Service();
+        $service->setServiceName('foobar');
+        $service->addLabel('traefik.backend', 'foobar');
+        $array = $service->jsonSerialize();
+        $this->assertEquals(['traefik.backend' => ['value'=>'foobar']], $array['service']['labels'][0]);
+    }
 }
