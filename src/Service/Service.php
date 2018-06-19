@@ -282,7 +282,7 @@ class Service implements \JsonSerializable
     public function addLabel(string $key, string $value): void
     {
         $this->labels[$key] = array(
-            'values' => $value,
+            'value' => $value,
         );
     }
 
