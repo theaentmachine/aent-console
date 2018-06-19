@@ -1,10 +1,7 @@
 <?php
 namespace TheAentMachine\Exception;
 
-use TheAentMachine\Enum\PheromoneEnum;
-use TheAentMachine\LogLevelConfigurator;
-
-class MissingEnvironementVariableException extends AenthillException
+class MissingEnvironmentVariableException extends AenthillException
 {
     public static function missingEnv(string $variableName): self
     {

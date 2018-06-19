@@ -2,7 +2,6 @@
 namespace TheAentMachine;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use TheAentMachine\Enum\PheromoneEnum;
 use TheAentMachine\Exception\LogLevelException;
 
 class LogLevelConfigurator

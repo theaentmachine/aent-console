@@ -16,17 +16,13 @@
         "command": {
           "type": "array",
           "items": {
-            "type": [
-              "string"
-            ]
+            "type": "string"
           }
         },
         "internalPorts": {
           "type": "array",
           "items": {
-            "type": [
-              "number"
-            ]
+            "type": "number"
           }
         },
         "dependsOn": {
@@ -46,14 +42,13 @@
                 ]
               },
               "target": {
-                "type": [
-                  "number"
-                ]
+                "type": "number"
               }
             },
             "required": [
               "source"
-            ]
+            ],
+            "additionalProperties": false
           }
         },
         "labels": {
@@ -64,8 +59,15 @@
               "properties": {
                 "value": {
                   "type": "string"
+                },
+                "comment": {
+                  "type": "string"
+                },
+                "isCommented": {
+                  "type": "boolean"
                 }
-              }
+              },
+              "additionalProperties": false
             },
             "additionalProperties": false
           }
@@ -87,11 +89,18 @@
                     "imageEnvVariable",
                     "containerEnvVariable"
                   ]
+                },
+                "comment": {
+                  "type": "string"
+                },
+                "isCommented": {
+                  "type": "boolean"
                 }
               },
               "required": [
                 "type"
-              ]
+              ],
+              "additionalProperties": false
             },
             "additionalProperties": false
           }
@@ -122,7 +131,8 @@
             "required": [
               "type",
               "source"
-            ]
+            ],
+            "additionalProperties": false
           }
         }
       }
