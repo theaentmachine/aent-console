@@ -13,28 +13,25 @@ class ServiceTest extends TestCase
 {
   "serviceName" : "foo",
   "service": {
-    "image"         : "foo",
+    "image"         : "foo/bar:baz",
     "command"       : ["foo", "-bar", "-baz", "--qux"],
     "internalPorts" : [1, 2, 3],
     "dependsOn"     : ["foo", "bar"],
     "ports"         : [{"source": 80, "target": 8080}],
     "environment"   : {
-                        "FOO": {
-                          "value": "fooo",
-                          "type": "containerEnvVariable"
-                        }
+                        "FOO": {"value": "foo", "type": "sharedEnvVariable"},
+                        "BAR": {"value": "bar", "type": "sharedSecret"},
+                        "BAZ": {"value": "baz", "type": "imageEnvVariable"},
+                        "QUX": {"value": "qux", "type": "containerEnvVariable"}
                       },
     "labels"        : {
                         "foo": {"value": "fooo"},
                         "bar": {"value": "baar"}
                       },               
     "volumes"       : [
-                        {
-                          "type"      : "volume",
-                          "source"    : "foo",
-                          "target"    : "bar",
-                          "readOnly"  : true
-                        }
+                        {"type": "volume", "source": "foo", "target": "/foo", "readOnly": true},
+                        {"type": "bind", "source": "/bar", "target": "/bar", "readOnly": false},
+                        {"type": "tmpfs", "source": "baz"}
                       ]
   }
 }
@@ -76,7 +73,7 @@ JSON;
 }
 JSON;
 
-    public function testValidPayload() : void
+    public function testValidPayload(): void
     {
         $array = json_decode(self::VALID_PAYLOAD, true);
         $service = Service::parsePayload($array);
@@ -84,33 +81,50 @@ JSON;
         $this->assertEquals($array, $out);
     }
 
-    public function testMissingServiceNamePayload() : void
+    public function testMissingServiceNamePayload(): void
     {
         $this->expectException(ServiceException::class);
         $array = json_decode(self::MISSING_SERVICE_NAME_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
-    public function testUnknownEnvVariableTypePayload() : void
+    public function testUnknownEnvVariableTypePayload(): void
     {
         $this->expectException(ServiceException::class);
         $array = json_decode(self::UNKNOWN_ENV_VARIABLE_TYPE_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
-    public function testUnknownVolumeTypePayload() : void
+    public function testUnknownVolumeTypePayload(): void
     {
         $this->expectException(ServiceException::class);
         $array = json_decode(self::UNKNOWN_VOLUME_TYPE_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
-    public function testLabels(): void
+    public function testSettersAndAdders(): void
     {
-        $service = new Service();
-        $service->setServiceName('foobar');
-        $service->addLabel('traefik.backend', 'foobar');
-        $array = $service->jsonSerialize();
-        $this->assertEquals(['traefik.backend' => ['value'=>'foobar']], $array['service']['labels']);
+        $s = new Service();
+        $s->setServiceName('foo');
+        $s->setImage('foo/bar:baz');
+        $s->setCommand(['foo', '-bar', '-baz']);
+        $s->addCommand('--qux');
+        $s->setInternalPorts([1, 2]);
+        $s->addInternalPort(3);
+        $s->setDependsOn(['foo']);
+        $s->addDependsOn('bar');
+        $s->addPort(80, 8080);
+        $s->addLabel('foo', 'fooo');
+        $s->addLabel('bar', 'baar');
+        $s->addSharedEnvVariable('FOO', 'foo');
+        $s->addSharedSecret('BAR', 'bar');
+        $s->addImageEnvVariable('BAZ', 'baz');
+        $s->addContainerEnvVariable('QUX', 'qux');
+        $s->addNamedVolume('foo', '/foo', true);
+        $s->addBindVolume('/bar', '/bar', false);
+        $s->addTmpfsVolume('baz');
+        $outArray = $s->jsonSerialize();
+        $expectedArray = json_decode(self::VALID_PAYLOAD, true);
+        $this->assertEquals($outArray, $expectedArray);
     }
 }
