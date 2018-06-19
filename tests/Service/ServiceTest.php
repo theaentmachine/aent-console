@@ -111,6 +111,6 @@ JSON;
         $service->setServiceName('foobar');
         $service->addLabel('traefik.backend', 'foobar');
         $array = $service->jsonSerialize();
-        $this->assertEquals(['traefik.backend' => ['value'=>'foobar']], $array['service']['labels'][0]);
+        $this->assertEquals(['traefik.backend' => ['value'=>'foobar']], $array['service']['labels']);
     }
 }
