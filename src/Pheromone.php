@@ -70,7 +70,13 @@ class Pheromone
 
     public static function getOriginContainer(): ?string
     {
-        $from = getenv('PHEROMONE_FROM');
+        $from = getenv('PHEROMONE_FROM_CONTAINER_ID');
+        return $from === false ? null : $from;
+    }
+
+    public static function getOriginImage(): ?string
+    {
+        $from = getenv('PHEROMONE_FROM_IMAGE_NAME');
         return $from === false ? null : $from;
     }
 }
