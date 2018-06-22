@@ -46,6 +46,10 @@ abstract class EventCommand extends Command
 
         $this->log = new ConsoleLogger($output);
 
+        if (!$this->isHidden()) {
+            $this->log->info(Pheromone::getWhoAmI());
+        }
+
         $payload = $input->getArgument('payload');
         $this->input = $input;
         $this->output = $output;
