@@ -8,10 +8,19 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * A command that does nothing
+ * A special command that is used to receive replies from a dispatch
  */
-class VoidCommand extends EventCommand
+class ReplyCommand extends EventCommand
 {
+
+    private $replyAggregator;
+
+    public function __construct(ReplyAggregator $replyAggregator)
+    {
+        parent::__construct();
+        $this->replyAggregator = $replyAggregator;
+    }
+
     protected function configure()
     {
         parent::configure();
@@ -20,13 +29,12 @@ class VoidCommand extends EventCommand
 
     protected function getEventName(): string
     {
-        return 'void';
+        return 'reply';
     }
 
     protected function executeEvent(?string $payload): ?string
     {
-        // Let's do nothing.
-        $this->log->debug('Event cannot be handled. Ignoring.');
+        $this->replyAggregator->storeReply($payload);
         return null;
     }
 }

@@ -26,7 +26,7 @@ abstract class EventCommand extends Command
     protected $output;
 
     abstract protected function getEventName(): string;
-    abstract protected function executeEvent(?string $payload): void;
+    abstract protected function executeEvent(?string $payload): ?string;
 
     protected function configure()
     {
@@ -50,7 +50,12 @@ abstract class EventCommand extends Command
         $this->input = $input;
         $this->output = $output;
 
-        $this->executeEvent($payload);
+        $result = $this->executeEvent($payload);
+
+        // Now, let's send a "reply" event
+        if ($result !== null) {
+            Hermes::reply('reply', $result);
+        }
     }
 
     /**

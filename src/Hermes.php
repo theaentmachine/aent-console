@@ -5,8 +5,16 @@ use Symfony\Component\Process\Process;
 
 class Hermes
 {
-    public static function dispatch(string $event, ?string $payload = null): void
+    /**
+     * @param string $event
+     * @param null|string $payload
+     * @return string[] The array of replies received from all Aents that replied.
+     */
+    public static function dispatch(string $event, ?string $payload = null): array
     {
+        $replyAggregator = new ReplyAggregator();
+        $replyAggregator->clear();
+
         $command = ['hermes', 'dispatch', $event];
         if (!empty($payload)) {
             $command[] = $payload;
@@ -17,17 +25,25 @@ class Hermes
         $process->setTty(true);
 
         $process->mustRun();
+
+        $replies = $replyAggregator->getReplies();
+        return $replies;
     }
 
     /**
      * @param mixed[]|object $payload
+     * @return mixed[]
      */
-    public static function dispatchJson(string $event, $payload): void
+    public static function dispatchJson(string $event, $payload): array
     {
         if (\is_object($payload) && !$payload instanceof \JsonSerializable) {
             throw new \RuntimeException('Payload object should implement JsonSerializable. Got an instance of '.\get_class($payload));
         }
-        self::dispatch($event, \json_encode($payload));
+        $replies = self::dispatch($event, \json_encode($payload));
+
+        return \array_map(function (string $reply) {
+            return \GuzzleHttp\json_decode($reply, true);
+        }, $replies);
     }
 
     public static function reply(string $event, ?string $payload = null): void
