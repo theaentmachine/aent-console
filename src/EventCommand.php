@@ -24,6 +24,10 @@ abstract class EventCommand extends Command
      * @var OutputInterface
      */
     protected $output;
+    /**
+     * @var AentHelper
+     */
+    private $aentHelper;
 
     abstract protected function getEventName(): string;
     abstract protected function executeEvent(?string $payload): ?string;
@@ -38,6 +42,8 @@ abstract class EventCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
+        $this->aentHelper = new AentHelper($input, $output, $this->getHelper('question'), $this->getHelper('formatter'));
+
         // Let's send the list of caught events to Hercule
         Hermes::setHandledEvents($this->getAllEventNames());
 
@@ -68,5 +74,13 @@ abstract class EventCommand extends Command
         }, \array_filter($this->getApplication()->all(), function (Command $command) {
             return $command instanceof EventCommand && !$command->isHidden();
         }));
+    }
+
+    protected function getAentHelper(): AentHelper
+    {
+        if ($this->aentHelper === null) {
+            throw new \BadMethodCallException('Function getAentHelper can only be called inside "execute(xxx)" functions.');
+        }
+        return $this->aentHelper;
     }
 }
