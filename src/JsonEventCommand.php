@@ -17,10 +17,11 @@ abstract class JsonEventCommand extends EventCommand
 {
     /**
      * @param mixed[] $payload
+     * @return mixed[]|null
      */
-    abstract protected function executeJsonEvent(array $payload): void;
+    abstract protected function executeJsonEvent(array $payload): ?array;
 
-    protected function executeEvent(?string $payload): void
+    protected function executeEvent(?string $payload): ?string
     {
         if ($payload === null) {
             throw new \InvalidArgumentException('Empty payload. JSON message expected.');
@@ -31,6 +32,10 @@ abstract class JsonEventCommand extends EventCommand
                 'json_decode error: ' . json_last_error_msg()
             );
         }
-        $this->executeJsonEvent($data);
+        $result = $this->executeJsonEvent($data);
+        if ($result === null) {
+            return null;
+        }
+        return \json_encode($result);
     }
 }

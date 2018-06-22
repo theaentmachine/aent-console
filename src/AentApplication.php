@@ -19,6 +19,7 @@ class AentApplication extends Application
         parent::__construct();
         $this->voidCommand = new VoidCommand();
         $this->add($this->voidCommand);
+        $this->add(new ReplyCommand(new ReplyAggregator()));
     }
 
     /**
