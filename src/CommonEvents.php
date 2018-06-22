@@ -58,8 +58,9 @@ class CommonEvents
 
     /**
      * @throws CannotHandleEventException
+     * @return array[] Returns the responses
      */
-    public function dispatchNewVirtualHost(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $serviceName, int $virtualPort = 80, string $virtualHost = null): void
+    public function dispatchNewVirtualHost(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $serviceName, int $virtualPort = 80, string $virtualHost = null): ?array
     {
         $this->canDispatchVirtualHostOrFail($helper, $input, $output);
 
@@ -71,7 +72,7 @@ class CommonEvents
             $message['virtualHost'] = $virtualHost;
         }
 
-        Hermes::dispatchJson(self::NEW_VIRTUAL_HOST, $message);
+        return Hermes::dispatchJson(self::NEW_VIRTUAL_HOST, $message);
     }
 
     /**
