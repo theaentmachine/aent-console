@@ -100,7 +100,6 @@ class Question
                 $text .= ' [y/N]';
             } else {
                 throw new \InvalidArgumentException('Default value must be "y" or "n".');
-
             }
         } elseif ($this->yesNoQuestion) {
             $text .= ' [y/n]';
