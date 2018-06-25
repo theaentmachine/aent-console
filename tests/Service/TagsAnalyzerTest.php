@@ -17,4 +17,14 @@ class TagsAnalyzerTest extends TestCase
             '1', '1.1', '1.0', '1.1.1', '1.0.5'
         ], $results);
     }
+
+    public function testNonWellBalancedTryy()
+    {
+        $tagsAnalyzer = new TagsAnalyzer();
+        $results = $tagsAnalyzer->filterBestTags(['5', '4.6']);
+
+        $this->assertEquals([
+            '5', '4.6'
+        ], $results);
+    }
 }
