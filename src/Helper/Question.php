@@ -35,7 +35,7 @@ class Question
      */
     private $compulsory = false;
     /**
-     * @var callable
+     * @var callable|null
      */
     private $validator;
     /**
@@ -99,8 +99,10 @@ class Question
             } elseif ($this->default === 'n') {
                 $text .= ' [y/N]';
             } else {
-                $text .= ' [y/n]';
+                throw new \InvalidArgumentException('Default value must be "y" or "n".');
             }
+        } elseif ($this->yesNoQuestion) {
+            $text .= ' [y/n]';
         }
         $text .= ': ';
 
@@ -110,7 +112,8 @@ class Question
 
         if ($this->yesNoQuestion) {
             $validator = function (?string $response) use ($validator) {
-                $response = trim(\strtolower($response));
+                $response = $response ?? '';
+                $response = \strtolower(trim($response));
                 if (!\in_array($response, ['y', 'n', 'yes', 'no'])) {
                     throw new \InvalidArgumentException('Answer must be "y" or "n"');
                 }
@@ -121,6 +124,7 @@ class Question
 
         if ($this->helpText !== null) {
             $validator = function (?string $response) use ($validator) {
+                $response = $response ?? '';
                 if (trim($response) === '?') {
                     $this->output->writeln($this->helpText ?: '');
                     return '?';
@@ -131,6 +135,7 @@ class Question
 
         if ($this->compulsory) {
             $validator = function (?string $response) use ($validator) {
+                $response = $response ?? '';
                 if (trim($response) === '') {
                     throw new \InvalidArgumentException('This field is compulsory.');
                 }

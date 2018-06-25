@@ -40,7 +40,7 @@ class Service implements \JsonSerializable
      */
     public function __construct()
     {
-        $this->validatorSchema = json_decode(file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
+        $this->validatorSchema = json_decode((string) file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
 
     /**
@@ -115,7 +115,7 @@ class Service implements \JsonSerializable
     private function checkValidity($data): bool
     {
         if (\is_array($data)) {
-            $data = json_decode(json_encode($data), false);
+            $data = \GuzzleHttp\json_decode(\GuzzleHttp\json_encode($data), false);
         }
         $validator = new Validator();
         $result = $validator->dataValidation($data, $this->validatorSchema);

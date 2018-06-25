@@ -60,7 +60,11 @@ class ReplyAggregator
         $i = 0;
         $replies = [];
         while (\file_exists($this->replyDirectory.'tmp'.$i)) {
-            $replies[] = \file_get_contents($this->replyDirectory.'tmp'.$i);
+            $content = \file_get_contents($this->replyDirectory.'tmp'.$i);
+            if ($content === false) {
+                throw new \RuntimeException('Failed to load file '.$this->replyDirectory.'tmp'.$i);
+            }
+            $replies[] = $content;
             $i++;
         }
         return $replies;
