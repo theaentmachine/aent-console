@@ -1,7 +1,6 @@
 <?php
 namespace TheAentMachine\Helper;
 
-
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -86,7 +85,7 @@ class Question
         return $this;
     }
 
-    public function ask()
+    public function ask(): string
     {
         $text = $this->question;
         if ($this->helpText) {
@@ -110,7 +109,7 @@ class Question
         $validator = $this->validator;
 
         if ($this->yesNoQuestion) {
-            $validator = function(?string $response) use ($validator) {
+            $validator = function (?string $response) use ($validator) {
                 $response = trim(\strtolower($response));
                 if (!\in_array($response, ['y', 'n', 'yes', 'no'])) {
                     throw new \InvalidArgumentException('Answer must be "y" or "n"');
@@ -120,10 +119,10 @@ class Question
             };
         }
 
-        if ($this->helpText) {
-            $validator = function(?string $response) use ($validator) {
+        if ($this->helpText !== null) {
+            $validator = function (?string $response) use ($validator) {
                 if (trim($response) === '?') {
-                    $this->output->writeln($this->helpText);
+                    $this->output->writeln($this->helpText ?: '');
                     return '?';
                 }
                 return $validator ? $validator($response) : $response;
@@ -131,7 +130,7 @@ class Question
         }
 
         if ($this->compulsory) {
-            $validator = function(?string $response) use ($validator) {
+            $validator = function (?string $response) use ($validator) {
                 if (trim($response) === '') {
                     throw new \InvalidArgumentException('This field is compulsory.');
                 }

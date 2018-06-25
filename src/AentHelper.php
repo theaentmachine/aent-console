@@ -104,7 +104,6 @@ class AentHelper
         $this->output->writeln("Please choose your $applicationName version.");
         if (!empty($proposedTags)) {
             $this->output->writeln('Possible values include: <info>'.\implode('</info>, <info>', $proposedTags).'</info>');
-
         }
         $this->output->writeln('Enter "v" to view all available versions, "?" for help');
         $question = new Question(
