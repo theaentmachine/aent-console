@@ -136,10 +136,15 @@
           }
         }
       }
+    },
+    "dockerFileCommands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [
-    "serviceName",
-    "service"
+    "serviceName"
   ]
 }

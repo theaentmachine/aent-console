@@ -33,7 +33,12 @@ class ServiceTest extends TestCase
                         {"type": "bind", "source": "/bar", "target": "/bar", "readOnly": false},
                         {"type": "tmpfs", "source": "baz"}
                       ]
-  }
+  },
+  "dockerfileCommands": [
+      "FROM foo",
+      "COPY bar",
+      "RUN baz"
+  ]
 }
 JSON;
 
@@ -123,6 +128,9 @@ JSON;
         $s->addNamedVolume('foo', '/foo', true);
         $s->addBindVolume('/bar', '/bar', false);
         $s->addTmpfsVolume('baz');
+        $s->addDockerfileCommand('FROM foo');
+        $s->addDockerfileCommand('COPY bar');
+        $s->addDockerfileCommand('RUN baz');
         $outArray = $s->jsonSerialize();
         $expectedArray = json_decode(self::VALID_PAYLOAD, true);
         $this->assertEquals($outArray, $expectedArray);
