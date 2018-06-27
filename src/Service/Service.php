@@ -34,13 +34,15 @@ class Service implements \JsonSerializable
     private $volumes = [];
     /** @var \stdClass */
     private $validatorSchema;
+    /** @var string[] */
+    private $dockerfileCommands = [];
 
     /**
      * Service constructor.
      */
     public function __construct()
     {
-        $this->validatorSchema = json_decode((string) file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
+        $this->validatorSchema = json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
 
     /**
@@ -72,6 +74,7 @@ class Service implements \JsonSerializable
                 }
             }
         }
+        $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
         return $service;
     }
 
@@ -100,8 +103,12 @@ class Service implements \JsonSerializable
                 'labels' => $this->labels,
                 'environment' => array_map($jsonSerializeMap, $this->environment),
                 'volumes' => array_map($jsonSerializeMap, $this->volumes),
-            ])
+            ]),
         );
+
+        if (!empty($this->dockerfileCommands)) {
+            $array['dockerfileCommands'] = $this->dockerfileCommands;
+        }
 
         $this->checkValidity($array);
         return $array;
@@ -200,6 +207,14 @@ class Service implements \JsonSerializable
     }
 
     /**
+     * @return string[]
+     */
+    public function getDockerfileCommands(): array
+    {
+        return $this->dockerfileCommands;
+    }
+
+    /**
      * @param string $serviceName
      */
     public function setServiceName(string $serviceName): void
@@ -242,7 +257,7 @@ class Service implements \JsonSerializable
     /**
      * @param string $command
      */
-    public function addCommand(string $command) : void
+    public function addCommand(string $command): void
     {
         $this->command[] = $command;
     }
@@ -398,5 +413,13 @@ class Service implements \JsonSerializable
     public function addTmpfsVolume(string $source): void
     {
         $this->volumes[] = new TmpfsVolume($source);
+    }
+
+    /**
+     * @param string $dockerfileCommand
+     */
+    public function addDockerfileCommand(string $dockerfileCommand): void
+    {
+        $this->dockerfileCommands[] = $dockerfileCommand;
     }
 }
