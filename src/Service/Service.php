@@ -92,26 +92,31 @@ class Service implements \JsonSerializable
             return $obj->jsonSerialize();
         };
 
-        $array = array(
+        $json = array(
             'serviceName' => $this->serviceName,
-            'service' => array_filter([
-                'image' => $this->image,
-                'command' => $this->command,
-                'internalPorts' => $this->internalPorts,
-                'dependsOn' => $this->dependsOn,
-                'ports' => $this->ports,
-                'labels' => $this->labels,
-                'environment' => array_map($jsonSerializeMap, $this->environment),
-                'volumes' => array_map($jsonSerializeMap, $this->volumes),
-            ]),
         );
 
-        if (!empty($this->dockerfileCommands)) {
-            $array['dockerfileCommands'] = $this->dockerfileCommands;
+        $service = array_filter([
+            'image' => $this->image,
+            'command' => $this->command,
+            'internalPorts' => $this->internalPorts,
+            'dependsOn' => $this->dependsOn,
+            'ports' => $this->ports,
+            'labels' => $this->labels,
+            'environment' => array_map($jsonSerializeMap, $this->environment),
+            'volumes' => array_map($jsonSerializeMap, $this->volumes),
+        ]);
+
+        if (!empty($service)) {
+            $json['service'] = $service;
         }
 
-        $this->checkValidity($array);
-        return $array;
+        if (!empty($this->dockerfileCommands)) {
+            $json['dockerfileCommands'] = $this->dockerfileCommands;
+        }
+
+        $this->checkValidity($json);
+        return $json;
     }
 
     /**
