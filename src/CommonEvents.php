@@ -12,7 +12,7 @@ use TheAentMachine\Service\Service;
 
 class CommonEvents
 {
-    private const NEW_DOCKER_SERVICE_INFO = 'NEW_DOCKER_SERVICE_INFO';
+    private const NEW_SERVICE = 'NEW_SERVICE';
     private const NEW_VIRTUAL_HOST = 'NEW_VIRTUAL_HOST';
 
     /**
@@ -22,7 +22,7 @@ class CommonEvents
     {
         $this->canDispatchServiceOrFail($helper, $input, $output);
 
-        Hermes::dispatchJson(self::NEW_DOCKER_SERVICE_INFO, $service);
+        Hermes::dispatchJson(self::NEW_SERVICE, $service);
     }
 
     /**
@@ -30,7 +30,7 @@ class CommonEvents
      */
     public function canDispatchServiceOrFail(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
     {
-        $canHandle = Hermes::canHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
+        $canHandle = Hermes::canHandleEvent(self::NEW_SERVICE);
 
         if (!$canHandle) {
             $output->writeln('<error>Heads up!</error>');
@@ -51,7 +51,7 @@ class CommonEvents
             if ($answer === 'y') {
                 Hermes::setDependencies(['theaentmachine/aent-docker-compose']);
             } else {
-                throw CannotHandleEventException::cannotHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
+                throw CannotHandleEventException::cannotHandleEvent(self::NEW_SERVICE);
             }
         }
     }
