@@ -39,21 +39,21 @@ class TagsAnalyzer
         // List of tags with the maximum precision and the highest point value.
         $maxLeafs = $this->getMaxLeafs($tree);
 
-        $otherVersions = [];
+        $versionsByKey = [];
 
         foreach ($maxLeafs as $tag) {
             while (true) {
+                if (\in_array($tag, $versions, true)) {
+                    $versionsByKey[$tag] = true;
+                }
                 $tag = $this->shortenTag($tag);
                 if ($tag === null) {
                     break;
                 }
-                if (\in_array($tag, $versions)) {
-                    $otherVersions[$tag] = true;
-                }
             }
         }
 
-        $interestingVersion = \array_merge($maxLeafs, \array_keys($otherVersions));
+        $interestingVersion = \array_keys($versionsByKey);
 
         \usort($interestingVersion, [$this, 'compareVersion']);
 
@@ -67,6 +67,9 @@ class TagsAnalyzer
     private function getMaxLeafs(array $subtree): array
     {
         if ($this->isLeaf($subtree)) {
+            if (empty($subtree)) {
+                return ['0'];
+            }
             return [max(\array_keys($subtree))];
         }
         $arr = [];

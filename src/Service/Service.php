@@ -34,13 +34,15 @@ class Service implements \JsonSerializable
     private $volumes = [];
     /** @var \stdClass */
     private $validatorSchema;
+    /** @var string[] */
+    private $dockerfileCommands = [];
 
     /**
      * Service constructor.
      */
     public function __construct()
     {
-        $this->validatorSchema = json_decode(file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
+        $this->validatorSchema = json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
 
     /**
@@ -72,6 +74,7 @@ class Service implements \JsonSerializable
                 }
             }
         }
+        $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
         return $service;
     }
 
@@ -89,22 +92,31 @@ class Service implements \JsonSerializable
             return $obj->jsonSerialize();
         };
 
-        $array = array(
+        $json = array(
             'serviceName' => $this->serviceName,
-            'service' => array_filter([
-                'image' => $this->image,
-                'command' => $this->command,
-                'internalPorts' => $this->internalPorts,
-                'dependsOn' => $this->dependsOn,
-                'ports' => $this->ports,
-                'labels' => $this->labels,
-                'environment' => array_map($jsonSerializeMap, $this->environment),
-                'volumes' => array_map($jsonSerializeMap, $this->volumes),
-            ])
         );
 
-        $this->checkValidity($array);
-        return $array;
+        $service = array_filter([
+            'image' => $this->image,
+            'command' => $this->command,
+            'internalPorts' => $this->internalPorts,
+            'dependsOn' => $this->dependsOn,
+            'ports' => $this->ports,
+            'labels' => $this->labels,
+            'environment' => array_map($jsonSerializeMap, $this->environment),
+            'volumes' => array_map($jsonSerializeMap, $this->volumes),
+        ]);
+
+        if (!empty($service)) {
+            $json['service'] = $service;
+        }
+
+        if (!empty($this->dockerfileCommands)) {
+            $json['dockerfileCommands'] = $this->dockerfileCommands;
+        }
+
+        $this->checkValidity($json);
+        return $json;
     }
 
     /**
@@ -115,7 +127,7 @@ class Service implements \JsonSerializable
     private function checkValidity($data): bool
     {
         if (\is_array($data)) {
-            $data = json_decode(json_encode($data), false);
+            $data = \GuzzleHttp\json_decode(\GuzzleHttp\json_encode($data), false);
         }
         $validator = new Validator();
         $result = $validator->dataValidation($data, $this->validatorSchema);
@@ -200,6 +212,14 @@ class Service implements \JsonSerializable
     }
 
     /**
+     * @return string[]
+     */
+    public function getDockerfileCommands(): array
+    {
+        return $this->dockerfileCommands;
+    }
+
+    /**
      * @param string $serviceName
      */
     public function setServiceName(string $serviceName): void
@@ -242,7 +262,7 @@ class Service implements \JsonSerializable
     /**
      * @param string $command
      */
-    public function addCommand(string $command) : void
+    public function addCommand(string $command): void
     {
         $this->command[] = $command;
     }
@@ -398,5 +418,13 @@ class Service implements \JsonSerializable
     public function addTmpfsVolume(string $source): void
     {
         $this->volumes[] = new TmpfsVolume($source);
+    }
+
+    /**
+     * @param string $dockerfileCommand
+     */
+    public function addDockerfileCommand(string $dockerfileCommand): void
+    {
+        $this->dockerfileCommands[] = $dockerfileCommand;
     }
 }

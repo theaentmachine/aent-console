@@ -36,6 +36,6 @@ abstract class JsonEventCommand extends EventCommand
         if ($result === null) {
             return null;
         }
-        return \json_encode($result);
+        return \GuzzleHttp\json_encode($result);
     }
 }

@@ -39,7 +39,7 @@ class Hermes
         if (\is_object($payload) && !$payload instanceof \JsonSerializable) {
             throw new \RuntimeException('Payload object should implement JsonSerializable. Got an instance of '.\get_class($payload));
         }
-        $replies = self::dispatch($event, \json_encode($payload));
+        $replies = self::dispatch($event, \GuzzleHttp\json_encode($payload));
 
         return \array_map(function (string $reply) {
             return \GuzzleHttp\json_decode($reply, true);
@@ -65,7 +65,7 @@ class Hermes
      */
     public static function replyJson(string $event, array $payload): void
     {
-        self::reply($event, \json_encode($payload));
+        self::reply($event, \GuzzleHttp\json_encode($payload));
     }
 
     /**
@@ -113,6 +113,9 @@ class Hermes
         $containerProjectDir = Pheromone::getContainerProjectDirectory();
 
         $aenthillJSONstr = file_get_contents($containerProjectDir . '/aenthill.json');
+        if ($aenthillJSONstr === false) {
+            throw new \RuntimeException('Failed to load file '.$containerProjectDir . '/aenthill.json');
+        }
         $aenthillJSON = \GuzzleHttp\json_decode($aenthillJSONstr, true);
 
         $aents = array();
