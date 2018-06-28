@@ -127,7 +127,7 @@ class CommonEvents
         if (!$canHandle) {
             $output->writeln('<error>Heads up!</error>');
             $output->writeln('It seems that Aenthill does not know how to handle the creation of a new image. You need to install a dedicated Aent for this.');
-            $output->writeln('Most of the time, you want to put the commands in a Dockerfile. We have a pretty good Aent for this: <info>theaentmachine/aent-dockerfile</info>.');
+            $output->writeln('Most of the time, you want to put the instructions in a Dockerfile. We have a pretty good Aent for this: <info>theaentmachine/aent-dockerfile</info>.');
             $question = new Question('Do you want me to add this Aent for you? (y/n) ', 'y');
             $question->setValidator(function (string $value) {
                 $value = \strtolower(trim($value));
