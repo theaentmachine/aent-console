@@ -80,6 +80,9 @@ class Pheromone
         return $from === false ? null : $from;
     }
 
+    /**
+     * @return mixed[]
+     */
     public static function getAenthillManifestContent(): array
     {
         $containerProjectDir = self::getContainerProjectDirectory();

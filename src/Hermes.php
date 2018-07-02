@@ -91,7 +91,7 @@ class Hermes
      */
     public static function setHandledEvents(array $events): void
     {
-        if (self::aentExists(getenv(Pheromone::getWhoAmI()))){
+        if (self::aentExists(getenv(Pheromone::getWhoAmI()))) {
             $command = ['hermes', 'set:handled-events'];
             foreach ($events as $event) {
                 $command[] = $event;
