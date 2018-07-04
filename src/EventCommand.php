@@ -30,6 +30,7 @@ abstract class EventCommand extends Command
     private $aentHelper;
 
     abstract protected function getEventName(): string;
+
     abstract protected function executeEvent(?string $payload): ?string;
 
     protected function configure()

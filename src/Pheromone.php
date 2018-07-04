@@ -1,6 +1,5 @@
 <?php
 
-
 namespace TheAentMachine;
 
 use TheAentMachine\Exception\LogLevelException;
@@ -78,5 +77,18 @@ class Pheromone
     {
         $from = getenv('PHEROMONE_FROM_IMAGE_NAME');
         return $from === false ? null : $from;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public static function getAenthillManifestContent(): array
+    {
+        $containerProjectDir = self::getContainerProjectDirectory();
+        $aenthillJSONstr = file_get_contents($containerProjectDir . '/aenthill.json');
+        if ($aenthillJSONstr === false) {
+            throw new \RuntimeException('Failed to load the aenthill manifest file ' . $containerProjectDir . '/aenthill.json');
+        }
+        return \GuzzleHttp\json_decode($aenthillJSONstr, true);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace TheAentMachine\Helper;
 
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -93,7 +94,7 @@ class Question
         }
         if ($this->default) {
             if (!$this->yesNoQuestion) {
-                $text .= ' ['.$this->default.']';
+                $text .= ' [' . $this->default . ']';
             } elseif ($this->default === 'y') {
                 $text .= ' [Y/n]';
             } elseif ($this->default === 'n') {

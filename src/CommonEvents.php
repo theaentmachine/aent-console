@@ -3,10 +3,7 @@
 
 namespace TheAentMachine;
 
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 use TheAentMachine\Exception\CannotHandleEventException;
 use TheAentMachine\Service\Service;
 
@@ -31,7 +28,7 @@ class CommonEvents
         $this->aentHelper = $aentHelper;
         $this->output = $output;
     }
-    
+
     /**
      * @throws CannotHandleEventException
      */
@@ -59,7 +56,7 @@ class CommonEvents
                 ->setDefault('y')
                 ->ask();
 
-            if ($answer === 'y') {
+            if ($answer) {
                 Hermes::setDependencies(['theaentmachine/aent-docker-compose']);
             } else {
                 throw CannotHandleEventException::cannotHandleEvent(self::NEW_SERVICE);
@@ -104,7 +101,7 @@ class CommonEvents
                 ->setDefault('y')
                 ->ask();
 
-            if ($answer === 'y') {
+            if ($answer) {
                 Hermes::setDependencies(['theaentmachine/aent-traefik']);
             } else {
                 throw CannotHandleEventException::cannotHandleEvent(self::NEW_VIRTUAL_HOST);
@@ -140,7 +137,7 @@ class CommonEvents
                 ->setDefault('y')
                 ->ask();
 
-            if ($answer === 'y') {
+            if ($answer) {
                 Hermes::setDependencies(['theaentmachine/aent-dockerfile']);
             } else {
                 throw CannotHandleEventException::cannotHandleEvent(self::NEW_IMAGE);

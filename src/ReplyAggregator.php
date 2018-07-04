@@ -1,6 +1,5 @@
 <?php
 
-
 namespace TheAentMachine;
 
 /**
@@ -20,7 +19,9 @@ class ReplyAggregator
         }
         $this->replyDirectory = rtrim($replyDirectory, '/').'/';
         if (!\file_exists($replyDirectory)) {
-            \mkdir($replyDirectory, 0777, true);
+            if (!mkdir($replyDirectory, 0777, true) && !is_dir($replyDirectory)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $replyDirectory));
+            }
         }
     }
 

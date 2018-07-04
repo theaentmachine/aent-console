@@ -1,4 +1,5 @@
 <?php
+
 namespace TheAentMachine;
 
 use Symfony\Component\Process\Process;
@@ -26,8 +27,7 @@ class Hermes
 
         $process->mustRun();
 
-        $replies = $replyAggregator->getReplies();
-        return $replies;
+        return $replyAggregator->getReplies();
     }
 
     /**
@@ -37,7 +37,7 @@ class Hermes
     public static function dispatchJson(string $event, $payload): array
     {
         if (\is_object($payload) && !$payload instanceof \JsonSerializable) {
-            throw new \RuntimeException('Payload object should implement JsonSerializable. Got an instance of '.\get_class($payload));
+            throw new \RuntimeException('Payload object should implement JsonSerializable. Got an instance of ' . \get_class($payload));
         }
         $replies = self::dispatch($event, \GuzzleHttp\json_encode($payload));
 
@@ -92,41 +92,48 @@ class Hermes
      */
     public static function setHandledEvents(array $events): void
     {
-        $command = ['hermes', 'set:handled-events'];
-        foreach ($events as $event) {
-            $command[] = $event;
+        if (self::aentExists(Pheromone::getWhoAmI())) {
+            $command = ['hermes', 'set:handled-events'];
+            foreach ($events as $event) {
+                $command[] = $event;
+            }
+
+            $process = new Process($command);
+            $process->enableOutput();
+            $process->setTty(true);
+
+            $process->mustRun();
         }
-
-        $process = new Process($command);
-        $process->enableOutput();
-        $process->setTty(true);
-
-        $process->mustRun();
     }
-    
+
     /**
      * @param string $handledEvent
      * @return string[]
      */
     public static function findAentsByHandledEvent(string $handledEvent): array
     {
-        $containerProjectDir = Pheromone::getContainerProjectDirectory();
-
-        $aenthillJSONstr = file_get_contents($containerProjectDir . '/aenthill.json');
-        if ($aenthillJSONstr === false) {
-            throw new \RuntimeException('Failed to load file '.$containerProjectDir . '/aenthill.json');
-        }
-        $aenthillJSON = \GuzzleHttp\json_decode($aenthillJSONstr, true);
+        $manifest = Pheromone::getAenthillManifestContent();
 
         $aents = array();
-        if (isset($aenthillJSON['aents'])) {
-            foreach ($aenthillJSON['aents'] as $aent) {
+        if (isset($manifest['aents'])) {
+            foreach ($manifest['aents'] as $aent) {
                 if (array_key_exists('handled_events', $aent) && \in_array($handledEvent, $aent['handled_events'], true)) {
                     $aents[] = $aent;
                 }
             }
         }
         return $aents;
+    }
+
+    /**
+     * @param string $imageName
+     * @return bool
+     */
+    public static function aentExists(string $imageName): bool
+    {
+        $manifest = Pheromone::getAenthillManifestContent();
+
+        return isset($manifest['aents']) && \in_array($imageName, $manifest['aents'], true);
     }
 
     /**
