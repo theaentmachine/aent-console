@@ -1,6 +1,5 @@
 <?php
 
-
 namespace TheAentMachine;
 
 use TheAentMachine\Exception\LogLevelException;

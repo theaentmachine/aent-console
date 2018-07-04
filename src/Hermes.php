@@ -1,4 +1,5 @@
 <?php
+
 namespace TheAentMachine;
 
 use Symfony\Component\Process\Process;
@@ -36,7 +37,7 @@ class Hermes
     public static function dispatchJson(string $event, $payload): array
     {
         if (\is_object($payload) && !$payload instanceof \JsonSerializable) {
-            throw new \RuntimeException('Payload object should implement JsonSerializable. Got an instance of '.\get_class($payload));
+            throw new \RuntimeException('Payload object should implement JsonSerializable. Got an instance of ' . \get_class($payload));
         }
         $replies = self::dispatch($event, \GuzzleHttp\json_encode($payload));
 
@@ -104,7 +105,7 @@ class Hermes
             $process->mustRun();
         }
     }
-    
+
     /**
      * @param string $handledEvent
      * @return string[]
