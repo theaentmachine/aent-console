@@ -133,11 +133,14 @@ JSON;
 
         $outArray = $s->imageJsonSerialize();
         $expectedArray = [
-            'FROM foo/bar:baz',
-            'ENV BAZ=baz',
-            'COPY /bar /bar',
-            'CMD foo -bar -baz --qux',
-            'RUN composer install'
+            'serviceName' => 'foo',
+            'dockerfileCommands' => [
+                'FROM foo/bar:baz',
+                'ENV BAZ=baz',
+                'COPY /bar /bar',
+                'CMD foo -bar -baz --qux',
+                'RUN composer install'
+            ]
         ];
         $this->assertEquals($outArray, $expectedArray);
 
