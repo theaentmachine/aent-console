@@ -143,7 +143,10 @@ class Service implements \JsonSerializable
 
         $dockerfileCommands = array_merge($dockerfileCommands, $this->dockerfileCommands);
 
-        return $dockerfileCommands;
+        return [
+            'serviceName' => $this->serviceName,
+            'dockerfileCommands' => $dockerfileCommands,
+        ];
     }
 
     /**
