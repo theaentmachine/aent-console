@@ -135,10 +135,7 @@
             "additionalProperties": false
           }
         }
-      },
-      "required": [
-        "image"
-      ]
+      }
     },
     "dockerFileCommands": {
       "type": "array",
