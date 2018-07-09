@@ -121,28 +121,29 @@ class Service implements \JsonSerializable
 
     /**
      * @return mixed[]
-     * @throws ServiceException
      */
     public function imageJsonSerialize(): array
     {
-        $this->dockerfileCommands[] = 'FROM ' . $this->image;
+        $dockerfileCommands = [];
+        $dockerfileCommands[] = 'FROM ' . $this->image;
         foreach ($this->environment as $key => $env) {
             if ($env->getType() === EnvVariableTypeEnum::IMAGE_ENV_VARIABLE) {
-                $this->dockerfileCommands[] = "ENV $key" . '='. $env->getValue();
+                $dockerfileCommands[] = "ENV $key" . '='. $env->getValue();
             }
         }
         foreach ($this->volumes as $volume) {
             if ($volume->getType() === VolumeTypeEnum::BIND_VOLUME) {
-                $this->dockerfileCommands[] = 'COPY ' . $volume->getSource() . ' ' . $volume->getTarget();
+                $dockerfileCommands[] = 'COPY ' . $volume->getSource() . ' ' . $volume->getTarget();
             }
         }
 
         if (!empty($this->command)) {
-            $this->dockerfileCommands[] = 'CMD ' . implode(' ', $this->command);
+            $dockerfileCommands[] = 'CMD ' . implode(' ', $this->command);
         }
 
+        $dockerfileCommands = array_merge($dockerfileCommands, $this->dockerfileCommands);
 
-        return $this->jsonSerialize();
+        return $dockerfileCommands;
     }
 
     /**
