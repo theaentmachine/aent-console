@@ -454,9 +454,4 @@ class Service implements \JsonSerializable
     {
         $this->dockerfileCommands[] = $dockerfileCommand;
     }
-
-    public function generateDockerFileCommands(): void
-    {
-        // TODO
-    }
 }
