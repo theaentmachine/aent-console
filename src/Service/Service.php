@@ -120,6 +120,32 @@ class Service implements \JsonSerializable
     }
 
     /**
+     * @return mixed[]
+     * @throws ServiceException
+     */
+    public function imageJsonSerialize(): array
+    {
+        $this->dockerfileCommands[] = 'FROM ' . $this->image;
+        foreach ($this->environment as $key => $env) {
+            if ($env->getType() === EnvVariableTypeEnum::IMAGE_ENV_VARIABLE) {
+                $this->dockerfileCommands[] = "ENV $key" . '='. $env->getValue();
+            }
+        }
+        foreach ($this->volumes as $volume) {
+            if ($volume->getType() === VolumeTypeEnum::BIND_VOLUME) {
+                $this->dockerfileCommands[] = 'COPY ' . $volume->getSource() . ' ' . $volume->getTarget();
+            }
+        }
+
+        if (!empty($this->command)) {
+            $this->dockerfileCommands[] = 'CMD ' . implode(' ', $this->command);
+        }
+
+
+        return $this->jsonSerialize();
+    }
+
+    /**
      * @param \stdClass|array|string $data
      * @return bool
      * @throws ServiceException
@@ -426,5 +452,10 @@ class Service implements \JsonSerializable
     public function addDockerfileCommand(string $dockerfileCommand): void
     {
         $this->dockerfileCommands[] = $dockerfileCommand;
+    }
+
+    public function generateDockerFileCommands(): void
+    {
+        // TODO
     }
 }
