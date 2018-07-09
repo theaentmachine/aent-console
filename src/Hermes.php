@@ -92,18 +92,16 @@ class Hermes
      */
     public static function setHandledEvents(array $events): void
     {
-        if (self::aentExists(Pheromone::getWhoAmI())) {
-            $command = ['hermes', 'set:handled-events'];
-            foreach ($events as $event) {
-                $command[] = $event;
-            }
-
-            $process = new Process($command);
-            $process->enableOutput();
-            $process->setTty(true);
-
-            $process->mustRun();
+        $command = ['hermes', 'set:handled-events'];
+        foreach ($events as $event) {
+            $command[] = $event;
         }
+
+        $process = new Process($command);
+        $process->enableOutput();
+        $process->setTty(true);
+
+        $process->mustRun();
     }
 
     /**

@@ -46,7 +46,9 @@ abstract class EventCommand extends Command
         $this->aentHelper = new AentHelper($input, $output, $this->getHelper('question'), $this->getHelper('formatter'));
 
         // Let's send the list of caught events to Hercule
-        Hermes::setHandledEvents($this->getAllEventNames());
+        if ($this->getEventName() !== 'REMOVE') {
+            Hermes::setHandledEvents($this->getAllEventNames());
+        }
 
         $logLevelConfigurator = new LogLevelConfigurator($output);
         $logLevelConfigurator->configureLogLevel();
