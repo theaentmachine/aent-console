@@ -124,17 +124,6 @@ class Hermes
     }
 
     /**
-     * @param string $imageName
-     * @return bool
-     */
-    public static function aentExists(string $imageName): bool
-    {
-        $manifest = Pheromone::getAenthillManifestContent();
-
-        return isset($manifest['aents']) && \in_array($imageName, $manifest['aents'], true);
-    }
-
-    /**
      * Returns true if one of the aents installed can explicitly handle events of type $handledEvent
      *
      * @param string $handledEvent

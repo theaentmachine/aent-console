@@ -116,7 +116,7 @@ class CommonEvents
     {
         $this->canDispatchImageOrFail();
 
-        Hermes::dispatchJson(self::NEW_IMAGE, $service);
+        Hermes::dispatchJson(self::NEW_IMAGE, $service->imageJsonSerialize());
     }
 
     /**

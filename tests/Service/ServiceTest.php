@@ -35,9 +35,7 @@ class ServiceTest extends TestCase
                       ]
   },
   "dockerfileCommands": [
-      "FROM foo",
-      "COPY bar",
-      "RUN baz"
+    "RUN composer install"
   ]
 }
 JSON;
@@ -128,11 +126,23 @@ JSON;
         $s->addNamedVolume('foo', '/foo', true);
         $s->addBindVolume('/bar', '/bar', false);
         $s->addTmpfsVolume('baz');
-        $s->addDockerfileCommand('FROM foo');
-        $s->addDockerfileCommand('COPY bar');
-        $s->addDockerfileCommand('RUN baz');
+        $s->addDockerfileCommand('RUN composer install');
         $outArray = $s->jsonSerialize();
         $expectedArray = json_decode(self::VALID_PAYLOAD, true);
         $this->assertEquals($outArray, $expectedArray);
+
+        $outArray = $s->imageJsonSerialize();
+        $expectedArray = [
+            'FROM foo/bar:baz',
+            'ENV BAZ=baz',
+            'COPY /bar /bar',
+            'CMD foo -bar -baz --qux',
+            'RUN composer install'
+        ];
+        $this->assertEquals($outArray, $expectedArray);
+
+
+
+
     }
 }
