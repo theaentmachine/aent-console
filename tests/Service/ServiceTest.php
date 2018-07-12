@@ -36,7 +36,11 @@ class ServiceTest extends TestCase
   },
   "dockerfileCommands": [
     "RUN composer install"
-  ]
+  ],
+  "requestMemory": "64Mi",
+  "requestCpu": "250m",
+  "limitMemory": "128Mi",
+  "limitCpu": "500m"
 }
 JSON;
 
@@ -78,7 +82,7 @@ JSON;
 
     public function testValidPayload(): void
     {
-        $array = json_decode(self::VALID_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::VALID_PAYLOAD, true);
         $service = Service::parsePayload($array);
         $out = $service->jsonSerialize();
         $this->assertEquals($array, $out);
@@ -87,21 +91,21 @@ JSON;
     public function testMissingServiceNamePayload(): void
     {
         $this->expectException(ServiceException::class);
-        $array = json_decode(self::MISSING_SERVICE_NAME_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::MISSING_SERVICE_NAME_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
     public function testUnknownEnvVariableTypePayload(): void
     {
         $this->expectException(ServiceException::class);
-        $array = json_decode(self::UNKNOWN_ENV_VARIABLE_TYPE_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::UNKNOWN_ENV_VARIABLE_TYPE_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
     public function testUnknownVolumeTypePayload(): void
     {
         $this->expectException(ServiceException::class);
-        $array = json_decode(self::UNKNOWN_VOLUME_TYPE_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::UNKNOWN_VOLUME_TYPE_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
@@ -127,6 +131,10 @@ JSON;
         $s->addBindVolume('/bar', '/bar', false);
         $s->addTmpfsVolume('baz');
         $s->addDockerfileCommand('RUN composer install');
+        $s->setRequestMemory('64Mi');
+        $s->setRequestCpu('250m');
+        $s->setLimitMemory('128Mi');
+        $s->setLimitCpu('500m');
         $outArray = $s->jsonSerialize();
         $expectedArray = json_decode(self::VALID_PAYLOAD, true);
         $this->assertEquals($outArray, $expectedArray);
@@ -143,9 +151,23 @@ JSON;
             ]
         ];
         $this->assertEquals($outArray, $expectedArray);
+    }
 
+    public function testUnvalidRequestMemoryPattern(): void
+    {
+        $s = new Service();
+        $s->setServiceName('foo');
+        $s->setRequestMemory('0.5Zi');
+        $this->expectException(ServiceException::class);
+        $s->jsonSerialize();
+    }
 
-
-
+    public function testUnvalidRequestCpuPattern(): void
+    {
+        $s = new Service();
+        $s->setServiceName('foo');
+        $s->setRequestCpu('0,1');
+        $this->expectException(ServiceException::class);
+        $s->jsonSerialize();
     }
 }

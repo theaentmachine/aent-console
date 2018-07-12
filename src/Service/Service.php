@@ -36,13 +36,28 @@ class Service implements \JsonSerializable
     private $validatorSchema;
     /** @var string[] */
     private $dockerfileCommands = [];
+    /** @var string */
+    private $requestMemory = '';
+    /** @var string */
+    private $requestCpu = '';
+    /** @var string */
+    private $limitMemory = '';
+    /** @var string */
+    private $limitCpu = '';
+
 
     /**
      * Service constructor.
+     * @throws ServiceException
      */
     public function __construct()
     {
-        $this->validatorSchema = json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
+        $jsonSchemaPathname = __DIR__ . '/ServiceJsonSchema.json';
+        $jsonSchema = file_get_contents($jsonSchemaPathname);
+        if ($jsonSchema === false) {
+            throw ServiceException::jsonSchemaNotFound($jsonSchemaPathname);
+        }
+        $this->validatorSchema = \GuzzleHttp\json_decode($jsonSchema, false);
     }
 
     /**
@@ -74,7 +89,12 @@ class Service implements \JsonSerializable
                 }
             }
         }
-        $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
+        $service->dockerfileCommands = $payload['dockerfileCommands'] ?? '';
+
+        $service->requestMemory = $payload['requestMemory'] ?? '';
+        $service->requestCpu = $payload['requestCpu'] ?? '';
+        $service->limitMemory = $payload['limitMemory'] ?? '';
+        $service->limitCpu = $payload['limitCpu'] ?? '';
         return $service;
     }
 
@@ -115,20 +135,29 @@ class Service implements \JsonSerializable
             $json['dockerfileCommands'] = $this->dockerfileCommands;
         }
 
+        $resources = array_filter([
+            'requestMemory' => $this->requestMemory,
+            'requestCpu' => $this->requestCpu,
+            'limitMemory' => $this->limitMemory,
+            'limitCpu' => $this->limitCpu
+        ]);
+
+        if (!empty($resources)) {
+            $json = array_merge($json, $resources);
+        }
+
         $this->checkValidity($json);
         return $json;
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function imageJsonSerialize(): array
     {
         $dockerfileCommands = [];
         $dockerfileCommands[] = 'FROM ' . $this->image;
         foreach ($this->environment as $key => $env) {
             if ($env->getType() === EnvVariableTypeEnum::IMAGE_ENV_VARIABLE) {
-                $dockerfileCommands[] = "ENV $key" . '='. $env->getValue();
+                $dockerfileCommands[] = "ENV $key" . '=' . $env->getValue();
             }
         }
         foreach ($this->volumes as $volume) {
@@ -169,154 +198,147 @@ class Service implements \JsonSerializable
         return $result->isValid();
     }
 
-    /**
-     * @return string
-     */
     public function getServiceName(): string
     {
         return $this->serviceName;
     }
 
-    /**
-     * @return string|null
-     */
     public function getImage(): ?string
     {
         return $this->image;
     }
 
-    /**
-     * @return string[]
-     */
+    /** @return string[] */
     public function getCommand(): array
     {
         return $this->command;
     }
 
-    /**
-     * @return int[]
-     */
+    /** @return int[] */
     public function getInternalPorts(): array
     {
         return $this->internalPorts;
     }
 
-    /**
-     * @return string[]
-     */
+    /** @return string[] */
     public function getDependsOn(): array
     {
         return $this->dependsOn;
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getPorts(): array
     {
         return $this->ports;
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getLabels(): array
     {
         return $this->labels;
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getEnvironment(): array
     {
         return $this->environment;
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getVolumes(): array
     {
         return $this->volumes;
     }
 
-    /**
-     * @return string[]
-     */
+    /** @return string[] */
     public function getDockerfileCommands(): array
     {
         return $this->dockerfileCommands;
     }
 
-    /**
-     * @param string $serviceName
-     */
+    public function getRequestMemory(): string
+    {
+        return $this->requestMemory;
+    }
+
+    public function getRequestCpu(): string
+    {
+        return $this->requestCpu;
+    }
+
+    public function getLimitMemory(): string
+    {
+        return $this->limitMemory;
+    }
+
+    public function getLimitCpu(): string
+    {
+        return $this->limitCpu;
+    }
+
     public function setServiceName(string $serviceName): void
     {
         $this->serviceName = $serviceName;
     }
 
-    /**
-     * @param string|null $image
-     */
     public function setImage(?string $image): void
     {
         $this->image = $image;
     }
 
-    /**
-     * @param string[] $command
-     */
+    /** @param string[] $command */
     public function setCommand(array $command): void
     {
         $this->command = $command;
     }
 
-    /**
-     * @param int[] $internalPorts
-     */
+    /** @param int[] $internalPorts */
     public function setInternalPorts(array $internalPorts): void
     {
         $this->internalPorts = $internalPorts;
     }
 
-    /**
-     * @param string[] $dependsOn
-     */
+    /** @param string[] $dependsOn */
     public function setDependsOn(array $dependsOn): void
     {
         $this->dependsOn = $dependsOn;
     }
 
-    /**
-     * @param string $command
-     */
+    public function setRequestMemory(string $requestMemory): void
+    {
+        $this->requestMemory = $requestMemory;
+    }
+
+    public function setRequestCpu(string $requestCpu): void
+    {
+        $this->requestCpu = $requestCpu;
+    }
+
+    public function setLimitMemory(string $limitMemory): void
+    {
+        $this->limitMemory = $limitMemory;
+    }
+
+    public function setLimitCpu(string $limitCpu): void
+    {
+        $this->limitCpu = $limitCpu;
+    }
+
     public function addCommand(string $command): void
     {
         $this->command[] = $command;
     }
 
-    /**
-     * @param int $internalPort
-     */
     public function addInternalPort(int $internalPort): void
     {
         $this->internalPorts[] = $internalPort;
     }
 
-    /**
-     * @param string $dependsOn
-     */
     public function addDependsOn(string $dependsOn): void
     {
         $this->dependsOn[] = $dependsOn;
     }
 
-    /**
-     * @param int $source
-     * @param int $target
-     */
     public function addPort(int $source, int $target): void
     {
         $this->ports[] = array(
@@ -325,10 +347,6 @@ class Service implements \JsonSerializable
         );
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
     public function addLabel(string $key, string $value): void
     {
         $this->labels[$key] = array(
@@ -336,12 +354,7 @@ class Service implements \JsonSerializable
         );
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     * @param string $type
-     * @throws ServiceException
-     */
+    /** @throws ServiceException */
     private function addEnvVar(string $key, string $value, string $type): void
     {
         switch ($type) {
@@ -362,49 +375,27 @@ class Service implements \JsonSerializable
         }
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
     public function addSharedEnvVariable(string $key, string $value): void
     {
         $this->environment[$key] = new EnvVariable($value, 'sharedEnvVariable');
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
     public function addSharedSecret(string $key, string $value): void
     {
         $this->environment[$key] = new EnvVariable($value, 'sharedSecret');
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
     public function addImageEnvVariable(string $key, string $value): void
     {
         $this->environment[$key] = new EnvVariable($value, 'imageEnvVariable');
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
     public function addContainerEnvVariable(string $key, string $value): void
     {
         $this->environment[$key] = new EnvVariable($value, 'containerEnvVariable');
     }
 
-    /**
-     * @param string $type
-     * @param string $source
-     * @param string $target
-     * @param bool $readOnly
-     * @throws ServiceException
-     */
+    /** @throws ServiceException */
     private function addVolume(string $type, string $source, string $target = '', bool $readOnly = false): void
     {
         switch ($type) {
@@ -422,37 +413,21 @@ class Service implements \JsonSerializable
         }
     }
 
-    /**
-     * @param string $source
-     * @param string $target
-     * @param bool $readOnly
-     */
     public function addNamedVolume(string $source, string $target, bool $readOnly = false): void
     {
         $this->volumes[] = new NamedVolume($source, $target, $readOnly);
     }
 
-    /**
-     * @param string $source
-     * @param string $target
-     * @param bool $readOnly
-     */
     public function addBindVolume(string $source, string $target, bool $readOnly = false): void
     {
         $this->volumes[] = new BindVolume($source, $target, $readOnly);
     }
 
-    /**
-     * @param string $source
-     */
     public function addTmpfsVolume(string $source): void
     {
         $this->volumes[] = new TmpfsVolume($source);
     }
 
-    /**
-     * @param string $dockerfileCommand
-     */
     public function addDockerfileCommand(string $dockerfileCommand): void
     {
         $this->dockerfileCommands[] = $dockerfileCommand;
