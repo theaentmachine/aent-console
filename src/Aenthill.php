@@ -11,22 +11,22 @@ class Aenthill
     /**
      * Installs or updates current aent in the manifest.
      *
-     * @param null|string[] $events
      * @param null|array<string,string> $metadata
+     * @param null|string[] $events
      */
-    public static function installOrUpdate(?array $events = null, ?array $metadata = null): void
+    public static function installOrUpdate(?array $metadata = null, ?array $events = null): void
     {
         $command = ['aenthill', 'install'];
-        if (!empty($events)) {
-            foreach ($events as $event) {
-                $command[] = '-e';
-                $command[] = $event;
-            }
-        }
         if (!empty($metadata)) {
             foreach ($metadata as $key => $value) {
                 $command[] = '-m';
                 $command[] = $key . '=' . $value;
+            }
+        }
+        if (!empty($events)) {
+            foreach ($events as $event) {
+                $command[] = '-e';
+                $command[] = $event;
             }
         }
         $process = new Process($command);
@@ -40,18 +40,11 @@ class Aenthill
      *
      * @param string $image
      * @param string $key
-     * @param null|string[] $events
      * @param null|array<string,string> $metadata
      */
-    public static function addDependency(string $image, string $key, ?array $events = null, ?array $metadata = null): void
+    public static function addDependency(string $image, string $key, ?array $metadata = null): void
     {
         $command = ['aenthill', 'register', $image, $key];
-        if (!empty($events)) {
-            foreach ($events as $event) {
-                $command[] = '-e';
-                $command[] = $event;
-            }
-        }
         if (!empty($metadata)) {
             foreach ($metadata as $key => $value) {
                 $command[] = '-m';
