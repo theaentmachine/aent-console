@@ -141,7 +141,6 @@ class Question
                 $response = $response ?? '';
                 if (!$this->multiselectQuestion) {
                     $index = intval($response);
-                    $index = $index === null ? -1 : $index;
                     if ($index < 0 || $index >= count($this->choices)) {
                         throw new \InvalidArgumentException('Answer must be in range');
                     }
