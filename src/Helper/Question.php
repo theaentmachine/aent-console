@@ -11,42 +11,41 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Question
 {
-    /**
-     * @var QuestionHelper
-     */
+    /** @var QuestionHelper */
     private $helper;
-    /**
-     * @var InputInterface
-     */
+
+    /** @var InputInterface */
     private $input;
-    /**
-     * @var OutputInterface
-     */
+
+    /** @var OutputInterface */
     private $output;
-    /**
-     * @var string
-     */
+
+    /** @var string */
     private $question;
-    /**
-     * @var string|null
-     */
+
+    /** @var string|null */
     private $default;
-    /**
-     * @var bool
-     */
+
+    /** @var bool */
     private $compulsory = false;
-    /**
-     * @var callable|null
-     */
+
+    /** @var callable|null */
     private $validator;
-    /**
-     * @var string|null
-     */
+
+    /** @var string|null */
     private $helpText;
-    /**
-     * @var bool
-     */
+
+    /** @var bool  */
     private $yesNoQuestion = false;
+
+    /** @var bool */
+    private $choiceQuestion = false;
+
+    /** @var mixed[] */
+    private $choices;
+
+    /** @var bool */
+    private $multiselectQuestion = false;
 
     public function __construct(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $question)
     {
@@ -86,6 +85,19 @@ class Question
         return $this;
     }
 
+    /**
+     * @param mixed[] $choices
+     * @param bool $multiselect
+     * @return Question
+     */
+    public function choiceQuestion(array $choices, bool $multiselect = false): self
+    {
+        $this->choiceQuestion = true;
+        $this->choices = $choices;
+        $this->multiselectQuestion = $multiselect;
+        return $this;
+    }
+
     public function ask(): string
     {
         $text = $this->question;
@@ -107,7 +119,8 @@ class Question
         }
         $text .= ': ';
 
-        $question = new \Symfony\Component\Console\Question\Question($text, $this->default);
+
+        $question = $this->choiceQuestion ? new \Symfony\Component\Console\Question\ChoiceQuestion($text, $this->choices, $this->default) : new \Symfony\Component\Console\Question\Question($text, $this->default);
 
         $validator = $this->validator;
 
