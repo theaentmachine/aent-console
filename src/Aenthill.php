@@ -40,8 +40,8 @@ class Aenthill
      *
      * @param string $image
      * @param string $key
-     * @param array|null $events
-     * @param array|null $metadata
+     * @param null|string[] $events
+     * @param null|array<string,string> $metadata
      */
     public static function addDependency(string $image, string $key, ?array $events = null, ?array $metadata = null): void
     {
