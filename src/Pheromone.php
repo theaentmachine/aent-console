@@ -1,6 +1,5 @@
 <?php
 
-
 namespace TheAentMachine;
 
 use TheAentMachine\Exception\LogLevelException;
@@ -140,5 +139,21 @@ class Pheromone
     public static function getDependency(string $key): ?string
     {
         return self::getOrNull('PHEROMONE_DEPENDENCY_' . strtoupper($key));
+    }
+
+    /**
+     * Returns the content of the manifest.
+     *
+     * @return mixed[]
+     * @throws MissingEnvironmentVariableException
+     */
+    public static function getAenthillManifestContent(): array
+    {
+        $containerProjectDir = self::getContainerProjectDirectory();
+        $aenthillJSONstr = file_get_contents($containerProjectDir . '/aenthill.json');
+        if ($aenthillJSONstr === false) {
+            throw new \RuntimeException('Failed to load the aenthill manifest file ' . $containerProjectDir . '/aenthill.json');
+        }
+        return \GuzzleHttp\json_decode($aenthillJSONstr, true);
     }
 }

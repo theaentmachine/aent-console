@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use TheAentMachine\Exception\LogLevelException;
+use TheAentMachine\Exception\MissingEnvironmentVariableException;
 
 abstract class EventCommand extends Command
 {
@@ -25,6 +27,7 @@ abstract class EventCommand extends Command
     private $aentHelper;
 
     abstract protected function getEventName(): string;
+
     abstract protected function executeEvent(?string $payload): ?string;
 
     protected function configure()
@@ -35,20 +38,22 @@ abstract class EventCommand extends Command
             ->addArgument('payload', InputArgument::OPTIONAL, 'The event payload');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @throws LogLevelException
+     * @throws MissingEnvironmentVariableException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->aentHelper = new AentHelper($input, $output, $this->getHelper('question'), $this->getHelper('formatter'));
-
-        // Let's send the list of caught events to Hercule
-        Aenthill::setHandledEvents($this->getAllEventNames());
-
         $logLevelConfigurator = new LogLevelConfigurator($output);
         $logLevelConfigurator->configureLogLevel();
 
         $this->log = new ConsoleLogger($output);
 
         if (!$this->isHidden()) {
-            $this->log->info(Pheromone::getWhoAmI());
+            $this->log->info(Pheromone::getImage());
         }
 
         $payload = $input->getArgument('payload');

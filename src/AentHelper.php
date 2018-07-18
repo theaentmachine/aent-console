@@ -70,7 +70,7 @@ class AentHelper
             ->setValidator(function (string $value) {
                 $value = trim($value);
                 if (!\preg_match('/^[a-zA-Z0-9_.-]+$/', $value)) {
-                    throw new \InvalidArgumentException('Invalid service name "'.$value.'". Service names can contain alphanumeric characters, and "_", ".", "-".');
+                    throw new \InvalidArgumentException('Invalid service name "' . $value . '". Service names can contain alphanumeric characters, and "_", ".", "-".');
                 }
                 return $value;
             })
@@ -97,7 +97,7 @@ class AentHelper
         $default = $proposedTags[0] ?? null;
         $this->output->writeln("Please choose your $applicationName version.");
         if (!empty($proposedTags)) {
-            $this->output->writeln('Possible values include: <info>'.\implode('</info>, <info>', $proposedTags).'</info>');
+            $this->output->writeln('Possible values include: <info>' . \implode('</info>, <info>', $proposedTags) . '</info>');
         }
         $this->output->writeln('Enter "v" to view all available versions, "?" for help');
         $question = new Question(
@@ -109,7 +109,7 @@ class AentHelper
             $value = trim($value);
 
             if ($value === 'v') {
-                $this->output->writeln('Available versions: <info>'.\implode('</info>, <info>', $availableVersions).'</info>');
+                $this->output->writeln('Available versions: <info>' . \implode('</info>, <info>', $availableVersions) . '</info>');
                 return 'v';
             }
 

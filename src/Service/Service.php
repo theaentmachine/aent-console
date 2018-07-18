@@ -120,6 +120,36 @@ class Service implements \JsonSerializable
     }
 
     /**
+     * @return mixed[]
+     */
+    public function imageJsonSerialize(): array
+    {
+        $dockerfileCommands = [];
+        $dockerfileCommands[] = 'FROM ' . $this->image;
+        foreach ($this->environment as $key => $env) {
+            if ($env->getType() === EnvVariableTypeEnum::IMAGE_ENV_VARIABLE) {
+                $dockerfileCommands[] = "ENV $key" . '='. $env->getValue();
+            }
+        }
+        foreach ($this->volumes as $volume) {
+            if ($volume->getType() === VolumeTypeEnum::BIND_VOLUME) {
+                $dockerfileCommands[] = 'COPY ' . $volume->getSource() . ' ' . $volume->getTarget();
+            }
+        }
+
+        if (!empty($this->command)) {
+            $dockerfileCommands[] = 'CMD ' . implode(' ', $this->command);
+        }
+
+        $dockerfileCommands = array_merge($dockerfileCommands, $this->dockerfileCommands);
+
+        return [
+            'serviceName' => $this->serviceName,
+            'dockerfileCommands' => $dockerfileCommands,
+        ];
+    }
+
+    /**
      * @param \stdClass|array|string $data
      * @return bool
      * @throws ServiceException

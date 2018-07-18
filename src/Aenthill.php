@@ -113,8 +113,7 @@ class Aenthill
         $process->enableOutput();
         $process->setTty(true);
         $process->mustRun();
-        $replies = $replyAggregator->getReplies();
-        return $replies;
+        return $replyAggregator->getReplies();
     }
 
     /**
@@ -124,7 +123,7 @@ class Aenthill
     public static function dispatchJson(string $event, $payload): array
     {
         if (\is_object($payload) && !$payload instanceof \JsonSerializable) {
-            throw new \RuntimeException('Payload object should implement JsonSerializable. Got an instance of '.\get_class($payload));
+            throw new \RuntimeException('Payload object should implement JsonSerializable. Got an instance of ' . \get_class($payload));
         }
         $replies = self::dispatch($event, \GuzzleHttp\json_encode($payload));
         return \array_map(function (string $reply) {
@@ -158,7 +157,7 @@ class Aenthill
     {
         self::reply($event, \GuzzleHttp\json_encode($payload));
     }
-    
+
     /**
      * Returns the list of aents in the manifest which handles the given event.
      *
@@ -168,17 +167,10 @@ class Aenthill
      */
     public static function findAentsByHandledEvent(string $handledEvent): array
     {
-        $containerProjectDir = Pheromone::getContainerProjectDirectory();
-
-        $aenthillJSONstr = file_get_contents($containerProjectDir . '/aenthill.json');
-        if ($aenthillJSONstr === false) {
-            throw new \RuntimeException('Failed to load file '.$containerProjectDir . '/aenthill.json');
-        }
-        $aenthillJSON = \GuzzleHttp\json_decode($aenthillJSONstr, true);
-
+        $manifest = Pheromone::getAenthillManifestContent();
         $aents = array();
-        if (isset($aenthillJSON['aents'])) {
-            foreach ($aenthillJSON['aents'] as $aent) {
+        if (isset($manifest['aents'])) {
+            foreach ($manifest['aents'] as $aent) {
                 if (array_key_exists('events', $aent) && \in_array($handledEvent, $aent['events'], true)) {
                     $aents[] = $aent;
                 }
