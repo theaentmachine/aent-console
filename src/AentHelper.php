@@ -17,26 +17,20 @@ use TheAentMachine\Registry\TagsAnalyzer;
  */
 class AentHelper
 {
-    /**
-     * @var InputInterface
-     */
+    /** @var InputInterface */
     private $input;
-    /**
-     * @var OutputInterface
-     */
+
+    /** @var OutputInterface */
     private $output;
-    /**
-     * @var QuestionHelper
-     */
+
+    /** @var QuestionHelper */
     private $questionHelper;
-    /**
-     * @var FormatterHelper
-     */
+
+    /** @var FormatterHelper */
     private $formatterHelper;
 
     public function __construct(InputInterface $input, OutputInterface $output, QuestionHelper $questionHelper, FormatterHelper $formatterHelper)
     {
-
         $this->input = $input;
         $this->output = $output;
         $this->questionHelper = $questionHelper;

@@ -1,4 +1,6 @@
 <?php
+
+
 namespace TheAentMachine;
 
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,7 +35,6 @@ class LogLevelConfigurator
     public function configureLogLevel(): void
     {
         $logLevel = Pheromone::getLogLevel();
-
         $this->output->setVerbosity($this->levels[$logLevel]);
     }
 }

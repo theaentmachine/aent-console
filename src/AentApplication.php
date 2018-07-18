@@ -7,7 +7,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 /**
- * Aents should start a AentApplication instead of a default Symfony console "Application"
+ * aents should start a AentApplication instead of a default Symfony console "Application"
  */
 class AentApplication extends Application
 {
@@ -30,7 +30,6 @@ class AentApplication extends Application
             if (!$this->has($name)) {
                 return $this->voidCommand;
             }
-
             return parent::find($name);
         } catch (CommandNotFoundException $e) {
             return $this->voidCommand;
