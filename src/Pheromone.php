@@ -7,7 +7,7 @@ use TheAentMachine\Exception\LogLevelException;
 use TheAentMachine\Exception\MissingEnvironmentVariableException;
 
 /**
- * Utility class to access the Aent configuration settings (stored in environment variables)
+ * Utility class to access the aent configuration settings (stored in environment variables)
  */
 class Pheromone
 {
@@ -19,9 +19,10 @@ class Pheromone
     ];
 
     /**
-     * Returns the log level for this Aent.
+     * Returns the log level for this aent.
      *
      * @return string
+     * @throws LogLevelException
      */
     public static function getLogLevel(): string
     {
@@ -38,22 +39,39 @@ class Pheromone
         return $logLevel;
     }
 
+    /**
+     * Tries to returns the value of an environment variable or throws an exception.
+     *
+     * @param string $variableName the environment variable key
+     * @return string
+     * @throws MissingEnvironmentVariableException
+     */
     private static function getOrFail(string $variableName): string
     {
-        $value = \getenv($variableName);
+        $value = getenv($variableName);
         if ($value === false) {
             throw MissingEnvironmentVariableException::missingEnv($variableName);
         }
         return $value;
     }
 
-    public static function getWhoAmI(): string
+    /**
+     * Tries to returns the value of an environment variable or null.
+     *
+     * @param string $variableName the environment variable key
+     * @return null|string
+     */
+    private static function getOrNull(string $variableName): ?string
     {
-        return self::getOrFail('PHEROMONE_WHOAMI');
+        $value = getenv($variableName);
+        return $value === false ? null : $value;
     }
 
     /**
-     * The project directory path on the host machine
+     * The project directory path on the host machine.
+     *
+     * @return string
+     * @throws MissingEnvironmentVariableException
      */
     public static function getHostProjectDirectory(): string
     {
@@ -61,22 +79,66 @@ class Pheromone
     }
 
     /**
-     * The project directory path in the container
+     * The project directory path in the container.
+     *
+     * @return string
+     * @throws MissingEnvironmentVariableException
      */
     public static function getContainerProjectDirectory(): string
     {
         return rtrim(self::getOrFail('PHEROMONE_CONTAINER_PROJECT_DIR'), '/');
     }
 
-    public static function getOriginContainer(): ?string
+    /**
+     * The current image of this aent.
+     *
+     * @return string
+     * @throws MissingEnvironmentVariableException
+     */
+    public static function getImage(): string
     {
-        $from = getenv('PHEROMONE_FROM_CONTAINER_ID');
-        return $from === false ? null : $from;
+        return self::getOrFail('PHEROMONE_IMAGE_NAME');
     }
 
-    public static function getOriginImage(): ?string
+    /**
+     * The container ID which has started this aent or null.
+     *
+     * @return null|string
+     */
+    public static function getOriginContainer(): ?string
     {
-        $from = getenv('PHEROMONE_FROM_IMAGE_NAME');
-        return $from === false ? null : $from;
+        return self::getOrNull('PHEROMONE_FROM_CONTAINER_ID');
+    }
+
+    /**
+     * The key from the manifest if this aent has been installed or null.
+     *
+     * @return null|string
+     */
+    public static function getKey(): ?string
+    {
+        return self::getOrNull('PHEROMONE_KEY');
+    }
+
+    /**
+     * The metadata or null.
+     *
+     * @param string $key the key on which this aent stored the metadata.
+     * @return null|string
+     */
+    public static function getMetadata(string $key): ?string
+    {
+        return self::getOrNull('PHEROMONE_METADATA_' . strtoupper($key));
+    }
+
+    /**
+     * The key from the manifest of the dependency or null.
+     *
+     * @param string $key the key on which this aent stored the dependency.
+     * @return null|string
+     */
+    public static function getDependency(string $key): ?string
+    {
+        return self::getOrNull('PHEROMONE_DEPENDENCY_' . strtoupper($key));
     }
 }

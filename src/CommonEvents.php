@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use TheAentMachine\Exception\CannotHandleEventException;
+use TheAentMachine\Exception\MissingEnvironmentVariableException;
 use TheAentMachine\Service\Service;
 
 class CommonEvents
@@ -22,15 +23,17 @@ class CommonEvents
     {
         $this->canDispatchServiceOrFail($helper, $input, $output);
 
-        Hermes::dispatchJson(self::NEW_DOCKER_SERVICE_INFO, $service);
+        Aenthill::dispatchJson(self::NEW_DOCKER_SERVICE_INFO, $service);
     }
 
     /**
      * @throws CannotHandleEventException
+     * @throws MissingEnvironmentVariableException
+     * // FIXME: still useful?
      */
     public function canDispatchServiceOrFail(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
     {
-        $canHandle = Hermes::canHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
+        $canHandle = Aenthill::canHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
 
         if (!$canHandle) {
             $output->writeln('<error>Heads up!</error>');
@@ -49,7 +52,7 @@ class CommonEvents
             $answer = $helper->ask($input, $output, $question);
 
             if ($answer === 'y') {
-                Hermes::setDependencies(['theaentmachine/aent-docker-compose']);
+                Aenthill::setDependencies(['theaentmachine/aent-docker-compose']);
             } else {
                 throw CannotHandleEventException::cannotHandleEvent(self::NEW_DOCKER_SERVICE_INFO);
             }
@@ -59,6 +62,7 @@ class CommonEvents
     /**
      * @throws CannotHandleEventException
      * @return array[] Returns the responses
+     * // FIXME: still useful?
      */
     public function dispatchNewVirtualHost(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $serviceName, int $virtualPort = 80, string $virtualHost = null): ?array
     {
@@ -72,15 +76,16 @@ class CommonEvents
             $message['virtualHost'] = $virtualHost;
         }
 
-        return Hermes::dispatchJson(self::NEW_VIRTUAL_HOST, $message);
+        return Aenthill::dispatchJson(self::NEW_VIRTUAL_HOST, $message);
     }
 
     /**
      * @throws CannotHandleEventException
+     * // FIXME: still useful?
      */
     public function canDispatchVirtualHostOrFail(QuestionHelper $helper, InputInterface $input, OutputInterface $output): void
     {
-        $canHandle = Hermes::canHandleEvent(self::NEW_VIRTUAL_HOST);
+        $canHandle = Aenthill::canHandleEvent(self::NEW_VIRTUAL_HOST);
 
         if (!$canHandle) {
             $output->writeln('<error>Heads up!</error>');
@@ -99,7 +104,7 @@ class CommonEvents
             $answer = $helper->ask($input, $output, $question);
 
             if ($answer === 'y') {
-                Hermes::setDependencies(['theaentmachine/aent-traefik']);
+                Aenthill::setDependencies(['theaentmachine/aent-traefik']);
             } else {
                 throw CannotHandleEventException::cannotHandleEvent(self::NEW_VIRTUAL_HOST);
             }

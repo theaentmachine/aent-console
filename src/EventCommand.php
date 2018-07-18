@@ -12,21 +12,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class EventCommand extends Command
 {
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     protected $log;
-    /**
-     * @var InputInterface
-     */
+
+    /** @var InputInterface */
     protected $input;
-    /**
-     * @var OutputInterface
-     */
+
+    /** @var OutputInterface */
     protected $output;
-    /**
-     * @var AentHelper
-     */
+
+    /** @var AentHelper */
     private $aentHelper;
 
     abstract protected function getEventName(): string;
@@ -45,7 +40,7 @@ abstract class EventCommand extends Command
         $this->aentHelper = new AentHelper($input, $output, $this->getHelper('question'), $this->getHelper('formatter'));
 
         // Let's send the list of caught events to Hercule
-        Hermes::setHandledEvents($this->getAllEventNames());
+        Aenthill::setHandledEvents($this->getAllEventNames());
 
         $logLevelConfigurator = new LogLevelConfigurator($output);
         $logLevelConfigurator->configureLogLevel();
@@ -64,7 +59,7 @@ abstract class EventCommand extends Command
 
         // Now, let's send a "reply" event
         if ($result !== null) {
-            Hermes::reply('reply', $result);
+            Aenthill::reply('reply', $result);
         }
     }
 
