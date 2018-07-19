@@ -9,14 +9,14 @@ use TheAentMachine\Exception\MissingEnvironmentVariableException;
 class Aenthill
 {
     /**
-     * Installs or updates current aent in the manifest.
+     * Updates current aent in the manifest.
      *
      * @param null|array<string,string> $metadata
      * @param null|string[] $events
      */
-    public static function installOrUpdate(?array $metadata = null, ?array $events = null): void
+    public static function update(?array $metadata = null, ?array $events = null): void
     {
-        $command = ['aenthill', 'install'];
+        $command = ['aenthill', 'update'];
         if (!empty($metadata)) {
             foreach ($metadata as $key => $value) {
                 $command[] = '-m';
@@ -46,9 +46,9 @@ class Aenthill
     {
         $command = ['aenthill', 'register', $image, $key];
         if (!empty($metadata)) {
-            foreach ($metadata as $key => $value) {
+            foreach ($metadata as $k => $value) {
                 $command[] = '-m';
-                $command[] = $key . '=' . $value;
+                $command[] = $k . '=' . $value;
             }
         }
         $process = new Process($command);
