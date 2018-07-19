@@ -9,7 +9,6 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 use TheAentMachine\Registry\RegistryClient;
 use TheAentMachine\Registry\TagsAnalyzer;
 
@@ -165,7 +164,7 @@ class AentHelper
     {
         $ciServices = $this->choiceQuestion('Select your CI service(s):', ['gitlab-ci', 'travis-ci', 'circle-ci'])
             ->askMultipleChoiceQuestion();
-        $ciServicesStr = implode(',', $ciServices);
+        $ciServicesStr = implode(', ', $ciServices);
         $this->output->writeln("<info>Your CI service(s): $ciServicesStr</info>");
         $this->spacer();
 
