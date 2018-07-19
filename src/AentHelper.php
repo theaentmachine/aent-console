@@ -138,4 +138,37 @@ class AentHelper
     {
         return new \TheAentMachine\Helper\Question($this->questionHelper, $this->input, $this->output, $question);
     }
+
+    public function askForEnv() : string
+    {
+        $answer = $this->question('Select your environment')
+            ->choiceQuestion(['dev', 'staging', 'prod'], false)
+            ->compulsory()
+            ->ask();
+        $this->output->writeln("<info>Your environment: $answer</info>");
+        $this->spacer();
+        return $answer;
+    }
+
+    public function askForCI() : string
+    {
+        $answer = $this->question('Do you want a CI ?')
+            ->yesNoQuestion()
+            ->setDefault('n')
+            ->compulsory()
+            ->ask();
+        $this->spacer();
+        return $answer;
+    }
+
+    public function askForReverseProxy() : string
+    {
+        $answer = $this->question('Do you want a reverse proxy ?')
+            ->yesNoQuestion()
+            ->setDefault('n')
+            ->compulsory()
+            ->ask();
+        $this->spacer();
+        return $answer;
+    }
 }
