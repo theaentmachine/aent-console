@@ -9,24 +9,21 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use TheAentMachine\Exception\LogLevelException;
+use TheAentMachine\Exception\MissingEnvironmentVariableException;
 
 abstract class EventCommand extends Command
 {
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     protected $log;
-    /**
-     * @var InputInterface
-     */
+
+    /** @var InputInterface */
     protected $input;
-    /**
-     * @var OutputInterface
-     */
+
+    /** @var OutputInterface */
     protected $output;
-    /**
-     * @var AentHelper
-     */
+
+    /** @var AentHelper */
     private $aentHelper;
 
     abstract protected function getEventName(): string;
@@ -41,19 +38,23 @@ abstract class EventCommand extends Command
             ->addArgument('payload', InputArgument::OPTIONAL, 'The event payload');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @throws LogLevelException
+     * @throws MissingEnvironmentVariableException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->aentHelper = new AentHelper($input, $output, $this->getHelper('question'), $this->getHelper('formatter'));
-
-        // Let's send the list of caught events to Hercule
-        if ($this->getEventName() !== 'REMOVE') {
-            Hermes::setHandledEvents($this->getAllEventNames());
-        }
-
         $logLevelConfigurator = new LogLevelConfigurator($output);
         $logLevelConfigurator->configureLogLevel();
 
         $this->log = new ConsoleLogger($output);
+
+        if (!$this->isHidden()) {
+            $this->log->info(Pheromone::getImage());
+        }
 
         $payload = $input->getArgument('payload');
         $this->input = $input;
@@ -63,14 +64,14 @@ abstract class EventCommand extends Command
 
         // Now, let's send a "reply" event
         if ($result !== null) {
-            Hermes::reply('reply', $result);
+            Aenthill::reply('reply', $result);
         }
     }
 
     /**
      * @return string[]
      */
-    private function getAllEventNames(): array
+    public function getAllEventNames(): array
     {
         return array_map(function (EventCommand $event) {
             return $event->getEventName();

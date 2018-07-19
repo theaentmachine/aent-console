@@ -1,6 +1,6 @@
 {
   "name": "theaentmachine/aent-console",
-  "description": "A utility PHP package to create Aents using Symfony console.",
+  "description": "A utility PHP package to create aents using Symfony console.",
   "homepage" : "https://github.com/theaentmachine/aent-console",
   "type" : "library",
   "license" : "MIT",
