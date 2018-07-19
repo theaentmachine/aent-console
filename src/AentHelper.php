@@ -139,33 +139,39 @@ class AentHelper
         return new \TheAentMachine\Helper\Question($this->questionHelper, $this->input, $this->output, $question);
     }
 
-    public function askForEnvType() : string
+    public function setEnvType() : string
     {
-        $answer = $this->question('Select your environment type')
-            ->choiceQuestion(['DEV', 'PROD'], false)
+        $envType = $this->question('Select your environment type')
+            ->choiceQuestion(['DEV', 'STAGING', 'PROD'], false)
             ->ask();
-        $this->output->writeln("<info>Your environment type: $answer</info>");
+        $this->output->writeln("<info>Your environment type: $envType</info>");
         $this->spacer();
-        return $answer;
+
+        Aenthill::update(['ENV_TYPE' => $envType]);
+        return $envType;
     }
 
-    public function askForCI() : string
+    public function registerCI() : string
     {
-        $answer = $this->question('Do you want a CI ?')
-            ->yesNoQuestion()
-            ->setDefault('n')
+        $ciService = $this->question('Select your CI service:')
+            ->choiceQuestion(['gitlab-ci', 'circle-ci', 'travis-ci'], false)
             ->ask();
+        $this->output->writeln("<info>Your CI service: $ciService</info>");
         $this->spacer();
-        return $answer;
+
+        Aenthill::addDependency('aent-' . $ciService, 'CI');
+        return $ciService;
     }
 
-    public function askForReverseProxy() : string
+    public function registerReverseProxy() : string
     {
-        $answer = $this->question('Do you want a reverse proxy ?')
-            ->yesNoQuestion()
-            ->setDefault('n')
+        $reverseProxy = $this->question('Select your reverse proxy:')
+            ->choiceQuestion(['traefik', 'nginx', 'ingress'], false)
             ->ask();
+        $this->output->writeln("<info>Your reverse proxy: $reverseProxy</info>");
         $this->spacer();
-        return $answer;
+
+        Aenthill::addDependency('aent' . $reverseProxy, 'CI');
+        return $reverseProxy;
     }
 }
