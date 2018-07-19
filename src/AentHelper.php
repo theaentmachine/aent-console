@@ -159,7 +159,7 @@ class AentHelper
         $this->output->writeln("<info>Your CI service: $ciService</info>");
         $this->spacer();
 
-        Aenthill::addDependency('aent-' . $ciService, 'CI');
+        Aenthill::addDependency('theaentmachine-aent-' . $ciService, 'CI');
         return $ciService;
     }
 
@@ -171,7 +171,7 @@ class AentHelper
         $this->output->writeln("<info>Your reverse proxy: $reverseProxy</info>");
         $this->spacer();
 
-        Aenthill::addDependency('aent' . $reverseProxy, 'CI');
+        Aenthill::addDependency('theaentmachine-aent-' . $reverseProxy, 'REVERSE_PROXY');
         return $reverseProxy;
     }
 }
