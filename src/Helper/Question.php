@@ -163,19 +163,19 @@ class Question
             };
         }
 
-        if ($this->choiceQuestion) {
-            $validator = function (?string $response) use ($validator) {
-                $response = $response ?? '';
-                if (!$this->multiselectQuestion) {
-                    $index = (int)$response;
-                    if ($index < 0 || $index >= count($this->choices)) {
-                        throw new \InvalidArgumentException('Answer must be in range');
-                    }
-                    $response = $this->choices[$index];
-                }
-                return $validator ? $validator($response) : $response;
-            };
-        }
+//        if ($this->choiceQuestion) {
+//            $validator = function (?string $response) use ($validator) {
+//                $response = $response ?? '';
+//                if (!$this->multiselectQuestion) {
+//                    $index = (int)$response;
+//                    if ($index < 0 || $index >= count($this->choices)) {
+//                        throw new \InvalidArgumentException('Answer must be in range');
+//                    }
+//                    $response = $this->choices[$index];
+//                }
+//                return $validator ? $validator($response) : $response;
+//            };
+//        }
 
         if ($this->helpText !== null) {
             $validator = function (?string $response) use ($validator) {
