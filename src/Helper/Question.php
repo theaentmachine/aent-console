@@ -87,18 +87,44 @@ class Question
 
     /**
      * @param mixed[] $choices
-     * @param bool $multiselect
-     * @return Question
+     * @return string
      */
-    public function choiceQuestion(array $choices, bool $multiselect = false): self
+    public function askSingleChoiceQuestion(array $choices) : string
     {
         $this->choiceQuestion = true;
         $this->choices = $choices;
-        $this->multiselectQuestion = $multiselect;
-        return $this;
+        $this->multiselectQuestion = false;
+        return $this->ask();
+    }
+
+    /**
+     * @param mixed[] $choices
+     * @return string[]
+     */
+    public function askMultipleChoiceQuestion(array $choices) : array
+    {
+        $this->choiceQuestion = true;
+        $this->choices = $choices;
+        $this->multiselectQuestion = true;
+        $question = $this->preAsk();
+        do {
+            $answer = $this->helper->ask($this->input, $this->output, $question);
+        } while ($this->helpText !== null && $answer === '?');
+        return $answer;
     }
 
     public function ask(): string
+    {
+        $question = $this->preAsk();
+        do {
+            $answer = $this->helper->ask($this->input, $this->output, $question);
+        } while ($this->helpText !== null && $answer === '?');
+
+        return $answer;
+    }
+
+    /** Format the question text and update the validator */
+    private function preAsk(): \Symfony\Component\Console\Question\Question
     {
         $text = $this->question;
         if ($this->helpText) {
@@ -118,6 +144,7 @@ class Question
             $text .= ' [y/n]';
         }
         $text .= ': ';
+        $this->question = $text;
 
 
         $question = $this->choiceQuestion ? new \Symfony\Component\Console\Question\ChoiceQuestion($text, $this->choices, $this->default) : new \Symfony\Component\Console\Question\Question($text, $this->default);
@@ -140,7 +167,7 @@ class Question
             $validator = function (?string $response) use ($validator) {
                 $response = $response ?? '';
                 if (!$this->multiselectQuestion) {
-                    $index = intval($response);
+                    $index = (int)$response;
                     if ($index < 0 || $index >= count($this->choices)) {
                         throw new \InvalidArgumentException('Answer must be in range');
                     }
@@ -170,13 +197,7 @@ class Question
                 return $validator ? $validator($response) : $response;
             };
         }
-
         $question->setValidator($validator);
-
-        do {
-            $answer = $this->helper->ask($this->input, $this->output, $question);
-        } while ($this->helpText !== null && $answer === '?');
-
-        return $answer;
+        return $question;
     }
 }

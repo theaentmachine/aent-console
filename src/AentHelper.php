@@ -139,35 +139,40 @@ class AentHelper
         return new \TheAentMachine\Helper\Question($this->questionHelper, $this->input, $this->output, $question);
     }
 
-    public function setEnvType() : string
+    public function setEnvType(): string
     {
         $envType = $this->question('Select your environment type')
-            ->choiceQuestion(['DEV', 'STAGING', 'PROD'], false)
-            ->ask();
-        $this->output->writeln("<info>Your environment type: $envType</info>");
+            ->compulsory()
+            ->askSingleChoiceQuestion(['DEV', 'STAGING', 'PROD']);
+        $this->output->writeln("<info>Selected environment type: $envType</info>");
         $this->spacer();
 
         Aenthill::update(['ENV_TYPE' => $envType]);
         return $envType;
     }
 
-    public function registerCI() : string
+    /** @return string[] */
+    public function registerCI(): array
     {
-        $ciService = $this->question('Select your CI service:')
-            ->choiceQuestion(['gitlab-ci', 'circle-ci', 'travis-ci'], false)
-            ->ask();
-        $this->output->writeln("<info>Your CI service: $ciService</info>");
+        $ciServices = $this->question('Select your CI service(s):')
+            ->compulsory()
+            ->askMultipleChoiceQuestion(['gitlab-ci', 'travis-ci', 'circle-ci']);
+        $ciServicesStr = implode(',', $ciServices);
+        $this->output->writeln("<info>Your CI service(s): $ciServicesStr</info>");
         $this->spacer();
 
-        Aenthill::addDependency('theaentmachine-aent-' . $ciService, 'CI');
-        return $ciService;
+        foreach ($ciServices as $index => $ciService) {
+            Aenthill::addDependency("theaentmachine-aent-$ciService", "CI_$index");
+        }
+
+        return $ciServices;
     }
 
-    public function registerReverseProxy() : string
+    public function registerReverseProxy(): string
     {
         $reverseProxy = $this->question('Select your reverse proxy:')
-            ->choiceQuestion(['traefik', 'nginx', 'ingress'], false)
-            ->ask();
+            ->compulsory()
+            ->askSingleChoiceQuestion(['traefik', 'nginx', 'ingress']);
         $this->output->writeln("<info>Your reverse proxy: $reverseProxy</info>");
         $this->spacer();
 
