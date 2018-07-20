@@ -165,7 +165,7 @@ class AentHelper
      */
     public function registerCI(): string
     {
-        $ci = $this->choiceQuestion('Select your reverse proxy:', ['gitlab-ci', 'travis-ci', 'circle-ci'])
+        $ci = $this->choiceQuestion('Select your CI/CD:', ['gitlab-ci', 'travis-ci', 'circle-ci'])
             ->askSingleChoiceQuestion();
         $this->output->writeln("<info>Your CI: $ci</info>");
         $this->spacer();
