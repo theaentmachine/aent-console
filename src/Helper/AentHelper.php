@@ -127,7 +127,7 @@ class AentHelper
         if ($currentEnvType === Metadata::ENV_TYPE_TEST) {
             $doAddAentDockerfile = $this->question('In the future, will you build an image of your project ?')
                 ->yesNoQuestion()
-                ->setDefault('n')
+                ->setDefault('y')
                 ->setHelpText('If yes, Aenthill will add a new aent which can generate Dockerfiles for you : <info>theaentmachine/aent-dockerfile</info>')
                 ->ask();
         }
