@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use TheAentMachine\AentHelper;
+use TheAentMachine\Helper\AentHelper;
 use TheAentMachine\Aenthill\Aenthill;
 use TheAentMachine\Exception\LogLevelException;
 use TheAentMachine\Exception\MissingEnvironmentVariableException;

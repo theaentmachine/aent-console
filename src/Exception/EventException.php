@@ -2,7 +2,7 @@
 
 namespace TheAentMachine\Exception;
 
-use TheAentMachine\Pheromone;
+use TheAentMachine\Aenthill\Pheromone;
 
 class EventException extends AenthillException
 {
