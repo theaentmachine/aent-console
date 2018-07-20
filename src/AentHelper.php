@@ -9,6 +9,8 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use TheAentMachine\Exception\ManifestException;
+use TheAentMachine\Exception\MissingEnvironmentVariableException;
 use TheAentMachine\Registry\RegistryClient;
 use TheAentMachine\Registry\TagsAnalyzer;
 
@@ -161,7 +163,8 @@ class AentHelper
 
     /**
      * @return string
-     * @throws Exception\MissingEnvironmentVariableException
+     * @throws MissingEnvironmentVariableException
+     * @throws ManifestException
      */
     public function registerCI(): string
     {
@@ -181,6 +184,7 @@ class AentHelper
     /**
      * @return string
      * @throws Exception\MissingEnvironmentVariableException
+     * @throws ManifestException
      */
     public function registerReverseProxy(): string
     {

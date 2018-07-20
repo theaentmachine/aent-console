@@ -3,6 +3,9 @@
 
 namespace TheAentMachine;
 
+use TheAentMachine\Exception\ManifestException;
+use TheAentMachine\Exception\MissingEnvironmentVariableException;
+
 /**
  * Utility class to access the manifest data.
  */
@@ -14,6 +17,9 @@ class Manifest
         return $containerProjectDir . '/aenthill.json';
     }
 
+    /**
+     * @return mixed[]
+     */
     private static function parse(): array
     {
         $filePath = self::getFilePath();
@@ -24,6 +30,9 @@ class Manifest
         return \GuzzleHttp\json_decode($str, true);
     }
 
+    /**
+     * @param string[] $events
+     */
     public static function setEvents(array $events): void
     {
         Aenthill::update(null, $events);
@@ -36,10 +45,11 @@ class Manifest
 
     /**
      * @param string $key
-     * @return null|string
-     * @throws Exception\MissingEnvironmentVariableException
+     * @return string
+     * @throws MissingEnvironmentVariableException
+     * @throws ManifestException
      */
-    public static function getMetadata(string $key): ?string
+    public static function getMetadata(string $key): string
     {
         $manifest = self::parse();
         $aentID = Pheromone::getKey();
@@ -50,7 +60,7 @@ class Manifest
                 }
             }
         }
-        return null;
+        throw ManifestException::missingMetadata($key);
     }
 
     /**
@@ -66,7 +76,8 @@ class Manifest
     /**
      * @param string $key
      * @return null|string
-     * @throws Exception\MissingEnvironmentVariableException
+     * @throws MissingEnvironmentVariableException
+     * @throws ManifestException
      */
     public static function getDependency(string $key): ?string
     {
@@ -79,6 +90,6 @@ class Manifest
                 }
             }
         }
-        return null;
+        throw ManifestException::missingDependency($key);
     }
 }
