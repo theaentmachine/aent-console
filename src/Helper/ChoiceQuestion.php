@@ -25,7 +25,7 @@ class ChoiceQuestion extends BaseQuestion
         $this->choices = $choices;
     }
 
-    public function setDefault($default): self
+    public function setDefault(string $default): self
     {
         $this->default = $default;
         return $this;

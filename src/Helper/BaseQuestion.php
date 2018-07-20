@@ -20,7 +20,7 @@ abstract class BaseQuestion
     /** @var string */
     protected $question;
 
-    /** @var mixed|null */
+    /** @var string|null */
     protected $default;
 
     /** @var string|null */
@@ -35,10 +35,10 @@ abstract class BaseQuestion
     }
 
     /**
-     * @param mixed $default
+     * @param string $default
      * @return mixed
      */
-    abstract public function setDefault($default);
+    abstract public function setDefault(string $default);
 
     /**
      * @param string $helpText

@@ -165,7 +165,7 @@ class AentHelper
     public function registerCI(): array
     {
         $ciServices = $this->choiceQuestion('Select your CI service(s):', ['gitlab-ci', 'travis-ci', 'circle-ci'])
-            ->setDefault(['gitlab-ci', 'travis-ci'])
+            ->setDefault('gitlab-ci, travis-ci')
             ->setHelpText('This is a help text')
             ->askWithMultipleChoices();
         $ciServicesStr = implode(', ', $ciServices);

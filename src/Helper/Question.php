@@ -14,7 +14,7 @@ class Question extends BaseQuestion
     /** @var bool */
     private $yesNoQuestion = false;
 
-    public function setDefault($default): self
+    public function setDefault(string $default): self
     {
         $this->default = $default;
         return $this;
