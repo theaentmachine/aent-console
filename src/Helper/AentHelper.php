@@ -1,16 +1,18 @@
 <?php
 
 
-namespace TheAentMachine;
+namespace TheAentMachine\Helper;
 
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\Question as SymfonyQuestion;
 use TheAentMachine\Exception\ManifestException;
 use TheAentMachine\Exception\MissingEnvironmentVariableException;
+use TheAentMachine\Aenthill\Manifest;
+use TheAentMachine\Aenthill\Metadata;
 use TheAentMachine\Registry\RegistryClient;
 use TheAentMachine\Registry\TagsAnalyzer;
 
@@ -102,7 +104,7 @@ class AentHelper
             $this->output->writeln('Possible values include: <info>' . \implode('</info>, <info>', $proposedTags) . '</info>');
         }
         $this->output->writeln('Enter "v" to view all available versions, "?" for help');
-        $question = new Question(
+        $question = new SymfonyQuestion(
             "Select your $applicationName version [$default]: ",
             $default
         );
@@ -136,18 +138,18 @@ class AentHelper
         return $version;
     }
 
-    public function question(string $question): \TheAentMachine\Helper\Question
+    public function question(string $question): Question
     {
-        return new \TheAentMachine\Helper\Question($this->questionHelper, $this->input, $this->output, $question);
+        return new Question($this->questionHelper, $this->input, $this->output, $question);
     }
 
     /**
      * @param string[] $choices
-     * @return Helper\ChoiceQuestion
+     * @return ChoiceQuestion
      */
-    public function choiceQuestion(string $question, array $choices): \TheAentMachine\Helper\ChoiceQuestion
+    public function choiceQuestion(string $question, array $choices): ChoiceQuestion
     {
-        return new \TheAentMachine\Helper\ChoiceQuestion($this->questionHelper, $this->input, $this->output, $question, $choices);
+        return new ChoiceQuestion($this->questionHelper, $this->input, $this->output, $question, $choices);
     }
 
     public function setEnvType(): string
@@ -183,7 +185,7 @@ class AentHelper
 
     /**
      * @return string
-     * @throws Exception\MissingEnvironmentVariableException
+     * @throws MissingEnvironmentVariableException
      * @throws ManifestException
      */
     public function registerReverseProxy(): string

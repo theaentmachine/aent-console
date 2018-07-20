@@ -1,10 +1,10 @@
 <?php
 
 
-namespace TheAentMachine;
+namespace TheAentMachine\Aenthill;
 
 use Symfony\Component\Process\Process;
-use TheAentMachine\Exception\MissingEnvironmentVariableException;
+use TheAentMachine\ReplyAggregator;
 
 class Aenthill
 {

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace TheAentMachine;
+namespace TheAentMachine\Aenthill;
 
 use TheAentMachine\Exception\ManifestException;
 use TheAentMachine\Exception\MissingEnvironmentVariableException;
@@ -11,6 +11,10 @@ use TheAentMachine\Exception\MissingEnvironmentVariableException;
  */
 class Manifest
 {
+    /**
+     * @return string
+     * @throws MissingEnvironmentVariableException
+     */
     private static function getFilePath(): string
     {
         $containerProjectDir = Pheromone::getContainerProjectDirectory();
@@ -19,6 +23,7 @@ class Manifest
 
     /**
      * @return mixed[]
+     * @throws MissingEnvironmentVariableException
      */
     private static function parse(): array
     {

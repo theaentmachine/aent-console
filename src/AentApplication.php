@@ -5,6 +5,8 @@ namespace TheAentMachine;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
+use TheAentMachine\Command\VoidCommand;
+use TheAentMachine\Command\ReplyCommand;
 
 /**
  * aents should start a AentApplication instead of a default Symfony console "Application"
