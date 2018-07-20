@@ -149,6 +149,9 @@ class AentHelper
         return Manifest::getDependency(Metadata::REVERSE_PROXY_KEY);
     }*/
 
+    /**
+     * @return mixed[]
+     */
     public function askForEnvironments(): array
     {
         $environments = Aenthill::dispatch('ENVIRONMENT');
