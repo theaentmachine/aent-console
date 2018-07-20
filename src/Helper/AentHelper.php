@@ -168,11 +168,14 @@ class AentHelper
     }*/
 
     /**
-     * @return mixed[]
+     * @return mixed[]|null
      */
-    public function askForEnvironments(): array
+    public function askForEnvironments(): ?array
     {
         $environments = Aenthill::dispatch('ENVIRONMENT');
+        if (empty($environments)) {
+            return null;
+        }
         $choosen = $this->choiceQuestion('Environments', array_keys($environments))
             ->askWithMultipleChoices();
         $this->output->writeln('<info>Environments: ' . implode($choosen, ', ') . '</info>');
