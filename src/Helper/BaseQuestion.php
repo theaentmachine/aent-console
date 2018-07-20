@@ -20,6 +20,12 @@ abstract class BaseQuestion
     /** @var string */
     protected $question;
 
+    /** @var mixed|null */
+    protected $default;
+
+    /** @var string|null */
+    protected $helpText;
+
     public function __construct(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $question)
     {
         $this->helper = $helper;
@@ -27,4 +33,21 @@ abstract class BaseQuestion
         $this->output = $output;
         $this->question = $question;
     }
+
+    /**
+     * @param mixed $default
+     * @return mixed
+     */
+    abstract public function setDefault($default);
+
+    /**
+     * @param string $helpText
+     * @return mixed
+     */
+    abstract public function setHelpText(string $helpText);
+
+    /**
+     * @return mixed
+     */
+    abstract public function ask();
 }
