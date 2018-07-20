@@ -75,11 +75,11 @@ class Manifest
 
     /**
      * @param string $key
-     * @return null|string
+     * @return string
      * @throws MissingEnvironmentVariableException
      * @throws ManifestException
      */
-    public static function getDependency(string $key): ?string
+    public static function getDependency(string $key): string
     {
         $manifest = self::parse();
         $aentID = Pheromone::getKey();
