@@ -124,10 +124,28 @@ class AentHelper
             ->ask();
         $this->output->writeln("<info>CI/CD: $ci</info>");
         $this->spacer();
+
+        $currentEnvType = Manifest::getMetadata(Metadata::ENV_TYPE_KEY);
         Manifest::addDependency("theaentmachine/aent-$ci", Metadata::CI_KEY, [
             Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
-            Metadata::ENV_TYPE_KEY => Manifest::getMetadata(Metadata::ENV_TYPE_KEY)
+            Metadata::ENV_TYPE_KEY => $currentEnvType
         ]);
+
+        $doAddAentDockerfile = false;
+        if ($currentEnvType === Metadata::ENV_TYPE_TEST) {
+            $doAddAentDockerfile = $this->question('In the future, will you build an image of your project ?')
+                ->yesNoQuestion()
+                ->setDefault('n')
+                ->setHelpText('If yes, Aenthill will add a new aent which can generate Dockerfiles for you : <info>theaentmachine/aent-dockerfile</info>')
+                ->ask();
+        }
+        if ($doAddAentDockerfile || $currentEnvType === Metadata::ENV_TYPE_PROD) {
+            Manifest::addDependency('theaentmachine/aent-dockerfile', Metadata::CI_KEY, [
+                Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
+                Metadata::ENV_TYPE_KEY => $currentEnvType
+            ]);
+        }
+
         return Manifest::getDependency(Metadata::CI_KEY);
     }
 
