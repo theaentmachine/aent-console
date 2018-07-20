@@ -3,30 +3,31 @@
 
 namespace TheAentMachine\Helper;
 
-use Symfony\Component\Console\Question\ChoiceQuestion as SymfonyQuestion;
+use Symfony\Component\Console\Question\Question as SymfonyQuestion;
 
 /**
  * A helper class to easily create questions.
  */
 class Question extends BaseQuestion
 {
-    private $default;
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $compulsory = false;
-    /**
-     * @var callable|null
-     */
+    /** @var callable|null */
     private $validator;
-    /**
-     * @var string|null
-     */
-    private $helpText;
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $yesNoQuestion = false;
+
+    public function setDefault(string $default): self
+    {
+        $this->default = $default;
+        return $this;
+    }
+
+    public function setHelpText(string $helpText): self
+    {
+        $this->helpText = $helpText;
+        return $this;
+    }
 
     public function compulsory(): self
     {
@@ -37,18 +38,6 @@ class Question extends BaseQuestion
     public function setValidator(callable $validator): self
     {
         $this->validator = $validator;
-        return $this;
-    }
-
-    public function setHelpText(string $helpText): self
-    {
-        $this->helpText = $helpText;
-        return $this;
-    }
-
-    public function setDefault(string $default): self
-    {
-        $this->default = $default;
         return $this;
     }
 
