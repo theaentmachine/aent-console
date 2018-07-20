@@ -3,7 +3,7 @@
 
 namespace TheAentMachine\Helper;
 
-use Symfony\Component\Console\Question\ChoiceQuestion as SymfonyQuestion;
+use Symfony\Component\Console\Question\Question as SymfonyQuestion;
 
 /**
  * A helper class to easily create questions.
