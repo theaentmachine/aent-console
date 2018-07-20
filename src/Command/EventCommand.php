@@ -1,7 +1,7 @@
 <?php
 
 
-namespace TheAentMachine;
+namespace TheAentMachine\Command;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -9,8 +9,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use TheAentMachine\AentHelper;
+use TheAentMachine\Aenthill\Aenthill;
 use TheAentMachine\Exception\LogLevelException;
 use TheAentMachine\Exception\MissingEnvironmentVariableException;
+use TheAentMachine\LogLevelConfigurator;
+use TheAentMachine\Pheromone;
 
 abstract class EventCommand extends Command
 {

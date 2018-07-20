@@ -1,6 +1,6 @@
 <?php
 
-namespace TheAentMachine;
+namespace TheAentMachine\Aenthill;
 
 use TheAentMachine\Exception\LogLevelException;
 use TheAentMachine\Exception\MissingEnvironmentVariableException;

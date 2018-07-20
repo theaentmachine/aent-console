@@ -1,6 +1,6 @@
 <?php
 
-namespace TheAentMachine;
+namespace TheAentMachine\Aenthill;
 
 class Metadata
 {
