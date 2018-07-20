@@ -120,17 +120,9 @@ class AentHelper
      */
     public function askForCICD(): string
     {
-        $ci = $this->choiceQuestion('CI/CD', ['gitlab-ci', 'travis-ci', 'circle-ci'])
-            ->ask();
-        $this->output->writeln("<info>CI/CD: $ci</info>");
-        $this->spacer();
-
         $currentEnvType = Manifest::getMetadata(Metadata::ENV_TYPE_KEY);
-        Manifest::addDependency("theaentmachine/aent-$ci", Metadata::CI_KEY, [
-            Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
-            Metadata::ENV_TYPE_KEY => $currentEnvType
-        ]);
 
+        // Image builder
         $doAddAentDockerfile = false;
         if ($currentEnvType === Metadata::ENV_TYPE_TEST) {
             $doAddAentDockerfile = $this->question('In the future, will you build an image of your project ?')
@@ -140,11 +132,23 @@ class AentHelper
                 ->ask();
         }
         if ($doAddAentDockerfile || $currentEnvType === Metadata::ENV_TYPE_PROD) {
-            Manifest::addDependency('theaentmachine/aent-dockerfile', Metadata::CI_KEY, [
+            $this->output->writeln('<info>Adding theaentmachine/aent-dockerfile to build images</info>');
+            Manifest::addDependency('theaentmachine/aent-dockerfile', Metadata::IMAGE_BUILDER_KEY, [
                 Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
                 Metadata::ENV_TYPE_KEY => $currentEnvType
             ]);
         }
+
+        // CI
+        $ci = $this->choiceQuestion('CI/CD', ['gitlab-ci', 'travis-ci', 'circle-ci'])
+            ->ask();
+        $this->output->writeln("<info>CI/CD: $ci</info>");
+        $this->spacer();
+
+        Manifest::addDependency("theaentmachine/aent-$ci", Metadata::CI_KEY, [
+            Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
+            Metadata::ENV_TYPE_KEY => $currentEnvType
+        ]);
 
         return Manifest::getDependency(Metadata::CI_KEY);
     }

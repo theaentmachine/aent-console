@@ -13,4 +13,5 @@ class Metadata
 
     const CI_KEY = 'CI';
     const REVERSE_PROXY_KEY = 'REVERSE_PROXY';
+    const IMAGE_BUILDER_KEY = 'IMAGE_BUILDER';
 }
