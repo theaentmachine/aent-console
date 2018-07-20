@@ -138,4 +138,51 @@ class AentHelper
     {
         return new \TheAentMachine\Helper\Question($this->questionHelper, $this->input, $this->output, $question);
     }
+
+    /**
+     * @param string[] $choices
+     * @return Helper\ChoiceQuestion
+     */
+    public function choiceQuestion(string $question, array $choices): \TheAentMachine\Helper\ChoiceQuestion
+    {
+        return new \TheAentMachine\Helper\ChoiceQuestion($this->questionHelper, $this->input, $this->output, $question, $choices);
+    }
+
+    public function setEnvType(): string
+    {
+        $envType = $this->choiceQuestion('Select your environment type', ['DEV', 'TEST', 'PROD'])
+            ->askSingleChoiceQuestion();
+        $this->output->writeln("<info>Selected environment type: $envType</info>");
+        $this->spacer();
+
+        Aenthill::update(['ENV_TYPE' => $envType]);
+        return $envType;
+    }
+
+    /** @return string[] */
+    public function registerCI(): array
+    {
+        $ciServices = $this->choiceQuestion('Select your CI service(s):', ['gitlab-ci', 'travis-ci', 'circle-ci'])
+            ->askMultipleChoiceQuestion();
+        $ciServicesStr = implode(', ', $ciServices);
+        $this->output->writeln("<info>Your CI service(s): $ciServicesStr</info>");
+        $this->spacer();
+
+        foreach ($ciServices as $index => $ciService) {
+            Aenthill::addDependency("theaentmachine-aent-$ciService", "CI_$index");
+        }
+
+        return $ciServices;
+    }
+
+    public function registerReverseProxy(): string
+    {
+        $reverseProxy = $this->choiceQuestion('Select your reverse proxy:', ['traefik', 'nginx', 'ingress'])
+            ->askSingleChoiceQuestion();
+        $this->output->writeln("<info>Your reverse proxy: $reverseProxy</info>");
+        $this->spacer();
+
+        Aenthill::addDependency('theaentmachine-aent-' . $reverseProxy, 'REVERSE_PROXY');
+        return $reverseProxy;
+    }
 }
