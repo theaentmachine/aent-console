@@ -1,6 +1,7 @@
 <?php
 
-namespace TheAentMachine;
+
+namespace TheAentMachine\Command;
 
 /**
  * A command that does nothing

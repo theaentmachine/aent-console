@@ -1,14 +1,18 @@
 <?php
 
 
-namespace TheAentMachine;
+namespace TheAentMachine\Helper;
 
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\Question as SymfonyQuestion;
+use TheAentMachine\Exception\ManifestException;
+use TheAentMachine\Exception\MissingEnvironmentVariableException;
+use TheAentMachine\Aenthill\Manifest;
+use TheAentMachine\Aenthill\Metadata;
 use TheAentMachine\Registry\RegistryClient;
 use TheAentMachine\Registry\TagsAnalyzer;
 
@@ -100,7 +104,7 @@ class AentHelper
             $this->output->writeln('Possible values include: <info>' . \implode('</info>, <info>', $proposedTags) . '</info>');
         }
         $this->output->writeln('Enter "v" to view all available versions, "?" for help');
-        $question = new Question(
+        $question = new SymfonyQuestion(
             "Select your $applicationName version [$default]: ",
             $default
         );
@@ -134,60 +138,68 @@ class AentHelper
         return $version;
     }
 
-    public function question(string $question): \TheAentMachine\Helper\Question
+    public function question(string $question): Question
     {
-        return new \TheAentMachine\Helper\Question($this->questionHelper, $this->input, $this->output, $question);
+        return new Question($this->questionHelper, $this->input, $this->output, $question);
     }
 
     /**
      * @param string[] $choices
-     * @return Helper\ChoiceQuestion
+     * @return ChoiceQuestion
      */
-    public function choiceQuestion(string $question, array $choices): \TheAentMachine\Helper\ChoiceQuestion
+    public function choiceQuestion(string $question, array $choices): ChoiceQuestion
     {
-        return new \TheAentMachine\Helper\ChoiceQuestion($this->questionHelper, $this->input, $this->output, $question, $choices);
+        return new ChoiceQuestion($this->questionHelper, $this->input, $this->output, $question, $choices);
     }
 
     public function setEnvType(): string
     {
-        $envType = $this->choiceQuestion('Select your environment type', ['DEV', 'TEST', 'PROD'])
-            ->setDefault('DEV')
-            ->setHelpText('This is a help text')
+        $envType = $this->choiceQuestion('Select your environment type', [Metadata::ENV_TYPE_DEV, Metadata::ENV_TYPE_TEST, Metadata::ENV_TYPE_PROD])
             ->ask();
         $this->output->writeln("<info>Selected environment type: $envType</info>");
         $this->spacer();
 
-        Aenthill::update(['ENV_TYPE' => $envType]);
+        Manifest::addMetadata(Metadata::ENV_TYPE_KEY, $envType);
         return $envType;
     }
 
-    /** @return string[] */
-    public function registerCI(): array
+    /**
+     * @return string
+     * @throws MissingEnvironmentVariableException
+     * @throws ManifestException
+     */
+    public function registerCI(): string
     {
-        $ciServices = $this->choiceQuestion('Select your CI service(s):', ['gitlab-ci', 'travis-ci', 'circle-ci'])
-            ->setDefault('gitlab-ci, travis-ci')
-            ->setHelpText('This is a help text')
-            ->askWithMultipleChoices();
-        $ciServicesStr = implode(', ', $ciServices);
-        $this->output->writeln("<info>Your CI service(s): $ciServicesStr</info>");
+        $ci = $this->choiceQuestion('Select your CI/CD:', ['gitlab-ci', 'travis-ci', 'circle-ci'])
+            ->ask();
+        $this->output->writeln("<info>Your CI: $ci</info>");
         $this->spacer();
 
-        foreach ($ciServices as $index => $ciService) {
-            Aenthill::addDependency("theaentmachine-aent-$ciService", "CI_$index");
-        }
+        Manifest::addDependency("theaentmachine/aent-$ci", Metadata::CI_KEY, [
+            Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
+            Metadata::ENV_TYPE_KEY => Manifest::getMetadata(Metadata::ENV_TYPE_KEY)
+        ]);
 
-        return $ciServices;
+        return Manifest::getDependency(Metadata::CI_KEY);
     }
 
+    /**
+     * @return string
+     * @throws MissingEnvironmentVariableException
+     * @throws ManifestException
+     */
     public function registerReverseProxy(): string
     {
         $reverseProxy = $this->choiceQuestion('Select your reverse proxy:', ['traefik', 'nginx', 'ingress'])
-            ->setHelpText('This is a help text')
             ->ask();
         $this->output->writeln("<info>Your reverse proxy: $reverseProxy</info>");
         $this->spacer();
 
-        Aenthill::addDependency('theaentmachine-aent-' . $reverseProxy, 'REVERSE_PROXY');
-        return $reverseProxy;
+        Manifest::addDependency("theaentmachine/aent-$reverseProxy", Metadata::REVERSE_PROXY_KEY, [
+            Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
+            Metadata::ENV_TYPE_KEY => Manifest::getMetadata(Metadata::ENV_TYPE_KEY)
+        ]);
+
+        return Manifest::getDependency(Metadata::REVERSE_PROXY_KEY);
     }
 }

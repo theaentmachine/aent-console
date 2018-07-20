@@ -1,10 +1,10 @@
 <?php
 
 
-namespace TheAentMachine;
+namespace TheAentMachine\Aenthill;
 
 use Symfony\Component\Process\Process;
-use TheAentMachine\Exception\MissingEnvironmentVariableException;
+use TheAentMachine\ReplyAggregator;
 
 class Aenthill
 {
@@ -42,7 +42,7 @@ class Aenthill
      * @param string $key
      * @param null|array<string,string> $metadata
      */
-    public static function addDependency(string $image, string $key, ?array $metadata = null): void
+    public static function register(string $image, string $key, ?array $metadata = null): void
     {
         $command = ['aenthill', 'register', $image, $key];
         if (!empty($metadata)) {
@@ -149,38 +149,5 @@ class Aenthill
     public static function replyJson(string $event, array $payload): void
     {
         self::reply($event, \GuzzleHttp\json_encode($payload));
-    }
-
-    /**
-     * Returns the list of aents in the manifest which handles the given event.
-     *
-     * @param string $handledEvent
-     * @return string[]
-     * @throws MissingEnvironmentVariableException
-     */
-    public static function findAentsByHandledEvent(string $handledEvent): array
-    {
-        $manifest = Pheromone::getAenthillManifestContent();
-        $aents = array();
-        if (isset($manifest['aents'])) {
-            foreach ($manifest['aents'] as $aent) {
-                if (array_key_exists('events', $aent) && \in_array($handledEvent, $aent['events'], true)) {
-                    $aents[] = $aent;
-                }
-            }
-        }
-        return $aents;
-    }
-
-    /**
-     * Returns true if one of the aents installed can explicitly handle events of type $handledEvent
-     *
-     * @param string $handledEvent
-     * @return bool
-     * @throws MissingEnvironmentVariableException
-     */
-    public static function canHandleEvent(string $handledEvent): bool
-    {
-        return count(self::findAentsByHandledEvent($handledEvent)) > 0;
     }
 }

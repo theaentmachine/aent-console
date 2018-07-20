@@ -1,6 +1,9 @@
 <?php
 
+
 namespace TheAentMachine\Helper;
+
+use Symfony\Component\Console\Question\ChoiceQuestion as SymfonyQuestion;
 
 /**
  * A helper class to easily create questions.
@@ -65,7 +68,7 @@ class Question extends BaseQuestion
         }
         $text .= ': ';
 
-        $question = new \Symfony\Component\Console\Question\Question($text, $this->default);
+        $question = new SymfonyQuestion($text, $this->default);
 
         $validator = $this->validator;
 

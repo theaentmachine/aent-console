@@ -1,7 +1,7 @@
 <?php
 
 
-namespace TheAentMachine;
+namespace TheAentMachine\Command;
 
 /**
  * Events that have JSON payloads should extend this class.

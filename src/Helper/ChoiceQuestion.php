@@ -6,6 +6,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion as SymfonyChoiceQuestion;
 
 /**
  * A helper class to easily create choice questions.
@@ -59,7 +60,7 @@ class ChoiceQuestion extends BaseQuestion
         return $answer;
     }
 
-    private function initQuestion(bool $multiselect): \Symfony\Component\Console\Question\ChoiceQuestion
+    private function initQuestion(bool $multiselect): SymfonyChoiceQuestion
     {
         $text = $this->question;
         if ($this->helpText) {
@@ -72,7 +73,7 @@ class ChoiceQuestion extends BaseQuestion
         $text .= ': ';
         $this->question = $text;
 
-        $question = new \Symfony\Component\Console\Question\ChoiceQuestion($this->question, $this->choices, $this->default);
+        $question = new SymfonyChoiceQuestion($this->question, $this->choices, $this->default);
         $this->multiselect = $multiselect;
         $question->setMultiselect($this->multiselect);
         $question->setValidator($this->getDefaultValidator());

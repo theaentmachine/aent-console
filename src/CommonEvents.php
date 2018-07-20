@@ -4,7 +4,9 @@
 namespace TheAentMachine;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use TheAentMachine\Aenthill\Aenthill;
 use TheAentMachine\Service\Service;
+use \TheAentMachine\Helper\AentHelper;
 
 class CommonEvents
 {
