@@ -14,7 +14,7 @@ use TheAentMachine\Aenthill\Aenthill;
 use TheAentMachine\Exception\LogLevelException;
 use TheAentMachine\Exception\MissingEnvironmentVariableException;
 use TheAentMachine\LogLevelConfigurator;
-use TheAentMachine\Pheromone;
+use TheAentMachine\Aenthill\Pheromone;
 
 abstract class EventCommand extends Command
 {

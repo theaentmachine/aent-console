@@ -4,6 +4,7 @@
 namespace TheAentMachine\Command;
 
 use TheAentMachine\Exception\EventException;
+use TheAentMachine\Exception\MissingEnvironmentVariableException;
 
 class CannotHandleAddEventCommand extends EventCommand
 {
@@ -16,7 +17,7 @@ class CannotHandleAddEventCommand extends EventCommand
      * @param null|string $payload
      * @return null|string
      * @throws EventException
-     * @throws \TheAentMachine\Exception\MissingEnvironmentVariableException
+     * @throws MissingEnvironmentVariableException
      */
     protected function executeEvent(?string $payload): ?string
     {
