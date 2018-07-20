@@ -45,7 +45,7 @@ class Pheromone
      * @return string
      * @throws MissingEnvironmentVariableException
      */
-    private static function getOrFail(string $variableName): string
+    private static function mustGet(string $variableName): string
     {
         $value = getenv($variableName);
         if ($value === false) {
@@ -60,7 +60,7 @@ class Pheromone
      * @param string $variableName the environment variable key
      * @return null|string
      */
-    private static function getOrNull(string $variableName): ?string
+    private static function get(string $variableName): ?string
     {
         $value = getenv($variableName);
         return $value === false ? null : $value;
@@ -74,7 +74,7 @@ class Pheromone
      */
     public static function getHostProjectDirectory(): string
     {
-        return self::getOrFail('PHEROMONE_HOST_PROJECT_DIR');
+        return self::mustGet('PHEROMONE_HOST_PROJECT_DIR');
     }
 
     /**
@@ -85,7 +85,7 @@ class Pheromone
      */
     public static function getContainerProjectDirectory(): string
     {
-        return rtrim(self::getOrFail('PHEROMONE_CONTAINER_PROJECT_DIR'), '/');
+        return rtrim(self::mustGet('PHEROMONE_CONTAINER_PROJECT_DIR'), '/');
     }
 
     /**
@@ -96,7 +96,18 @@ class Pheromone
      */
     public static function getImage(): string
     {
-        return self::getOrFail('PHEROMONE_IMAGE_NAME');
+        return self::mustGet('PHEROMONE_IMAGE_NAME');
+    }
+
+    /**
+     * The key from the manifest if this aent has been installed.
+     *
+     * @return string
+     * @throws MissingEnvironmentVariableException
+     */
+    public static function getKey(): string
+    {
+        return self::mustGet('PHEROMONE_KEY');
     }
 
     /**
@@ -106,54 +117,6 @@ class Pheromone
      */
     public static function getOriginContainer(): ?string
     {
-        return self::getOrNull('PHEROMONE_FROM_CONTAINER_ID');
-    }
-
-    /**
-     * The key from the manifest if this aent has been installed or null.
-     *
-     * @return null|string
-     */
-    public static function getKey(): ?string
-    {
-        return self::getOrNull('PHEROMONE_KEY');
-    }
-
-    /**
-     * The metadata or null.
-     *
-     * @param string $key the key on which this aent stored the metadata.
-     * @return null|string
-     */
-    public static function getMetadata(string $key): ?string
-    {
-        return self::getOrNull('PHEROMONE_METADATA_' . strtoupper($key));
-    }
-
-    /**
-     * The key from the manifest of the dependency or null.
-     *
-     * @param string $key the key on which this aent stored the dependency.
-     * @return null|string
-     */
-    public static function getDependency(string $key): ?string
-    {
-        return self::getOrNull('PHEROMONE_DEPENDENCY_' . strtoupper($key));
-    }
-
-    /**
-     * Returns the content of the manifest.
-     *
-     * @return mixed[]
-     * @throws MissingEnvironmentVariableException
-     */
-    public static function getAenthillManifestContent(): array
-    {
-        $containerProjectDir = self::getContainerProjectDirectory();
-        $aenthillJSONstr = file_get_contents($containerProjectDir . '/aenthill.json');
-        if ($aenthillJSONstr === false) {
-            throw new \RuntimeException('Failed to load the aenthill manifest file ' . $containerProjectDir . '/aenthill.json');
-        }
-        return \GuzzleHttp\json_decode($aenthillJSONstr, true);
+        return self::get('PHEROMONE_FROM_CONTAINER_ID');
     }
 }
