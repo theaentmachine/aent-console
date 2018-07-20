@@ -106,7 +106,7 @@ class AentHelper
     public function askForEnvType(): string
     {
         $envType = $this->choiceQuestion('Environment type', [Metadata::ENV_TYPE_DEV, Metadata::ENV_TYPE_TEST, Metadata::ENV_TYPE_PROD])
-            ->askSingleChoiceQuestion();
+            ->ask();
         $this->output->writeln("<info>Environment type: $envType</info>");
         $this->spacer();
         Manifest::addMetadata(Metadata::ENV_TYPE_KEY, $envType);
@@ -121,7 +121,7 @@ class AentHelper
     public function askForCICD(): string
     {
         $ci = $this->choiceQuestion('CI/CD', ['gitlab-ci', 'travis-ci', 'circle-ci'])
-            ->askSingleChoiceQuestion();
+            ->ask();
         $this->output->writeln("<info>CI/CD: $ci</info>");
         $this->spacer();
         Manifest::addDependency("theaentmachine/aent-$ci", Metadata::CI_KEY, [
@@ -156,7 +156,7 @@ class AentHelper
     {
         $environments = Aenthill::dispatch('ENVIRONMENT');
         $choosen = $this->choiceQuestion('Environments', array_keys($environments))
-            ->askMultipleChoiceQuestion();
+            ->askWithMultipleChoices();
         $this->output->writeln('<info>Environments: ' . implode($choosen, ', ') . '</info>');
         $this->spacer();
         return array_filter($environments, function (string $key) use ($choosen) {
