@@ -8,45 +8,28 @@ namespace TheAentMachine;
  */
 class Manifest
 {
-    /** @var string */
-    private $filePath;
-
-    /** @var array|null */
-    private $content;
-
-    /**
-     * Manifest constructor.
-     */
-    public function __construct()
+    private static function getFilePath(): string
     {
         $containerProjectDir = Pheromone::getContainerProjectDirectory();
-        $this->filePath = $containerProjectDir . '/aenthill.json';
+        return $containerProjectDir . '/aenthill.json';
     }
 
-    public function __call($method, $arguments)
+    private static function parse(): array
     {
-        if (method_exists($this, $method)) {
-            $this->parse();
-            call_user_func([$this, $method], $arguments);
-            $this->parse();
-        }
-    }
-
-    private function parse(): void
-    {
-        $str = file_get_contents($this->filePath);
+        $filePath = self::getFilePath();
+        $str = file_get_contents($filePath);
         if ($str === false) {
-            throw new \RuntimeException('Failed to load the aenthill manifest file ' . $this->filePath);
+            throw new \RuntimeException('Failed to load the aenthill manifest file ' . $filePath);
         }
-        $this->content = \GuzzleHttp\json_decode($str, true);
+        return \GuzzleHttp\json_decode($str, true);
     }
 
-    public function setEvents(array $events): void
+    public static function setEvents(array $events): void
     {
         Aenthill::update(null, $events);
     }
 
-    public function addMetadata(string $key, string $value): void
+    public static function addMetadata(string $key, string $value): void
     {
         Aenthill::update([$key => $value]);
     }
@@ -56,11 +39,12 @@ class Manifest
      * @return null|string
      * @throws Exception\MissingEnvironmentVariableException
      */
-    public function getMetadata(string $key): ?string
+    public static function getMetadata(string $key): ?string
     {
+        $manifest = self::parse();
         $aentID = Pheromone::getKey();
-        if (isset($this->content['aents'])) {
-            foreach ($this->content['aents'] as $ID => $aent) {
+        if (isset($manifest['aents'])) {
+            foreach ($manifest['aents'] as $ID => $aent) {
                 if ($ID === $aentID && array_key_exists('metadata', $aent) && array_key_exists($key, $aent['metadata'])) {
                     return $aent['metadata'][$key];
                 }
@@ -74,7 +58,7 @@ class Manifest
      * @param string $key
      * @param array<string,string>|null $metadata
      */
-    public function addDependency(string $image, string $key, ?array $metadata): void
+    public static function addDependency(string $image, string $key, ?array $metadata): void
     {
         Aenthill::register($image, $key, $metadata);
     }
@@ -84,11 +68,12 @@ class Manifest
      * @return null|string
      * @throws Exception\MissingEnvironmentVariableException
      */
-    public function getDependency(string $key): ?string
+    public static function getDependency(string $key): ?string
     {
+        $manifest = self::parse();
         $aentID = Pheromone::getKey();
-        if (isset($this->content['aents'])) {
-            foreach ($this->content['aents'] as $ID => $aent) {
+        if (isset($manifest['aents'])) {
+            foreach ($manifest['aents'] as $ID => $aent) {
                 if ($ID === $aentID && array_key_exists('dependencies', $aent) && array_key_exists($key, $aent['dependencies'])) {
                     return $aent['dependencies'][$key];
                 }

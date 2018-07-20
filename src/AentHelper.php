@@ -150,31 +150,38 @@ class AentHelper
 
     public function setEnvType(): string
     {
-        $envType = $this->choiceQuestion('Select your environment type', ['DEV', 'TEST', 'PROD'])
+        $envType = $this->choiceQuestion('Select your environment type', [Metadata::ENV_TYPE_DEV, Metadata::ENV_TYPE_TEST, Metadata::ENV_TYPE_PROD])
             ->askSingleChoiceQuestion();
         $this->output->writeln("<info>Selected environment type: $envType</info>");
         $this->spacer();
 
-        Aenthill::update(['ENV_TYPE' => $envType]);
+        Manifest::addMetadata(Metadata::ENV_TYPE_KEY, $envType);
         return $envType;
     }
 
-    /** @return string[] */
-    public function registerCI(): array
+    /**
+     * @return string
+     * @throws Exception\MissingEnvironmentVariableException
+     */
+    public function registerCI(): string
     {
-        $ciServices = $this->choiceQuestion('Select your CI service(s):', ['gitlab-ci', 'travis-ci', 'circle-ci'])
-            ->askMultipleChoiceQuestion();
-        $ciServicesStr = implode(', ', $ciServices);
-        $this->output->writeln("<info>Your CI service(s): $ciServicesStr</info>");
+        $ci = $this->choiceQuestion('Select your reverse proxy:', ['gitlab-ci', 'travis-ci', 'circle-ci'])
+            ->askSingleChoiceQuestion();
+        $this->output->writeln("<info>Your CI: $ci</info>");
         $this->spacer();
 
-        foreach ($ciServices as $index => $ciService) {
-            Aenthill::addDependency("theaentmachine-aent-$ciService", "CI_$index");
-        }
+        Manifest::addDependency("theaentmachine/aent-$ci", Metadata::CI_KEY, [
+            Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
+            Metadata::ENV_TYPE_KEY => Manifest::getMetadata(Metadata::ENV_TYPE_KEY)
+        ]);
 
-        return $ciServices;
+        return Manifest::getDependency(Metadata::CI_KEY);
     }
 
+    /**
+     * @return string
+     * @throws Exception\MissingEnvironmentVariableException
+     */
     public function registerReverseProxy(): string
     {
         $reverseProxy = $this->choiceQuestion('Select your reverse proxy:', ['traefik', 'nginx', 'ingress'])
@@ -182,7 +189,11 @@ class AentHelper
         $this->output->writeln("<info>Your reverse proxy: $reverseProxy</info>");
         $this->spacer();
 
-        Aenthill::addDependency('theaentmachine-aent-' . $reverseProxy, 'REVERSE_PROXY');
-        return $reverseProxy;
+        Manifest::addDependency("theaentmachine/aent-$reverseProxy", Metadata::REVERSE_PROXY_KEY, [
+            Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
+            Metadata::ENV_TYPE_KEY => Manifest::getMetadata(Metadata::ENV_TYPE_KEY)
+        ]);
+
+        return Manifest::getDependency(Metadata::REVERSE_PROXY_KEY);
     }
 }
