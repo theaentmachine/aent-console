@@ -76,6 +76,7 @@ class ChoiceQuestion extends BaseQuestion
         $this->multiselect = $multiselect;
         $question->setMultiselect($this->multiselect);
         $question->setValidator($this->getDefaultValidator());
+        return $question;
     }
 
     /** Greatly inspired from the default Symfony's ChoiceQuestion validator*/

@@ -151,6 +151,8 @@ class AentHelper
     public function setEnvType(): string
     {
         $envType = $this->choiceQuestion('Select your environment type', ['DEV', 'TEST', 'PROD'])
+            ->setDefault('DEV')
+            ->setHelpText('This is a help text')
             ->ask();
         $this->output->writeln("<info>Selected environment type: $envType</info>");
         $this->spacer();
@@ -163,6 +165,8 @@ class AentHelper
     public function registerCI(): array
     {
         $ciServices = $this->choiceQuestion('Select your CI service(s):', ['gitlab-ci', 'travis-ci', 'circle-ci'])
+            ->setDefault(['gitlab-ci', 'travis-ci'])
+            ->setHelpText('This is a help text')
             ->askWithMultipleChoices();
         $ciServicesStr = implode(', ', $ciServices);
         $this->output->writeln("<info>Your CI service(s): $ciServicesStr</info>");
@@ -178,6 +182,7 @@ class AentHelper
     public function registerReverseProxy(): string
     {
         $reverseProxy = $this->choiceQuestion('Select your reverse proxy:', ['traefik', 'nginx', 'ingress'])
+            ->setHelpText('This is a help text')
             ->ask();
         $this->output->writeln("<info>Your reverse proxy: $reverseProxy</info>");
         $this->spacer();
