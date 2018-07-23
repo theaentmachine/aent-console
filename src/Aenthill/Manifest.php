@@ -71,13 +71,13 @@ class Manifest
     /**
      * @param string $key
      * @return null|string
-     * @throws ManifestException
+     * @throws MissingEnvironmentVariableException
      */
     public static function getMetadataOrNull(string $key): ?string
     {
         try {
-            self::getMetadata($key);
-        } catch (MissingEnvironmentVariableException $e) {
+            return self::getMetadata($key);
+        } catch (ManifestException $e) {
             return null;
         }
     }
@@ -110,5 +110,20 @@ class Manifest
             }
         }
         throw ManifestException::missingDependency($key);
+    }
+
+
+    /**
+     * @param string $key
+     * @return null|string
+     * @throws MissingEnvironmentVariableException
+     */
+    public static function getDependencyOrNull(string $key): ?string
+    {
+        try {
+            return self::getDependency($key);
+        } catch (ManifestException $e) {
+            return null;
+        }
     }
 }

@@ -44,7 +44,7 @@ class Service implements \JsonSerializable
      */
     public function __construct()
     {
-        $this->validatorSchema = json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
+        $this->validatorSchema = \GuzzleHttp\json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
 
     /**
