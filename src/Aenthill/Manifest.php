@@ -69,6 +69,20 @@ class Manifest
     }
 
     /**
+     * @param string $key
+     * @return null|string
+     * @throws ManifestException
+     */
+    public static function getMetadataOrNull(string $key): ?string
+    {
+        try {
+            self::getMetadata($key);
+        } catch (MissingEnvironmentVariableException $e) {
+            return null;
+        }
+    }
+
+    /**
      * @param string $image
      * @param string $key
      * @param array<string,string>|null $metadata
