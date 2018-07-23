@@ -32,7 +32,8 @@ class ServiceTest extends TestCase
                         {"type": "volume", "source": "foo", "target": "/foo", "readOnly": true},
                         {"type": "bind", "source": "/bar", "target": "/bar", "readOnly": false},
                         {"type": "tmpfs", "source": "baz"}
-                      ]
+                      ],
+    "needVirtualHost": true
   },
   "dockerfileCommands": [
     "RUN composer install"
@@ -127,6 +128,7 @@ JSON;
         $s->addBindVolume('/bar', '/bar', false);
         $s->addTmpfsVolume('baz');
         $s->addDockerfileCommand('RUN composer install');
+        $s->setNeedVirtualHost(true);
         $outArray = $s->jsonSerialize();
         $expectedArray = json_decode(self::VALID_PAYLOAD, true);
         $this->assertEquals($outArray, $expectedArray);

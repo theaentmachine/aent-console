@@ -64,9 +64,12 @@ class Aenthill
      * @param string $target the image name or a key from the manifest.
      * @param string $event
      * @param null|string $payload
+     * @return string[]
      */
-    public static function run(string $target, string $event, ?string $payload = null): void
+    public static function run(string $target, string $event, ?string $payload = null): array
     {
+        $replyAggregator = new ReplyAggregator();
+        $replyAggregator->clear();
         $command = ['aenthill', 'run', $target, $event];
         if (!empty($payload)) {
             $command[] = $payload;
@@ -75,16 +78,18 @@ class Aenthill
         $process->enableOutput();
         $process->setTty(true);
         $process->mustRun();
+        return $replyAggregator->getReplies();
     }
 
     /**
      * @param string $target
      * @param string $event
      * @param mixed[] $payload
+     * @return string[]
      */
-    public static function runJson(string $target, string $event, array $payload): void
+    public static function runJson(string $target, string $event, array $payload): array
     {
-        self::run($target, $event, \GuzzleHttp\json_encode($payload));
+        return self::run($target, $event, \GuzzleHttp\json_encode($payload));
     }
 
     /**

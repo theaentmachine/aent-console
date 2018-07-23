@@ -32,6 +32,8 @@ class Service implements \JsonSerializable
     private $environment = [];
     /** @var mixed[] */
     private $volumes = [];
+    /** @var null|bool */
+    private $needVirtualHost = null;
     /** @var \stdClass */
     private $validatorSchema;
     /** @var string[] */
@@ -73,6 +75,7 @@ class Service implements \JsonSerializable
                     $service->addVolume($vol['type'], $vol['source'], $vol['target'] ?? '', $vol['readOnly'] ?? false);
                 }
             }
+            $service->needVirtualHost = $s['needVirtualHost'] ?? null;
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
         return $service;
@@ -105,6 +108,7 @@ class Service implements \JsonSerializable
             'labels' => $this->labels,
             'environment' => array_map($jsonSerializeMap, $this->environment),
             'volumes' => array_map($jsonSerializeMap, $this->volumes),
+            'needVirtualHost' => $this->needVirtualHost,
         ]);
 
         if (!empty($service)) {
@@ -242,6 +246,14 @@ class Service implements \JsonSerializable
     }
 
     /**
+     * @return bool|null
+     */
+    public function getNeedVirtualHost(): ?bool
+    {
+        return $this->needVirtualHost;
+    }
+
+    /**
      * @return string[]
      */
     public function getDockerfileCommands(): array
@@ -287,6 +299,14 @@ class Service implements \JsonSerializable
     public function setDependsOn(array $dependsOn): void
     {
         $this->dependsOn = $dependsOn;
+    }
+
+    /**
+     * @param bool|null $needVirtualHost
+     */
+    public function setNeedVirtualHost(?bool $needVirtualHost): void
+    {
+        $this->needVirtualHost = $needVirtualHost;
     }
 
     /**
