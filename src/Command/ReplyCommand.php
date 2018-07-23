@@ -26,7 +26,7 @@ class ReplyCommand extends EventCommand
 
     protected function getEventName(): string
     {
-        return 'reply';
+        return 'REPLY';
     }
 
     protected function executeEvent(?string $payload): ?string
