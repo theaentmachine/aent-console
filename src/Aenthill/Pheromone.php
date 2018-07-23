@@ -100,14 +100,14 @@ class Pheromone
     }
 
     /**
-     * The key from the manifest if this aent has been installed.
+     * The ID from the manifest if this aent has been registred.
      *
      * @return string
      * @throws MissingEnvironmentVariableException
      */
-    public static function getKey(): string
+    public static function getID(): string
     {
-        return self::mustGet('PHEROMONE_KEY');
+        return self::mustGet('PHEROMONE_ID');
     }
 
     /**

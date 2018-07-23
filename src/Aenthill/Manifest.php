@@ -57,7 +57,7 @@ class Manifest
     public static function getMetadata(string $key): string
     {
         $manifest = self::parse();
-        $aentID = Pheromone::getKey();
+        $aentID = Pheromone::getID();
         if (isset($manifest['aents'])) {
             foreach ($manifest['aents'] as $ID => $aent) {
                 if ($ID === $aentID && array_key_exists('metadata', $aent) && array_key_exists($key, $aent['metadata'])) {
@@ -101,7 +101,7 @@ class Manifest
     public static function getDependency(string $key): string
     {
         $manifest = self::parse();
-        $aentID = Pheromone::getKey();
+        $aentID = Pheromone::getID();
         if (isset($manifest['aents'])) {
             foreach ($manifest['aents'] as $ID => $aent) {
                 if ($ID === $aentID && array_key_exists('dependencies', $aent) && array_key_exists($key, $aent['dependencies'])) {
