@@ -134,6 +134,9 @@
             ],
             "additionalProperties": false
           }
+        },
+        "needVirtualHost": {
+          "type": "boolean"
         }
       }
     },
