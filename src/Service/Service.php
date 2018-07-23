@@ -246,6 +246,14 @@ class Service implements \JsonSerializable
     }
 
     /**
+     * @return bool|null
+     */
+    public function getNeedVirtualHost(): ?bool
+    {
+        return $this->needVirtualHost;
+    }
+
+    /**
      * @return string[]
      */
     public function getDockerfileCommands(): array
