@@ -126,5 +126,4 @@ class Manifest
             return null;
         }
     }
-
 }
