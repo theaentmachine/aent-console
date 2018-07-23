@@ -16,7 +16,7 @@ class ServiceException extends \Exception
     {
         $message = 'Invalid service data' . PHP_EOL
             . 'Error of type ' . $vError->keyword() . ' at ' . implode('->', $vError->dataPointer()) . PHP_EOL
-            . json_encode($vError->keywordArgs(), JSON_PRETTY_PRINT);
+            . \GuzzleHttp\json_encode($vError->keywordArgs(), JSON_PRETTY_PRINT);
         return new self($message);
     }
 
@@ -27,7 +27,7 @@ class ServiceException extends \Exception
     public static function unknownVolumeType(string $volumeType): ServiceException
     {
         $message = 'Unknown service volume type: ' . $volumeType . PHP_EOL
-            . 'Expected: ' . json_encode(VolumeTypeEnum::getVolumeTypes());
+            . 'Expected: ' . \GuzzleHttp\json_encode(VolumeTypeEnum::getVolumeTypes());
         return new self($message);
     }
 
@@ -38,7 +38,7 @@ class ServiceException extends \Exception
     public static function unknownEnvVariableType(string $type): ServiceException
     {
         $message = 'Unknown environment variable type: ' . $type . PHP_EOL
-            . 'Expected: ' . json_encode(EnvVariableTypeEnum::getEnvVariableTypes());
+            . 'Expected: ' . \GuzzleHttp\json_encode(EnvVariableTypeEnum::getEnvVariableTypes());
         return new self($message);
     }
 }
