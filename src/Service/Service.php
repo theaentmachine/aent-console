@@ -4,6 +4,7 @@ namespace TheAentMachine\Service;
 
 use Opis\JsonSchema\ValidationError;
 use Opis\JsonSchema\Validator;
+use TheAentMachine\Aenthill\Metadata;
 use TheAentMachine\Service\Enum\EnvVariableTypeEnum;
 use TheAentMachine\Service\Enum\VolumeTypeEnum;
 use TheAentMachine\Service\Environment\EnvVariable;
@@ -39,11 +40,8 @@ class Service implements \JsonSerializable
     /** @var string[] */
     private $dockerfileCommands = [];
     /** @var string[] */
-    private $forSpecificEnvTypes = [];
+    private $destEnvTypes = []; // empty === all env types
 
-    /**
-     * Service constructor.
-     */
     public function __construct()
     {
         $this->validatorSchema = \GuzzleHttp\json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
@@ -80,7 +78,7 @@ class Service implements \JsonSerializable
             $service->needVirtualHost = $s['needVirtualHost'] ?? null;
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
-        $service->forSpecificEnvTypes = $payload['forSpecificEnvTypes'] ?? [];
+        $service->destEnvTypes = $payload['destEnvTypes'] ?? [];
         return $service;
     }
 
@@ -122,7 +120,7 @@ class Service implements \JsonSerializable
             $json['dockerfileCommands'] = $this->dockerfileCommands;
         }
 
-        $json['forSpecificEnvTypes'] = $this->forSpecificEnvTypes;
+        $json['destEnvTypes'] = $this->destEnvTypes;
 
         $this->checkValidity($json);
         return $json;
@@ -155,7 +153,7 @@ class Service implements \JsonSerializable
         return [
             'serviceName' => $this->serviceName,
             'dockerfileCommands' => $dockerfileCommands,
-            'forSpecificEnvTypes' => $this->forSpecificEnvTypes,
+            'destEnvTypes' => $this->destEnvTypes,
         ];
     }
 
@@ -179,73 +177,56 @@ class Service implements \JsonSerializable
         return $result->isValid();
     }
 
-    /**
-     * @return string
-     */
+
+    /************************ getters **********************/
+
     public function getServiceName(): string
     {
         return $this->serviceName;
     }
 
-    /**
-     * @return string|null
-     */
     public function getImage(): ?string
     {
         return $this->image;
     }
 
-    /**
-     * @return string[]
-     */
+    /** @return string[] */
     public function getCommand(): array
     {
         return $this->command;
     }
 
-    /**
-     * @return int[]
-     */
+    /** @return int[] */
     public function getInternalPorts(): array
     {
         return $this->internalPorts;
     }
 
-    /**
-     * @return string[]
-     */
+    /** @return string[] */
     public function getDependsOn(): array
     {
         return $this->dependsOn;
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getPorts(): array
     {
         return $this->ports;
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getLabels(): array
     {
         return $this->labels;
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getEnvironment(): array
     {
         return $this->environment;
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getVolumes(): array
     {
         return $this->volumes;
@@ -263,10 +244,13 @@ class Service implements \JsonSerializable
     }
 
     /**  @return string[] */
-    public function getForSpecificEnvTypes(): array
+    public function getDestEnvTypes(): array
     {
-        return $this->forSpecificEnvTypes;
+        return $this->destEnvTypes;
     }
+
+
+    /************************ setters **********************/
 
     public function setServiceName(string $serviceName): void
     {
@@ -303,6 +287,9 @@ class Service implements \JsonSerializable
         $this->needVirtualHost = $needVirtualHost;
     }
 
+
+    /************************ adders **********************/
+
     public function addCommand(string $command): void
     {
         $this->command[] = $command;
@@ -332,6 +319,9 @@ class Service implements \JsonSerializable
             'value' => $value,
         );
     }
+
+
+    /************************ environment adders **********************/
 
     /** @throws ServiceException */
     private function addEnvVar(string $key, string $value, string $type): void
@@ -400,31 +390,44 @@ class Service implements \JsonSerializable
         $this->volumes[] = new NamedVolume($source, $target, $readOnly);
     }
 
-    /**
-     * @param string $source
-     * @param string $target
-     * @param bool $readOnly
-     */
     public function addBindVolume(string $source, string $target, bool $readOnly = false): void
     {
         $this->volumes[] = new BindVolume($source, $target, $readOnly);
     }
 
-    /**
-     * @param string $source
-     */
     public function addTmpfsVolume(string $source): void
     {
         $this->volumes[] = new TmpfsVolume($source);
     }
 
-    /**
-     * @param string $dockerfileCommand
-     */
     public function addDockerfileCommand(string $dockerfileCommand): void
     {
         $this->dockerfileCommands[] = $dockerfileCommand;
     }
 
-    /************************ Environments **********************/
+
+    /************************ forSpecificEnvTypes stuffs **********************/
+
+    public function addDestEnvType(string $envType, bool $keepTheOtherEnvTypes = true): void
+    {
+        if (!$keepTheOtherEnvTypes) {
+            $this->destEnvTypes = [];
+        }
+        $this->destEnvTypes[] = $envType;
+    }
+
+    public function isForDevEnvType(): bool
+    {
+        return empty($this->destEnvTypes) || \in_array(Metadata::ENV_TYPE_DEV, $this->destEnvTypes);
+    }
+
+    public function isForTestEnvType(): bool
+    {
+        return empty($this->destEnvTypes) || \in_array(Metadata::ENV_TYPE_TEST, $this->destEnvTypes);
+    }
+
+    public function isForProdEnvType(): bool
+    {
+        return empty($this->destEnvTypes) || \in_array(Metadata::ENV_TYPE_PROD, $this->destEnvTypes);
+    }
 }
