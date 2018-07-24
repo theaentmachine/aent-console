@@ -145,6 +145,12 @@
       "items": {
         "type": "string"
       }
+    },
+    "destEnvTypes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

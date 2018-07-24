@@ -4,6 +4,7 @@ namespace TheAentMachine\Registry;
 
 
 use PHPUnit\Framework\TestCase;
+use TheAentMachine\Aenthill\Metadata;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Service;
 
@@ -37,6 +38,9 @@ class ServiceTest extends TestCase
   },
   "dockerfileCommands": [
     "RUN composer install"
+  ],
+  "destEnvTypes": [
+    "DEV"
   ]
 }
 JSON;
@@ -83,6 +87,9 @@ JSON;
         $service = Service::parsePayload($array);
         $out = $service->jsonSerialize();
         $this->assertEquals($array, $out);
+        $this->assertTrue($service->isForDevEnvType());
+        $this->assertFalse($service->isForTestEnvType());
+        $this->assertFalse($service->isForProdEnvType());
     }
 
     public function testMissingServiceNamePayload(): void
@@ -129,6 +136,7 @@ JSON;
         $s->addTmpfsVolume('baz');
         $s->addDockerfileCommand('RUN composer install');
         $s->setNeedVirtualHost(true);
+        $s->addDestEnvType(Metadata::ENV_TYPE_DEV, true);
         $outArray = $s->jsonSerialize();
         $expectedArray = json_decode(self::VALID_PAYLOAD, true);
         $this->assertEquals($outArray, $expectedArray);
@@ -142,12 +150,9 @@ JSON;
                 'COPY /bar /bar',
                 'CMD foo -bar -baz --qux',
                 'RUN composer install'
-            ]
+            ],
+            'destEnvTypes' => ['DEV']
         ];
         $this->assertEquals($outArray, $expectedArray);
-
-
-
-
     }
 }
