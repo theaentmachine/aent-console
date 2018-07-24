@@ -10,6 +10,8 @@ use \TheAentMachine\Helper\AentHelper;
 
 class CommonEvents
 {
+    // TODO: delete this
+
     private const NEW_SERVICE = 'NEW_SERVICE';
     private const NEW_VIRTUAL_HOST = 'NEW_VIRTUAL_HOST';
     private const NEW_IMAGE = 'NEW_IMAGE';

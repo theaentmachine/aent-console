@@ -85,24 +85,6 @@ class AentHelper
         return new ChoiceQuestion($this->questionHelper, $this->input, $this->output, $question, $choices);
     }
 
-    public function askForEnvName(): string
-    {
-        $envName = $this->question('Environment name')
-            ->compulsory()
-            ->setValidator(function (string $value) {
-                $value = trim($value);
-                if (!\preg_match('/^[a-zA-Z0-9_.-]+$/', $value)) {
-                    throw new \InvalidArgumentException('Invalid environment name "' . $value . '". Environment names can contain alphanumeric characters, and "_", ".", "-".');
-                }
-                return $value;
-            })
-            ->ask();
-        $this->output->writeln("<info>Environment name: $envName</info>");
-        $this->spacer();
-        Manifest::addMetadata(Metadata::ENV_NAME_KEY, $envName);
-        return $envName;
-    }
-
     public function askForEnvType(): string
     {
         $envType = $this->choiceQuestion('Environment type', [Metadata::ENV_TYPE_DEV, Metadata::ENV_TYPE_TEST, Metadata::ENV_TYPE_PROD])
@@ -113,6 +95,29 @@ class AentHelper
         return $envType;
     }
 
+    public function askForEnvName(?string $envType): string
+    {
+        $question = $this->question('Environment name')
+            ->compulsory()
+            ->setValidator(function (string $value) {
+                $value = trim($value);
+                if (!\preg_match('/^[a-zA-Z0-9_.-]+$/', $value)) {
+                    throw new \InvalidArgumentException('Invalid environment name "' . $value . '". Environment names can contain alphanumeric characters, and "_", ".", "-".');
+                }
+                return $value;
+            });
+
+        if (null !== $envType) {
+            $question->setDefault($envType);
+        }
+
+        $envName = $question->ask();
+        $this->output->writeln("<info>Environment name: $envName</info>");
+        $this->spacer();
+        Manifest::addMetadata(Metadata::ENV_NAME_KEY, $envName);
+        return $envName;
+    }
+
     /**
      * @return string
      * @throws MissingEnvironmentVariableException
@@ -121,7 +126,7 @@ class AentHelper
     public function askForCICD(): string
     {
         $currentEnvType = Manifest::getMetadata(Metadata::ENV_TYPE_KEY);
-
+        /*
         // Image builder
         $doAddAentDockerfile = false;
         if ($currentEnvType === Metadata::ENV_TYPE_TEST) {
@@ -138,7 +143,7 @@ class AentHelper
                 Metadata::ENV_TYPE_KEY => $currentEnvType
             ]);
         }
-
+        */
         // CI
         $ci = $this->choiceQuestion('CI/CD', ['gitlab-ci', 'travis-ci', 'circle-ci'])
             ->ask();
@@ -178,15 +183,24 @@ class AentHelper
     {
         $environments = Aenthill::dispatchJson('ENVIRONMENT', []);
         if (empty($environments)) {
-            return null;
+            $this->output->writeln('<error>No environments available, did you forget to install an aent like theaentmachine/aent-docker-compose?</error>');
+            exit(1);
         }
-        $chosen = $this->choiceQuestion('Environments', array_keys($environments))
+        $environmentsStr = [];
+        foreach ($environments as $env) {
+            $environmentsStr[] = $env[Metadata::ENV_NAME_KEY] . '(of type '. $env[Metadata::ENV_TYPE_KEY]  .')';
+        }
+        $chosen = $this->choiceQuestion('Environments', $environmentsStr)
             ->askWithMultipleChoices();
+
+        $results = [];
+        foreach ($chosen as $c) {
+            $results[] = $environments[array_search($c, $environmentsStr, true)];
+        }
+
         $this->output->writeln('<info>Environments: ' . implode($chosen, ', ') . '</info>');
         $this->spacer();
-        return array_filter($environments, function (string $key) use ($chosen) {
-            return isset($chosen[$key]);
-        }, ARRAY_FILTER_USE_KEY);
+        return $results;
     }
 
     public function askForTag(string $dockerHubImage, string $applicationName = ''): string
