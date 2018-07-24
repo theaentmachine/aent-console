@@ -63,7 +63,7 @@ class Aenthill
         $process = new Process($command);
         $process->mustRun();
         $output = $process->getOutput();
-        return substr($output, 0, count($output)-1); // remove \n
+        return substr($output, 0, -1); // remove \n
     }
 
     public static function dependency(string $key): string
@@ -72,7 +72,7 @@ class Aenthill
         $process = new Process($command);
         $process->mustRun();
         $output = $process->getOutput();
-        return substr($output, 0, count($output)-1); // remove \n
+        return substr($output, 0, -1); // remove \n
     }
 
     /**
