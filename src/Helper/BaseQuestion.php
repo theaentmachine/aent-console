@@ -34,6 +34,11 @@ abstract class BaseQuestion
         $this->question = $question;
     }
 
+    protected function spacer(): void
+    {
+        $this->output->writeln('');
+    }
+
     /**
      * @param string $default
      * @return mixed

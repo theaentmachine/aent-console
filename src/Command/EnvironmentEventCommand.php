@@ -24,8 +24,8 @@ class EnvironmentEventCommand extends JsonEventCommand
     protected function executeJsonEvent(array $payload): ?array
     {
         return [
-            Manifest::getMetadata(Metadata::ENV_NAME_KEY),
-            Manifest::getMetadata(Metadata::ENV_TYPE_KEY)
+            Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
+            Metadata::ENV_TYPE_KEY => Manifest::getMetadata(Metadata::ENV_TYPE_KEY)
         ];
     }
 }

@@ -138,7 +138,7 @@ class ChoiceQuestion extends BaseQuestion
                 }
                 $multiselectChoices[] = (string)$result;
             }
-
+            $this->spacer();
             if ($multiselect) {
                 return $multiselectChoices;
             }
