@@ -17,7 +17,7 @@ class Service implements \JsonSerializable
     /** @var string */
     private $serviceName = '';
     /** @var string|null */
-    private $image = null;
+    private $image;
     /** @var string[] */
     private $command = [];
     /** @var int[] */
@@ -33,11 +33,13 @@ class Service implements \JsonSerializable
     /** @var mixed[] */
     private $volumes = [];
     /** @var null|bool */
-    private $needVirtualHost = null;
+    private $needVirtualHost;
     /** @var \stdClass */
     private $validatorSchema;
     /** @var string[] */
     private $dockerfileCommands = [];
+    /** @var string[] */
+    private $forSpecificEnvTypes = [];
 
     /**
      * Service constructor.
@@ -78,6 +80,7 @@ class Service implements \JsonSerializable
             $service->needVirtualHost = $s['needVirtualHost'] ?? null;
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
+        $service->forSpecificEnvTypes = $payload['forSpecificEnvTypes'] ?? [];
         return $service;
     }
 
@@ -119,6 +122,8 @@ class Service implements \JsonSerializable
             $json['dockerfileCommands'] = $this->dockerfileCommands;
         }
 
+        $json['forSpecificEnvTypes'] = $this->forSpecificEnvTypes;
+
         $this->checkValidity($json);
         return $json;
     }
@@ -150,6 +155,7 @@ class Service implements \JsonSerializable
         return [
             'serviceName' => $this->serviceName,
             'dockerfileCommands' => $dockerfileCommands,
+            'forSpecificEnvTypes' => $this->forSpecificEnvTypes,
         ];
     }
 
@@ -245,41 +251,34 @@ class Service implements \JsonSerializable
         return $this->volumes;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getNeedVirtualHost(): ?bool
     {
         return $this->needVirtualHost;
     }
 
-    /**
-     * @return string[]
-     */
+    /** @return string[] */
     public function getDockerfileCommands(): array
     {
         return $this->dockerfileCommands;
     }
 
-    /**
-     * @param string $serviceName
-     */
+    /**  @return string[] */
+    public function getForSpecificEnvTypes(): array
+    {
+        return $this->forSpecificEnvTypes;
+    }
+
     public function setServiceName(string $serviceName): void
     {
         $this->serviceName = $serviceName;
     }
 
-    /**
-     * @param string|null $image
-     */
     public function setImage(?string $image): void
     {
         $this->image = $image;
     }
 
-    /**
-     * @param string[] $command
-     */
+    /** @param string[] $command  */
     public function setCommand(array $command): void
     {
         $this->command = $command;
@@ -293,50 +292,32 @@ class Service implements \JsonSerializable
         $this->internalPorts = $internalPorts;
     }
 
-    /**
-     * @param string[] $dependsOn
-     */
+    /** @param string[] $dependsOn */
     public function setDependsOn(array $dependsOn): void
     {
         $this->dependsOn = $dependsOn;
     }
 
-    /**
-     * @param bool|null $needVirtualHost
-     */
     public function setNeedVirtualHost(?bool $needVirtualHost): void
     {
         $this->needVirtualHost = $needVirtualHost;
     }
 
-    /**
-     * @param string $command
-     */
     public function addCommand(string $command): void
     {
         $this->command[] = $command;
     }
 
-    /**
-     * @param int $internalPort
-     */
     public function addInternalPort(int $internalPort): void
     {
         $this->internalPorts[] = $internalPort;
     }
 
-    /**
-     * @param string $dependsOn
-     */
     public function addDependsOn(string $dependsOn): void
     {
         $this->dependsOn[] = $dependsOn;
     }
 
-    /**
-     * @param int $source
-     * @param int $target
-     */
     public function addPort(int $source, int $target): void
     {
         $this->ports[] = array(
@@ -345,10 +326,6 @@ class Service implements \JsonSerializable
         );
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
     public function addLabel(string $key, string $value): void
     {
         $this->labels[$key] = array(
@@ -356,12 +333,7 @@ class Service implements \JsonSerializable
         );
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     * @param string $type
-     * @throws ServiceException
-     */
+    /** @throws ServiceException */
     private function addEnvVar(string $key, string $value, string $type): void
     {
         switch ($type) {
@@ -382,49 +354,30 @@ class Service implements \JsonSerializable
         }
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
     public function addSharedEnvVariable(string $key, string $value): void
     {
         $this->environment[$key] = new EnvVariable($value, 'sharedEnvVariable');
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
     public function addSharedSecret(string $key, string $value): void
     {
         $this->environment[$key] = new EnvVariable($value, 'sharedSecret');
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
+
+    /************************ volumes adders **********************/
+
     public function addImageEnvVariable(string $key, string $value): void
     {
         $this->environment[$key] = new EnvVariable($value, 'imageEnvVariable');
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
     public function addContainerEnvVariable(string $key, string $value): void
     {
         $this->environment[$key] = new EnvVariable($value, 'containerEnvVariable');
     }
 
-    /**
-     * @param string $type
-     * @param string $source
-     * @param string $target
-     * @param bool $readOnly
-     * @throws ServiceException
-     */
+    /** @throws ServiceException */
     private function addVolume(string $type, string $source, string $target = '', bool $readOnly = false): void
     {
         switch ($type) {
@@ -442,11 +395,6 @@ class Service implements \JsonSerializable
         }
     }
 
-    /**
-     * @param string $source
-     * @param string $target
-     * @param bool $readOnly
-     */
     public function addNamedVolume(string $source, string $target, bool $readOnly = false): void
     {
         $this->volumes[] = new NamedVolume($source, $target, $readOnly);
@@ -477,4 +425,6 @@ class Service implements \JsonSerializable
     {
         $this->dockerfileCommands[] = $dockerfileCommand;
     }
+
+    /************************ Environments **********************/
 }

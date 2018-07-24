@@ -57,6 +57,23 @@ class Aenthill
         $process->mustRun();
     }
 
+    public static function metadata(string $key): string
+    {
+        $command = ['aenthill', 'metadata', $key];
+        $process = new Process($command);
+        $process->setTty(true);
+        $process->mustRun();
+        return $process->getOutput();
+    }
+
+    public static function dependency(string $key): string
+    {
+        $command = ['aenthill', 'dependency', $key];
+        $process = new Process($command);
+        $process->setTty(true);
+        $process->mustRun();
+        return $process->getOutput();
+    }
 
     /**
      * Starts an aent.
@@ -71,7 +88,7 @@ class Aenthill
         $replyAggregator = new ReplyAggregator();
         $replyAggregator->clear();
         $command = ['aenthill', 'run', $target, $event];
-        if (!empty($payload)) {
+        if (null !== $payload) {
             $command[] = $payload;
         }
         $process = new Process($command);
@@ -104,7 +121,7 @@ class Aenthill
         $replyAggregator = new ReplyAggregator();
         $replyAggregator->clear();
         $command = ['aenthill', 'dispatch', $event];
-        if (!empty($payload)) {
+        if (null !== $payload) {
             $command[] = $payload;
         }
         $process = new Process($command);
@@ -138,7 +155,7 @@ class Aenthill
     public static function reply(string $event, ?string $payload = null): void
     {
         $command = ['aenthill', 'reply', $event];
-        if (!empty($payload)) {
+        if (null !== $payload) {
             $command[] = $payload;
         }
         $process = new Process($command);

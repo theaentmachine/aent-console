@@ -51,7 +51,6 @@ class CommonEvents
         return Aenthill::dispatchJson(self::NEW_VIRTUAL_HOST, $message);
     }
 
-
     public function dispatchImage(Service $service): void
     {
         Aenthill::dispatchJson(self::NEW_IMAGE, $service->imageJsonSerialize());
