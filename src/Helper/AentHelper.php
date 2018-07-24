@@ -108,7 +108,7 @@ class AentHelper
             });
 
         if (null !== $envType) {
-            $question->setDefault($envType);
+            $question->setDefault(strtolower($envType));
         }
 
         $envName = $question->ask();
@@ -188,7 +188,7 @@ class AentHelper
         }
         $environmentsStr = [];
         foreach ($environments as $env) {
-            $environmentsStr[] = $env[Metadata::ENV_NAME_KEY] . '(of type '. $env[Metadata::ENV_TYPE_KEY]  .')';
+            $environmentsStr[] = $env[Metadata::ENV_NAME_KEY] . ' (of type '. $env[Metadata::ENV_TYPE_KEY]  .')';
         }
         $chosen = $this->choiceQuestion('Environments', $environmentsStr)
             ->askWithMultipleChoices();
