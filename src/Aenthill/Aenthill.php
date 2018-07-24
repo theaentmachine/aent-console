@@ -62,7 +62,8 @@ class Aenthill
         $command = ['aenthill', 'metadata', $key];
         $process = new Process($command);
         $process->mustRun();
-        return $process->getOutput();
+        $output = $process->getOutput();
+        return substr($output, 0, count($output)-1); // remove \n
     }
 
     public static function dependency(string $key): string
@@ -70,7 +71,8 @@ class Aenthill
         $command = ['aenthill', 'dependency', $key];
         $process = new Process($command);
         $process->mustRun();
-        return $process->getOutput();
+        $output = $process->getOutput();
+        return substr($output, 0, count($output)-1); // remove \n
     }
 
     /**
