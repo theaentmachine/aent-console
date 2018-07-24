@@ -61,7 +61,6 @@ class Aenthill
     {
         $command = ['aenthill', 'metadata', $key];
         $process = new Process($command);
-        $process->setTty(true);
         $process->mustRun();
         return $process->getOutput();
     }
@@ -70,7 +69,6 @@ class Aenthill
     {
         $command = ['aenthill', 'dependency', $key];
         $process = new Process($command);
-        $process->setTty(true);
         $process->mustRun();
         return $process->getOutput();
     }
