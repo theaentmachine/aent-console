@@ -68,7 +68,7 @@ abstract class EventCommand extends Command
 
         // Now, let's send a "reply" event
         if ($result !== null) {
-            Aenthill::reply('reply', $result);
+            Aenthill::reply('REPLY', $result);
         }
     }
 
