@@ -54,7 +54,9 @@ class AentHelper
     public function title(string $title): void
     {
         $this->registerStyle();
+        $this->spacer();
         $this->output->writeln($this->formatterHelper->formatBlock($title, 'title', true));
+        $this->spacer();
     }
 
     /**
