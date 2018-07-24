@@ -34,7 +34,7 @@ class Manifest
         try {
             return Aenthill::metadata($key);
         } catch (\Exception $e) {
-            throw ManifestException::missingMetadata($key);
+            throw ManifestException::missingMetadata($key, $e);
         }
     }
 
@@ -71,10 +71,9 @@ class Manifest
         try {
             return Aenthill::dependency($key);
         } catch (\Exception $e) {
-            throw ManifestException::missingDependency($key);
+            throw ManifestException::missingDependency($key, $e);
         }
     }
-
 
     /**
      * @param string $key
