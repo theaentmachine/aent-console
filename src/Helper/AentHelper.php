@@ -245,7 +245,7 @@ class AentHelper
         return $version;
     }
 
-    public function askForServiceName(string $serviceName, string $applicationName = '', $printAnswer=true): string
+    public function askForServiceName(string $serviceName, string $applicationName = '', bool $printAnswer = true): string
     {
         $answer = $this->question("$applicationName service name", $printAnswer)
             ->setDefault($serviceName)
