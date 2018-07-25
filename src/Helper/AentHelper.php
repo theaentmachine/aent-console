@@ -189,6 +189,9 @@ class AentHelper
         $chosen = $this->choiceQuestion('Environments', $environmentsStr, false)
             ->askWithMultipleChoices();
 
+        $this->output->writeln('<info>Environments: ' . implode($chosen, ', ') . '</info>');
+        $this->spacer();
+
         $results = [];
         foreach ($chosen as $c) {
             $results[] = $environments[array_search($c, $environmentsStr, true)];
