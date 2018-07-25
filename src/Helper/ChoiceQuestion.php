@@ -20,9 +20,9 @@ class ChoiceQuestion extends BaseQuestion
     private $multiselect = false;
 
 
-    public function __construct(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $question, array $choices)
+    public function __construct(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $question, array $choices, bool $printAnswer = true)
     {
-        parent::__construct($helper, $input, $output, $question);
+        parent::__construct($helper, $input, $output, $question, $printAnswer);
         $this->choices = $choices;
     }
 
@@ -138,12 +138,21 @@ class ChoiceQuestion extends BaseQuestion
                 }
                 $multiselectChoices[] = (string)$result;
             }
-            $this->spacer();
             if ($multiselect) {
+                if ($this->printAnswer) {
+                    $this->output->writeln('<info>You selected: ' . \implode(", ", $multiselectChoices) . '</info>');
+                    $this->spacer();
+                }
                 return $multiselectChoices;
             }
 
-            return current($multiselectChoices);
+            $answer = current($multiselectChoices);
+            if ($this->printAnswer) {
+                $this->output->writeln("<info>You selected: $answer</info>");
+                $this->spacer();
+            }
+
+            return $answer;
         };
     }
 }

@@ -26,12 +26,16 @@ abstract class BaseQuestion
     /** @var string|null */
     protected $helpText;
 
-    public function __construct(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $question)
+    /** @var bool */
+    protected $printAnswer;
+
+    public function __construct(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $question, bool $printAnswer = true)
     {
         $this->helper = $helper;
         $this->input = $input;
         $this->output = $output;
         $this->question = $question;
+        $this->printAnswer = $printAnswer;
     }
 
     protected function spacer(): void
