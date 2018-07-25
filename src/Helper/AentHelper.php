@@ -177,7 +177,7 @@ class AentHelper
      */
     public function askForEnvironments(): ?array
     {
-        $environments = Aenthill::dispatchJson('ENVIRONMENT', []);
+        $environments = array_unique(Aenthill::dispatchJson('ENVIRONMENT', []), SORT_REGULAR);
         if (empty($environments)) {
             $this->output->writeln('<error>No environments available, did you forget to install an aent like theaentmachine/aent-docker-compose?</error>');
             exit(1);
@@ -193,7 +193,7 @@ class AentHelper
         foreach ($chosen as $c) {
             $results[] = $environments[array_search($c, $environmentsStr, true)];
         }
-        return array_unique($results, SORT_REGULAR);
+        return $results;
     }
 
     public function askForTag(string $dockerHubImage, string $applicationName = ''): string
