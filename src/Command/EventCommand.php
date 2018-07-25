@@ -11,7 +11,6 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use TheAentMachine\Aenthill\Aenthill;
 use TheAentMachine\Exception\LogLevelException;
-use TheAentMachine\Exception\MissingEnvironmentVariableException;
 use TheAentMachine\Helper\AentHelper;
 use TheAentMachine\LogLevelConfigurator;
 
@@ -45,7 +44,6 @@ abstract class EventCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @throws LogLevelException
-     * @throws MissingEnvironmentVariableException
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
