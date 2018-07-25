@@ -193,7 +193,7 @@ class AentHelper
         foreach ($chosen as $c) {
             $results[] = $environments[array_search($c, $environmentsStr, true)];
         }
-        return array_unique($results);
+        return array_unique($results, SORT_REGULAR);
     }
 
     public function askForTag(string $dockerHubImage, string $applicationName = ''): string
