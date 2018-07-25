@@ -73,7 +73,7 @@ class AentHelper
         $this->output->writeln('');
     }
 
-    public function question(string $question): Question
+    public function question(string $question, bool $printAnswer = true): Question
     {
         return new Question($this->questionHelper, $this->input, $this->output, $question);
     }
@@ -82,7 +82,7 @@ class AentHelper
      * @param string[] $choices
      * @return ChoiceQuestion
      */
-    public function choiceQuestion(string $question, array $choices): ChoiceQuestion
+    public function choiceQuestion(string $question, array $choices, bool $printAnswer = true): ChoiceQuestion
     {
         return new ChoiceQuestion($this->questionHelper, $this->input, $this->output, $question, $choices);
     }
@@ -91,8 +91,6 @@ class AentHelper
     {
         $envType = $this->choiceQuestion('Environment type', [Metadata::ENV_TYPE_DEV, Metadata::ENV_TYPE_TEST, Metadata::ENV_TYPE_PROD])
             ->ask();
-        $this->output->writeln("<info>Environment type: $envType</info>");
-        $this->spacer();
         Manifest::addMetadata(Metadata::ENV_TYPE_KEY, $envType);
         return $envType;
     }
@@ -114,8 +112,6 @@ class AentHelper
         }
 
         $envName = $question->ask();
-        $this->output->writeln("<info>Environment name: $envName</info>");
-        $this->spacer();
         Manifest::addMetadata(Metadata::ENV_NAME_KEY, $envName);
         return $envName;
     }
@@ -192,7 +188,7 @@ class AentHelper
         foreach ($environments as $env) {
             $environmentsStr[] = $env[Metadata::ENV_NAME_KEY] . ' (of type '. $env[Metadata::ENV_TYPE_KEY]  .')';
         }
-        $chosen = $this->choiceQuestion('Environments', $environmentsStr)
+        $chosen = $this->choiceQuestion('Environments', $environmentsStr, false)
             ->askWithMultipleChoices();
 
         $results = [];
@@ -266,9 +262,6 @@ class AentHelper
                 return $value;
             })
             ->ask();
-
-        $this->output->writeln("<info>Service name: $answer</info>");
-        $this->spacer();
 
         return $answer;
     }

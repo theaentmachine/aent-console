@@ -110,7 +110,12 @@ class Question extends BaseQuestion
         do {
             $answer = $this->helper->ask($this->input, $this->output, $question);
         } while ($this->helpText !== null && $answer === '?');
-        $this->spacer();
+
+        if ($this->printAnswer) {
+            $this->output->writeln("<info>Your answer: $answer</info>");
+            $this->spacer();
+        }
+
         return $answer;
     }
 }
