@@ -9,12 +9,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use TheAentMachine\Helper\AentHelper;
 use TheAentMachine\Aenthill\Aenthill;
 use TheAentMachine\Exception\LogLevelException;
-use TheAentMachine\Exception\MissingEnvironmentVariableException;
+use TheAentMachine\Helper\AentHelper;
 use TheAentMachine\LogLevelConfigurator;
-use TheAentMachine\Aenthill\Pheromone;
 
 abstract class EventCommand extends Command
 {
@@ -46,7 +44,6 @@ abstract class EventCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @throws LogLevelException
-     * @throws MissingEnvironmentVariableException
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
@@ -55,10 +52,6 @@ abstract class EventCommand extends Command
         $logLevelConfigurator->configureLogLevel();
 
         $this->log = new ConsoleLogger($output);
-
-        if (!$this->isHidden()) {
-            $this->log->info(Pheromone::getImage());
-        }
 
         $payload = $input->getArgument('payload');
         $this->input = $input;

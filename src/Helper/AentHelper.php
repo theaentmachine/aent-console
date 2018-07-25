@@ -75,7 +75,7 @@ class AentHelper
 
     public function question(string $question, bool $printAnswer = true): Question
     {
-        return new Question($this->questionHelper, $this->input, $this->output, $question);
+        return new Question($this->questionHelper, $this->input, $this->output, $question, $printAnswer);
     }
 
     /**
@@ -84,7 +84,7 @@ class AentHelper
      */
     public function choiceQuestion(string $question, array $choices, bool $printAnswer = true): ChoiceQuestion
     {
-        return new ChoiceQuestion($this->questionHelper, $this->input, $this->output, $question, $choices);
+        return new ChoiceQuestion($this->questionHelper, $this->input, $this->output, $question, $choices, $printAnswer);
     }
 
     public function askForEnvType(): string
@@ -118,7 +118,6 @@ class AentHelper
 
     /**
      * @return string
-     * @throws MissingEnvironmentVariableException
      * @throws ManifestException
      */
     public function askForCICD(): string
@@ -145,7 +144,6 @@ class AentHelper
         // CI
         $ci = $this->choiceQuestion('CI/CD', ['gitlab-ci', 'travis-ci', 'circle-ci'])
             ->ask();
-        $this->output->writeln("<info>CI/CD: $ci</info>");
         $this->spacer();
 
         Manifest::addDependency("theaentmachine/aent-$ci", Metadata::CI_KEY, [
@@ -179,7 +177,7 @@ class AentHelper
      */
     public function askForEnvironments(): ?array
     {
-        $environments = Aenthill::dispatchJson('ENVIRONMENT', []);
+        $environments = array_unique(Aenthill::dispatchJson('ENVIRONMENT', []), SORT_REGULAR);
         if (empty($environments)) {
             $this->output->writeln('<error>No environments available, did you forget to install an aent like theaentmachine/aent-docker-compose?</error>');
             exit(1);
@@ -195,9 +193,6 @@ class AentHelper
         foreach ($chosen as $c) {
             $results[] = $environments[array_search($c, $environmentsStr, true)];
         }
-
-        $this->output->writeln('<info>Environments: ' . implode($chosen, ', ') . '</info>');
-        $this->spacer();
         return $results;
     }
 
@@ -248,9 +243,9 @@ class AentHelper
         return $version;
     }
 
-    public function askForServiceName(string $serviceName, string $applicationName = ''): string
+    public function askForServiceName(string $serviceName, string $applicationName = '', bool $printAnswer = true): string
     {
-        $answer = $this->question("$applicationName service name")
+        $answer = $this->question("$applicationName service name", $printAnswer)
             ->setDefault($serviceName)
             ->compulsory()
             ->setHelpText('The "service name" is used as an identifier for the container you are creating. It is also bound in Docker internal network DNS and can be used from other containers to reference your container.')
@@ -262,7 +257,6 @@ class AentHelper
                 return $value;
             })
             ->ask();
-
         return $answer;
     }
 }

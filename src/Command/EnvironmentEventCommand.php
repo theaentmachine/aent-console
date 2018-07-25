@@ -6,7 +6,6 @@ namespace TheAentMachine\Command;
 use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Aenthill\Metadata;
 use TheAentMachine\Exception\ManifestException;
-use TheAentMachine\Exception\MissingEnvironmentVariableException;
 
 class EnvironmentEventCommand extends JsonEventCommand
 {
@@ -19,7 +18,6 @@ class EnvironmentEventCommand extends JsonEventCommand
      * @param array $payload
      * @return array|null
      * @throws ManifestException
-     * @throws MissingEnvironmentVariableException
      */
     protected function executeJsonEvent(array $payload): ?array
     {
