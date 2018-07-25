@@ -4,6 +4,7 @@ namespace TheAentMachine\Service;
 
 use Opis\JsonSchema\ValidationError;
 use Opis\JsonSchema\Validator;
+use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Aenthill\Metadata;
 use TheAentMachine\Service\Enum\EnvVariableTypeEnum;
 use TheAentMachine\Service\Enum\VolumeTypeEnum;
@@ -429,5 +430,12 @@ class Service implements \JsonSerializable
     public function isForProdEnvType(): bool
     {
         return empty($this->destEnvTypes) || \in_array(Metadata::ENV_TYPE_PROD, $this->destEnvTypes);
+    }
+
+    /** @throws \TheAentMachine\Exception\ManifestException */
+    public function isForMyEnvType(): bool
+    {
+        $myEnvType = Manifest::getMetadata(Metadata::ENV_TYPE_KEY);
+        return empty($this->destEnvTypes) || \in_array($myEnvType, $this->destEnvTypes);
     }
 }
