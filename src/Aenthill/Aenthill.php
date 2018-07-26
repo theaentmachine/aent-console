@@ -4,7 +4,7 @@
 namespace TheAentMachine\Aenthill;
 
 use Symfony\Component\Process\Process;
-use TheAentMachine\ReplyAggregator;
+use TheAentMachine\Helper\ReplyAggregator;
 
 final class Aenthill
 {
