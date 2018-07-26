@@ -4,7 +4,7 @@ namespace TheAentMachine\Registry;
 
 
 use PHPUnit\Framework\TestCase;
-use TheAentMachine\Aenthill\Metadata;
+use TheAentMachine\Aenthill\CommonMetadata;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Service;
 
@@ -136,7 +136,7 @@ JSON;
         $s->addTmpfsVolume('baz');
         $s->addDockerfileCommand('RUN composer install');
         $s->setNeedVirtualHost(true);
-        $s->addDestEnvType(Metadata::ENV_TYPE_DEV, true);
+        $s->addDestEnvType(CommonMetadata::ENV_TYPE_DEV, true);
         $outArray = $s->jsonSerialize();
         $expectedArray = json_decode(self::VALID_PAYLOAD, true);
         $this->assertEquals($outArray, $expectedArray);

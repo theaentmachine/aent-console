@@ -8,9 +8,8 @@ use TheAentMachine\Exception\ManifestException;
 /**
  * Utility class to access the manifest data.
  */
-class Manifest
+final class Manifest
 {
-
     /**
      * @param string[] $events
      */
@@ -29,7 +28,7 @@ class Manifest
      * @return string
      * @throws ManifestException
      */
-    public static function getMetadata(string $key): string
+    public static function mustGetMetadata(string $key): string
     {
         try {
             return Aenthill::metadata($key);
@@ -42,10 +41,10 @@ class Manifest
      * @param string $key
      * @return null|string
      */
-    public static function getMetadataOrNull(string $key): ?string
+    public static function getMetadata(string $key): ?string
     {
         try {
-            return self::getMetadata($key);
+            return self::mustGetMetadata($key);
         } catch (ManifestException $e) {
             return null;
         }
@@ -66,7 +65,7 @@ class Manifest
      * @return string
      * @throws ManifestException
      */
-    public static function getDependency(string $key): string
+    public static function mustGetDependency(string $key): string
     {
         try {
             return Aenthill::dependency($key);
@@ -79,10 +78,10 @@ class Manifest
      * @param string $key
      * @return null|string
      */
-    public static function getDependencyOrNull(string $key): ?string
+    public static function getDependency(string $key): ?string
     {
         try {
-            return self::getDependency($key);
+            return self::mustGetDependency($key);
         } catch (ManifestException $e) {
             return null;
         }

@@ -1,12 +1,12 @@
 <?php
 
-namespace TheAentMachine\Helper;
+namespace TheAentMachine\Question;
 
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class BaseQuestion
+abstract class AbstractQuestion
 {
     /** @var QuestionHelper */
     protected $helper;
@@ -29,7 +29,7 @@ abstract class BaseQuestion
     /** @var bool */
     protected $printAnswer;
 
-    public function __construct(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $question, bool $printAnswer = true)
+    public function __construct(InputInterface $input, OutputInterface $output, QuestionHelper $helper, string $question, bool $printAnswer = true)
     {
         $this->helper = $helper;
         $this->input = $input;

@@ -1,6 +1,6 @@
 <?php
 
-namespace TheAentMachine\Helper;
+namespace TheAentMachine\Question;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion as SymfonyChoiceQuestion;
 /**
  * A helper class to easily create choice questions.
  */
-class ChoiceQuestion extends BaseQuestion
+final class ChoiceQuestion extends AbstractQuestion
 {
     /** @var string[] */
     private $choices;
@@ -20,9 +20,9 @@ class ChoiceQuestion extends BaseQuestion
     private $multiselect = false;
 
 
-    public function __construct(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $question, array $choices, bool $printAnswer = true)
+    public function __construct(InputInterface $input, OutputInterface $output, QuestionHelper $helper, string $question, array $choices, bool $printAnswer = true)
     {
-        parent::__construct($helper, $input, $output, $question, $printAnswer);
+        parent::__construct($input, $output, $helper, $question, $printAnswer);
         $this->choices = $choices;
     }
 

@@ -5,7 +5,7 @@ namespace TheAentMachine\Service;
 use Opis\JsonSchema\ValidationError;
 use Opis\JsonSchema\Validator;
 use TheAentMachine\Aenthill\Manifest;
-use TheAentMachine\Aenthill\Metadata;
+use TheAentMachine\Aenthill\CommonMetadata;
 use TheAentMachine\Service\Enum\EnvVariableTypeEnum;
 use TheAentMachine\Service\Enum\VolumeTypeEnum;
 use TheAentMachine\Service\Environment\EnvVariable;
@@ -419,23 +419,23 @@ class Service implements \JsonSerializable
 
     public function isForDevEnvType(): bool
     {
-        return empty($this->destEnvTypes) || \in_array(Metadata::ENV_TYPE_DEV, $this->destEnvTypes);
+        return empty($this->destEnvTypes) || \in_array(CommonMetadata::ENV_TYPE_DEV, $this->destEnvTypes);
     }
 
     public function isForTestEnvType(): bool
     {
-        return empty($this->destEnvTypes) || \in_array(Metadata::ENV_TYPE_TEST, $this->destEnvTypes);
+        return empty($this->destEnvTypes) || \in_array(CommonMetadata::ENV_TYPE_TEST, $this->destEnvTypes);
     }
 
     public function isForProdEnvType(): bool
     {
-        return empty($this->destEnvTypes) || \in_array(Metadata::ENV_TYPE_PROD, $this->destEnvTypes);
+        return empty($this->destEnvTypes) || \in_array(CommonMetadata::ENV_TYPE_PROD, $this->destEnvTypes);
     }
 
     /** @throws \TheAentMachine\Exception\ManifestException */
     public function isForMyEnvType(): bool
     {
-        $myEnvType = Manifest::getMetadata(Metadata::ENV_TYPE_KEY);
+        $myEnvType = Manifest::getMetadata(CommonMetadata::ENV_TYPE_KEY);
         return empty($this->destEnvTypes) || \in_array($myEnvType, $this->destEnvTypes);
     }
 }

@@ -3,12 +3,13 @@
 
 namespace TheAentMachine\Command;
 
-use TheAentMachine\ReplyAggregator;
+use TheAentMachine\Aenthill\CommonEvents;
+use TheAentMachine\Helper\ReplyAggregator;
 
 /**
  * A special command that is used to receive replies from a dispatch
  */
-class ReplyCommand extends EventCommand
+final class ReplyCommand extends AbstractEventCommand
 {
     private $replyAggregator;
 
@@ -26,7 +27,7 @@ class ReplyCommand extends EventCommand
 
     protected function getEventName(): string
     {
-        return 'REPLY';
+        return CommonEvents::REPLY_EVENT;
     }
 
     protected function executeEvent(?string $payload): ?string

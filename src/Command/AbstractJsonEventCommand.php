@@ -6,7 +6,7 @@ namespace TheAentMachine\Command;
 /**
  * Events that have JSON payloads should extend this class.
  */
-abstract class JsonEventCommand extends EventCommand
+abstract class AbstractJsonEventCommand extends AbstractEventCommand
 {
     /**
      * @param mixed[] $payload

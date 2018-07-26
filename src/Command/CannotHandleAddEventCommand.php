@@ -3,14 +3,21 @@
 
 namespace TheAentMachine\Command;
 
+use TheAentMachine\Aenthill\CommonEvents;
 use TheAentMachine\Exception\EventException;
 use TheAentMachine\Exception\MissingEnvironmentVariableException;
 
-class CannotHandleAddEventCommand extends EventCommand
+final class CannotHandleAddEventCommand extends AbstractEventCommand
 {
+    protected function configure()
+    {
+        parent::configure();
+        $this->setHidden(true);
+    }
+
     protected function getEventName(): string
     {
-        return 'ADD';
+        return CommonEvents::ADD_EVENT;
     }
 
     /**

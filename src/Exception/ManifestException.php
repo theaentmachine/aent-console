@@ -2,7 +2,7 @@
 
 namespace TheAentMachine\Exception;
 
-class ManifestException extends AenthillException
+final class ManifestException extends AenthillException
 {
     public static function missingMetadata(string $key, \Exception $e): self
     {

@@ -1,7 +1,7 @@
 <?php
 namespace TheAentMachine\Exception;
 
-class LogLevelException extends AenthillException
+final class LogLevelException extends AenthillException
 {
     public static function invalidLogLevel(string $wrongLogLevel): self
     {

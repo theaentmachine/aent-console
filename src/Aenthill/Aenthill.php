@@ -4,9 +4,9 @@
 namespace TheAentMachine\Aenthill;
 
 use Symfony\Component\Process\Process;
-use TheAentMachine\ReplyAggregator;
+use TheAentMachine\Helper\ReplyAggregator;
 
-class Aenthill
+final class Aenthill
 {
     /**
      * Updates current aent in the manifest.
@@ -17,18 +17,21 @@ class Aenthill
     public static function update(?array $metadata = null, ?array $events = null): void
     {
         $command = ['aenthill', 'update'];
+
         if (!empty($metadata)) {
             foreach ($metadata as $key => $value) {
                 $command[] = '-m';
                 $command[] = $key . '=' . $value;
             }
         }
+
         if (!empty($events)) {
             foreach ($events as $event) {
                 $command[] = '-e';
                 $command[] = $event;
             }
         }
+
         $process = new Process($command);
         $process->enableOutput();
         $process->setTty(true);
@@ -45,12 +48,14 @@ class Aenthill
     public static function register(string $image, string $key, ?array $metadata = null): void
     {
         $command = ['aenthill', 'register', $image, $key];
+
         if (!empty($metadata)) {
             foreach ($metadata as $k => $value) {
                 $command[] = '-m';
                 $command[] = $k . '=' . $value;
             }
         }
+
         $process = new Process($command);
         $process->enableOutput();
         $process->setTty(true);
@@ -86,13 +91,16 @@ class Aenthill
         $replyAggregator = new ReplyAggregator();
         $replyAggregator->clear();
         $command = ['aenthill', 'run', $target, $event];
+
         if (null !== $payload) {
             $command[] = $payload;
         }
+
         $process = new Process($command);
         $process->enableOutput();
         $process->setTty(true);
         $process->mustRun();
+
         return $replyAggregator->getReplies();
     }
 
@@ -118,7 +126,9 @@ class Aenthill
     {
         $replyAggregator = new ReplyAggregator();
         $replyAggregator->clear();
+
         $command = ['aenthill', 'dispatch', $event];
+
         if (null !== $payload) {
             $command[] = $payload;
         }
@@ -126,6 +136,7 @@ class Aenthill
         $process->enableOutput();
         $process->setTty(true);
         $process->mustRun();
+
         return $replyAggregator->getReplies();
     }
 
@@ -153,9 +164,11 @@ class Aenthill
     public static function reply(string $event, ?string $payload = null): void
     {
         $command = ['aenthill', 'reply', $event];
+
         if (null !== $payload) {
             $command[] = $payload;
         }
+
         $process = new Process($command);
         $process->enableOutput();
         $process->setTty(true);
