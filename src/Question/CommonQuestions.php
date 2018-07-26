@@ -47,23 +47,18 @@ final class CommonQuestions
 
         $tagsAnalyzer = new TagsAnalyzer();
         $proposedTags = $tagsAnalyzer->filterBestTags($availableVersions);
-        $default = $proposedTags[0] ?? null;
+        $default = $proposedTags[0] ?? $availableVersions[0];
 
         $this->output->writeln("Please choose your $applicationName version.");
 
         if (!empty($proposedTags)) {
             $this->output->writeln('Possible values include: <info>' . \implode('</info>, <info>', $proposedTags) . '</info>');
         }
-
         $this->output->writeln('Enter "v" to view all available versions, "?" for help');
 
-        $question = new SymfonyQuestion(
-            "Select your $applicationName version [$default]: ",
-            $default
-        );
+        $question = new SymfonyQuestion("Select your $applicationName version [$default]: ", $default);
 
         $question->setAutocompleterValues($availableVersions);
-
         $question->setValidator(function (string $value) use ($availableVersions, $dockerHubImage) {
             $value = trim($value);
 
@@ -77,7 +72,7 @@ final class CommonQuestions
                 return '?';
             }
 
-            if (!\in_array($value, $availableVersions)) {
+            if (!\in_array($value, $availableVersions, true)) {
                 throw new \InvalidArgumentException("Version '$value' is invalid.");
             }
 
