@@ -26,7 +26,7 @@ final class CommonValidators
             if (!\preg_match($pattern, $value)) {
                 $message = 'Invalid value "' . $value . '".';
                 if (!empty($hint)) {
-                    $message .= "Hint: $hint";
+                    $message .= " Hint: $hint";
                 }
                 throw new \InvalidArgumentException($message);
             }
