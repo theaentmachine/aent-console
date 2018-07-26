@@ -55,7 +55,7 @@ final class Question extends AbstractQuestion
         if ($this->helpText) {
             $text .= ' (? for help)';
         }
-        if ($this->default) {
+        if (null !== $this->default) {
             if (!$this->yesNoQuestion) {
                 $text .= ' [' . $this->default . ']';
             } elseif ($this->default === 'y') {
@@ -86,7 +86,7 @@ final class Question extends AbstractQuestion
             };
         }
 
-        if ($this->helpText !== null) {
+        if (null !== $this->helpText) {
             $validator = function (?string $response) use ($validator) {
                 $response = $response ?? '';
                 if (trim($response) === '?') {
