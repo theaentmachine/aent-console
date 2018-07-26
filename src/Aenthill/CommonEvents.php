@@ -13,9 +13,9 @@ final class CommonEvents
     public const NEW_SERVICE_EVENT = 'NEW_SERVICE';
     public const NEW_VIRTUAL_HOST_EVENT = 'NEW_VIRTUAL_HOST';
     public const NEW_IMAGE_EVENT = 'NEW_IMAGE';
-    public const NEW_BUILD_IMAGE_EVENT = 'NEW_BUILD_IMAGE';
-    public const NEW_DEPLOY_JOB_DOCKER_COMPOSE_EVENT = 'NEW_DEPLOY_JOB_DOCKER_COMPOSE';
-    public const NEW_DEPLOY_JOB_KUBERNETES_EVENT = 'NEW_DEPLOY_JOB_KUBERNETES';
+    public const NEW_BUILD_IMAGE_JOB_EVENT = 'NEW_BUILD_IMAGE_JOB';
+    public const NEW_DEPLOY_DOCKER_COMPOSE_JOB_EVENT = 'NEW_DEPLOY_DOCKER_COMPOSE_JOB';
+    public const NEW_DEPLOY_KUBERNETES_JOB_EVENT = 'NEW_DEPLOY_KUBERNETES_JOB';
 
     public static function dispatchService(Service $service): void
     {
