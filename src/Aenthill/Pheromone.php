@@ -8,7 +8,7 @@ use TheAentMachine\Exception\MissingEnvironmentVariableException;
 /**
  * Utility class to access the aent configuration settings (stored in environment variables)
  */
-class Pheromone
+final class Pheromone
 {
     private static $levels = [
         'DEBUG' => true,

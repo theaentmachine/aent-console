@@ -5,9 +5,8 @@ namespace TheAentMachine\YamlTools;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
-class YamlTools
+final class YamlTools
 {
-
     /**
      * Merge the content of $sourceFile into $destinationFile's one (overwritten)
      * @param string $destinationFile

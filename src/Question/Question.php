@@ -1,19 +1,21 @@
 <?php
 
 
-namespace TheAentMachine\Helper;
+namespace TheAentMachine\Question;
 
 use Symfony\Component\Console\Question\Question as SymfonyQuestion;
 
 /**
  * A helper class to easily create questions.
  */
-class Question extends BaseQuestion
+final class Question extends AbstractQuestion
 {
     /** @var bool */
     private $compulsory = false;
+
     /** @var callable|null */
     private $validator;
+
     /** @var bool */
     private $yesNoQuestion = false;
 

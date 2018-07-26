@@ -3,27 +3,26 @@
 
 namespace TheAentMachine\Command;
 
+use TheAentMachine\Aenthill\CommonEvents;
 use TheAentMachine\Aenthill\Manifest;
-use TheAentMachine\Aenthill\Metadata;
-use TheAentMachine\Exception\ManifestException;
+use TheAentMachine\Aenthill\CommonMetadata;
 
-class EnvironmentEventCommand extends JsonEventCommand
+final class EnvironmentEventCommand extends AbstractJsonEventCommand
 {
     protected function getEventName(): string
     {
-        return 'ENVIRONMENT';
+        return CommonEvents::ENVIRONMENT_EVENT;
     }
 
     /**
-     * @param array $payload
+     * @param mixed[] $payload
      * @return array|null
-     * @throws ManifestException
      */
     protected function executeJsonEvent(array $payload): ?array
     {
         return [
-            Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
-            Metadata::ENV_TYPE_KEY => Manifest::getMetadata(Metadata::ENV_TYPE_KEY)
+            CommonMetadata::ENV_NAME_KEY => Manifest::getMetadata(CommonMetadata::ENV_NAME_KEY),
+            CommonMetadata::ENV_TYPE_KEY => Manifest::getMetadata(CommonMetadata::ENV_TYPE_KEY)
         ];
     }
 }

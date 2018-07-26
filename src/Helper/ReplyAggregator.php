@@ -1,6 +1,6 @@
 <?php
 
-namespace TheAentMachine;
+namespace TheAentMachine\Helper;
 
 /**
  * Class in charge of assembling replies from the different containers.

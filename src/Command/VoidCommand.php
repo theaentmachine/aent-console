@@ -6,7 +6,7 @@ namespace TheAentMachine\Command;
 /**
  * A command that does nothing
  */
-class VoidCommand extends EventCommand
+final class VoidCommand extends AbstractEventCommand
 {
     protected function configure()
     {

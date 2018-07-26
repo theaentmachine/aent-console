@@ -4,7 +4,7 @@ namespace TheAentMachine\Exception;
 
 use TheAentMachine\Aenthill\Pheromone;
 
-class EventException extends AenthillException
+final class EventException extends AenthillException
 {
     /**
      * @return EventException

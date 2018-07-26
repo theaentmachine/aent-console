@@ -8,19 +8,15 @@ use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question as SymfonyQuestion;
-use TheAentMachine\Aenthill\Aenthill;
-use TheAentMachine\Exception\ManifestException;
-use TheAentMachine\Exception\MissingEnvironmentVariableException;
-use TheAentMachine\Aenthill\Manifest;
-use TheAentMachine\Aenthill\Metadata;
-use TheAentMachine\Registry\RegistryClient;
-use TheAentMachine\Registry\TagsAnalyzer;
+use TheAentMachine\Question\CommonQuestions;
+use TheAentMachine\Question\QuestionFactory;
+use TheAentMachine\Question\Question;
+use TheAentMachine\Question\ChoiceQuestion;
 
 /**
  * A helper class for the most common questions asked in the console.
  */
-class AentHelper
+final class AentHelper
 {
     /** @var InputInterface */
     private $input;
@@ -34,12 +30,21 @@ class AentHelper
     /** @var FormatterHelper */
     private $formatterHelper;
 
+    /** @var QuestionFactory */
+    private $factory;
+
+    /** @var CommonQuestions */
+    private $commonQuestions;
+
+
     public function __construct(InputInterface $input, OutputInterface $output, QuestionHelper $questionHelper, FormatterHelper $formatterHelper)
     {
         $this->input = $input;
         $this->output = $output;
         $this->questionHelper = $questionHelper;
         $this->formatterHelper = $formatterHelper;
+        $this->factory = new QuestionFactory($input, $output, $questionHelper);
+        $this->commonQuestions = new CommonQuestions($input, $output, $questionHelper);
     }
 
     private function registerStyle(): void
@@ -75,191 +80,25 @@ class AentHelper
 
     public function question(string $question, bool $printAnswer = true): Question
     {
-        return new Question($this->questionHelper, $this->input, $this->output, $question, $printAnswer);
+        return $this->factory->question($question, $printAnswer);
     }
 
     /**
+     * @param string $question
      * @param string[] $choices
+     * @param bool $printAnswer
      * @return ChoiceQuestion
      */
     public function choiceQuestion(string $question, array $choices, bool $printAnswer = true): ChoiceQuestion
     {
-        return new ChoiceQuestion($this->questionHelper, $this->input, $this->output, $question, $choices, $printAnswer);
-    }
-
-    public function askForEnvType(): string
-    {
-        $envType = $this->choiceQuestion('Environment type', [Metadata::ENV_TYPE_DEV, Metadata::ENV_TYPE_TEST, Metadata::ENV_TYPE_PROD])
-            ->ask();
-        Manifest::addMetadata(Metadata::ENV_TYPE_KEY, $envType);
-        return $envType;
-    }
-
-    public function askForEnvName(?string $envType): string
-    {
-        $question = $this->question('Environment name')
-            ->compulsory()
-            ->setValidator(function (string $value) {
-                $value = trim($value);
-                if (!\preg_match('/^[a-zA-Z0-9_.-]+$/', $value)) {
-                    throw new \InvalidArgumentException('Invalid environment name "' . $value . '". Environment names can contain alphanumeric characters, and "_", ".", "-".');
-                }
-                return $value;
-            });
-
-        if (null !== $envType) {
-            $question->setDefault(strtolower($envType));
-        }
-
-        $envName = $question->ask();
-        Manifest::addMetadata(Metadata::ENV_NAME_KEY, $envName);
-        return $envName;
+        return $this->factory->choiceQuestion($question, $choices, $printAnswer);
     }
 
     /**
-     * @return string
-     * @throws ManifestException
+     * @return CommonQuestions
      */
-    public function askForCICD(): string
+    public function getCommonQuestions(): CommonQuestions
     {
-        $currentEnvType = Manifest::getMetadata(Metadata::ENV_TYPE_KEY);
-        /*
-        // Image builder
-        $doAddAentDockerfile = false;
-        if ($currentEnvType === Metadata::ENV_TYPE_TEST) {
-            $doAddAentDockerfile = $this->question('In the future, will you build an image of your project?')
-                ->yesNoQuestion()
-                ->setDefault('y')
-                ->setHelpText('If yes, Aenthill will add a new aent which can generate Dockerfiles for you : <info>theaentmachine/aent-dockerfile</info>')
-                ->ask();
-        }
-        if ($doAddAentDockerfile || $currentEnvType === Metadata::ENV_TYPE_PROD) {
-            $this->output->writeln('<info>Adding theaentmachine/aent-dockerfile to build images</info>');
-            Manifest::addDependency('theaentmachine/aent-dockerfile', Metadata::IMAGE_BUILDER_KEY, [
-                Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
-                Metadata::ENV_TYPE_KEY => $currentEnvType
-            ]);
-        }
-        */
-        // CI
-        $ci = $this->choiceQuestion('CI/CD', ['gitlab-ci', 'travis-ci', 'circle-ci'])
-            ->ask();
-        $this->spacer();
-
-        Manifest::addDependency("theaentmachine/aent-$ci", Metadata::CI_KEY, [
-            Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
-            Metadata::ENV_TYPE_KEY => $currentEnvType
-        ]);
-
-        return Manifest::getDependency(Metadata::CI_KEY);
-    }
-
-    /**
-     * @return string
-     * @throws MissingEnvironmentVariableException
-     * @throws ManifestException
-     */
-    /*public function registerReverseProxy(): string
-    {
-        $reverseProxy = $this->choiceQuestion('Reverse proxy', ['traefik', 'nginx', 'ingress'])
-            ->askSingleChoiceQuestion();
-        $this->output->writeln("<info>Reverse proxy: $reverseProxy</info>");
-        $this->spacer();
-        Manifest::addDependency("theaentmachine/aent-$reverseProxy", Metadata::REVERSE_PROXY_KEY, [
-            Metadata::ENV_NAME_KEY => Manifest::getMetadata(Metadata::ENV_NAME_KEY),
-            Metadata::ENV_TYPE_KEY => Manifest::getMetadata(Metadata::ENV_TYPE_KEY)
-        ]);
-        return Manifest::getDependency(Metadata::REVERSE_PROXY_KEY);
-    }*/
-
-    /**
-     * @return mixed[]|null
-     */
-    public function askForEnvironments(): ?array
-    {
-        $environments = array_unique(Aenthill::dispatchJson('ENVIRONMENT', []), SORT_REGULAR);
-        if (empty($environments)) {
-            $this->output->writeln('<error>No environments available, did you forget to install an aent like theaentmachine/aent-docker-compose?</error>');
-            exit(1);
-        }
-        $environmentsStr = [];
-        foreach ($environments as $env) {
-            $environmentsStr[] = $env[Metadata::ENV_NAME_KEY] . ' (of type '. $env[Metadata::ENV_TYPE_KEY]  .')';
-        }
-        $chosen = $this->choiceQuestion('Environments', $environmentsStr, false)
-            ->askWithMultipleChoices();
-
-        $this->output->writeln('<info>Environments: ' . implode($chosen, ', ') . '</info>');
-        $this->spacer();
-
-        $results = [];
-        foreach ($chosen as $c) {
-            $results[] = $environments[array_search($c, $environmentsStr, true)];
-        }
-        return $results;
-    }
-
-    public function askForTag(string $dockerHubImage, string $applicationName = ''): string
-    {
-        $registryClient = new RegistryClient();
-        $availableVersions = $registryClient->getImageTagsOnDockerHub($dockerHubImage);
-
-        $tagsAnalyzer = new TagsAnalyzer();
-        $proposedTags = $tagsAnalyzer->filterBestTags($availableVersions);
-        $default = $proposedTags[0] ?? null;
-        $this->output->writeln("Please choose your $applicationName version.");
-        if (!empty($proposedTags)) {
-            $this->output->writeln('Possible values include: <info>' . \implode('</info>, <info>', $proposedTags) . '</info>');
-        }
-        $this->output->writeln('Enter "v" to view all available versions, "?" for help');
-        $question = new SymfonyQuestion(
-            "Select your $applicationName version [$default]: ",
-            $default
-        );
-        $question->setAutocompleterValues($availableVersions);
-        $question->setValidator(function (string $value) use ($availableVersions, $dockerHubImage) {
-            $value = trim($value);
-
-            if ($value === 'v') {
-                $this->output->writeln('Available versions: <info>' . \implode('</info>, <info>', $availableVersions) . '</info>');
-                return 'v';
-            }
-
-            if ($value === '?') {
-                $this->output->writeln("Please choose the version (i.e. the tag) of the $dockerHubImage image you are about to install. Press 'v' to view the list of available tags.");
-                return '?';
-            }
-
-            if (!\in_array($value, $availableVersions)) {
-                throw new \InvalidArgumentException("Version '$value' is invalid.");
-            }
-
-            return $value;
-        });
-        do {
-            $version = $this->questionHelper->ask($this->input, $this->output, $question);
-        } while ($version === 'v' || $version === '?');
-
-        $this->output->writeln("<info>Selected version: $version</info>");
-        $this->spacer();
-
-        return $version;
-    }
-
-    public function askForServiceName(string $serviceName, string $applicationName = '', bool $printAnswer = true): string
-    {
-        $answer = $this->question("$applicationName service name", $printAnswer)
-            ->setDefault($serviceName)
-            ->compulsory()
-            ->setHelpText('The "service name" is used as an identifier for the container you are creating. It is also bound in Docker internal network DNS and can be used from other containers to reference your container.')
-            ->setValidator(function (string $value) {
-                $value = trim($value);
-                if (!\preg_match('/^[a-zA-Z0-9_.-]+$/', $value)) {
-                    throw new \InvalidArgumentException('Invalid service name "' . $value . '". Service names can contain alphanumeric characters, and "_", ".", "-".');
-                }
-                return $value;
-            })
-            ->ask();
-        return $answer;
+        return $this->commonQuestions;
     }
 }

@@ -10,11 +10,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use TheAentMachine\Aenthill\Aenthill;
+use TheAentMachine\Aenthill\CommonEvents;
 use TheAentMachine\Exception\LogLevelException;
 use TheAentMachine\Helper\AentHelper;
-use TheAentMachine\LogLevelConfigurator;
+use TheAentMachine\Helper\LogLevelConfigurator;
 
-abstract class EventCommand extends Command
+abstract class AbstractEventCommand extends Command
 {
     /** @var LoggerInterface */
     protected $log;
@@ -61,7 +62,7 @@ abstract class EventCommand extends Command
 
         // Now, let's send a "reply" event
         if ($result !== null) {
-            Aenthill::reply('REPLY', $result);
+            Aenthill::reply(CommonEvents::REPLY_EVENT, $result);
         }
     }
 
@@ -70,10 +71,10 @@ abstract class EventCommand extends Command
      */
     public function getAllEventNames(): array
     {
-        return array_map(function (EventCommand $event) {
+        return array_map(function (AbstractEventCommand $event) {
             return $event->getEventName();
         }, \array_filter($this->getApplication()->all(), function (Command $command) {
-            return $command instanceof EventCommand && !$command->isHidden();
+            return $command instanceof AbstractEventCommand && !$command->isHidden();
         }));
     }
 

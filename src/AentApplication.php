@@ -7,11 +7,12 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use TheAentMachine\Command\VoidCommand;
 use TheAentMachine\Command\ReplyCommand;
+use TheAentMachine\Helper\ReplyAggregator;
 
 /**
  * aents should start a AentApplication instead of a default Symfony console "Application"
  */
-class AentApplication extends Application
+final class AentApplication extends Application
 {
     private $voidCommand;
 
