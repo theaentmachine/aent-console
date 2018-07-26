@@ -47,7 +47,7 @@ final class CommonQuestions
 
         $tagsAnalyzer = new TagsAnalyzer();
         $proposedTags = $tagsAnalyzer->filterBestTags($availableVersions);
-        $default = $proposedTags[0] ?? null;
+        $default = $proposedTags[0] ?? '';
 
         $this->output->writeln("Please choose your $applicationName version.");
 
@@ -56,7 +56,7 @@ final class CommonQuestions
         }
         $this->output->writeln('Enter "v" to view all available versions, "?" for help');
 
-        null === $default ? $question = new SymfonyQuestion("Select your $applicationName version: ") :
+        '' === $default ? $question = new SymfonyQuestion("Select your $applicationName version: ", $default) :
             $question = new SymfonyQuestion("Select your $applicationName version [$default]: ", $default);
 
         $question->setAutocompleterValues($availableVersions);
