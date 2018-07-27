@@ -182,7 +182,7 @@ final class CommonQuestions
         if ($image === 'other') {
             $image = $this->factory->question('Name of your reverse proxy image')
                 ->compulsory()
-                ->setValidator(CommonValidators::getAlphaValidator(['_', '.', '-']))
+                ->setValidator(CommonValidators::getDockerImageWithoutTagValidator())
                 ->ask();
             $this->spacer();
         }
@@ -228,9 +228,9 @@ final class CommonQuestions
         $this->spacer();
 
         if ($image === 'other') {
-            $image = $this->factory->question('Name of your CI image')
+            $image = $this->factory->question('Name of your CI image (with tag)')
                 ->compulsory()
-                ->setValidator(CommonValidators::getAlphaValidator(['_', '.', '-']))
+                ->setValidator(CommonValidators::getDockerImageWithoutTagValidator())
                 ->ask();
             $this->spacer();
         }

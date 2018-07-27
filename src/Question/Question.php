@@ -116,7 +116,7 @@ final class Question extends AbstractQuestion
         if ($this->printAnswer) {
             if ($this->yesNoQuestion) {
                 $answerStr = $answer === null ? 'no' : 'yes';
-            }  else {
+            } else {
                 $answerStr = $answer;
             }
             $this->output->writeln("<info>Your answer: $answerStr</info>");

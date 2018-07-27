@@ -78,4 +78,26 @@ final class CommonValidators
             return $value;
         };
     }
+
+    public static function getDockerImageWithoutTagValidator(): \Closure
+    {
+        return function (string $value) {
+            $value = trim($value);
+            if (!\preg_match('/^[a-z0-9]+\/([a-z0-9]+(?:[._-][a-z0-9]+)*)$/', $value)) {
+                throw new \InvalidArgumentException('Invalid value "' . $value . '". Hint: the docker image should be of type <info>username/repository</info>');
+            }
+            return $value;
+        };
+    }
+
+    public static function getDockerImageWithTagValidator(): \Closure
+    {
+        return function (string $value) {
+            $value = trim($value);
+            if (!\preg_match('/^[a-z0-9]+\/([a-z0-9]+(?:[._-][a-z0-9]+)*)(:[\w]+([\w._-]+)?)$/', $value)) {
+                throw new \InvalidArgumentException('Invalid value "' . $value . '". Hint: the docker image should be of type <info>username/repository:tag</info>');
+            }
+            return $value;
+        };
+    }
 }
