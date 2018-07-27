@@ -41,11 +41,6 @@ final class CommonQuestions
         $this->factory = new QuestionFactory($input, $output, $questionHelper);
     }
 
-    private function spacer(): void
-    {
-        $this->output->writeln('');
-    }
-
     public function askForDockerImageTag(string $dockerHubImage, string $applicationName = ''): string
     {
         $registryClient = new RegistryClient();
@@ -89,21 +84,19 @@ final class CommonQuestions
         } while ($version === 'v' || $version === '?');
 
         $this->output->writeln("<info>Selected version: $version</info>");
-        $this->spacer();
+        $this->output->writeln('');
 
         return $version;
     }
 
     public function askForServiceName(string $serviceName, string $applicationName = ''): string
     {
-        $answer = $this->factory->question("$applicationName service name")
+        return $this->factory->question("$applicationName service name")
             ->setDefault($serviceName)
             ->compulsory()
             ->setHelpText('The "service name" is used as an identifier for the container you are creating. It is also bound in Docker internal network DNS and can be used from other containers to reference your container.')
             ->setValidator(CommonValidators::getAlphaValidator(['_', '.', '-']))
             ->ask();
-        $this->spacer();
-        return $answer;
     }
 
     /**
@@ -130,7 +123,7 @@ final class CommonQuestions
             ->askWithMultipleChoices();
 
         $this->output->writeln('<info>Environments: ' . \implode($chosen, ', ') . '</info>');
-        $this->spacer();
+        $this->output->writeln('');
 
         $results = [];
         foreach ($chosen as $c) {
@@ -144,9 +137,7 @@ final class CommonQuestions
     {
         $envType = $this->factory->choiceQuestion('Environment type', [CommonMetadata::ENV_TYPE_DEV, CommonMetadata::ENV_TYPE_TEST, CommonMetadata::ENV_TYPE_PROD])
             ->ask();
-        $this->spacer();
         Manifest::addMetadata(CommonMetadata::ENV_TYPE_KEY, $envType);
-
         return $envType;
     }
 
@@ -161,7 +152,6 @@ final class CommonQuestions
         }
 
         $envName = $question->ask();
-        $this->spacer();
         Manifest::addMetadata(CommonMetadata::ENV_NAME_KEY, $envName);
         return $envName;
     }
@@ -174,11 +164,11 @@ final class CommonQuestions
     public function askForReverseProxy(): string
     {
         $available = CommonAents::getAentsListByDependencyKey(CommonDependencies::REVERSE_PROXY_KEY);
+        $available[] = 'other';
         $image = $this->factory->choiceQuestion('Reverse proxy', $available)
             ->setDefault($available[0])
             ->setHelpText('A reverse proxy is useful for public facing services with a domain name. It handles the incoming requests and forward them to the correct container.')
             ->ask();
-        $this->spacer();
 
         $version = null;
         if ($image === 'other') {
@@ -187,15 +177,15 @@ final class CommonQuestions
                     ->compulsory()
                     ->setValidator(CommonValidators::getDockerImageWithoutTagValidator())
                     ->ask();
-                $this->spacer();
                 try {
                     $version = $this->askForDockerImageTag($image, $image);
                 } catch (GuzzleException $e) {
                     $this->output->writeln("<error>It seems that your image $image does not exist in the docker hub, please try again.</error>");
-                    $this->spacer();
-                    $version = null;
+                    $this->output->writeln('');
                 }
             } while ($version === null);
+        } else {
+            $version = $this->askForDockerImageTag($image, $image);
         }
 
         Manifest::addDependency("$image:$version", CommonDependencies::REVERSE_PROXY_KEY, [
@@ -223,7 +213,6 @@ final class CommonQuestions
             ->compulsory()
             ->yesNoQuestion()
             ->ask();
-        $this->spacer();
 
         if (empty($installCIAent)) {
             return null;
@@ -234,7 +223,6 @@ final class CommonQuestions
         $image = $this->factory->choiceQuestion('CI/CD', $available)
             ->setDefault($available[0])
             ->ask();
-        $this->spacer();
 
         $version = null;
         if ($image === 'other') {
@@ -243,14 +231,15 @@ final class CommonQuestions
                     ->compulsory()
                     ->setValidator(CommonValidators::getDockerImageWithoutTagValidator())
                     ->ask();
-                $this->spacer();
                 try {
                     $version = $this->askForDockerImageTag($image, $image);
                 } catch (GuzzleException $e) {
                     $this->output->writeln("<error>It seems that $image does not exist in the docker hub, please try again.</error>");
-                    $this->spacer();
+                    $this->output->writeln('');
                 }
             } while ($version === null);
+        } else {
+            $version = $this->askForDockerImageTag($image, $image);
         }
 
         Manifest::addDependency("$image:$version", CommonDependencies::CI_KEY, [
