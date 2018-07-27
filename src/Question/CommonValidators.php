@@ -61,7 +61,7 @@ final class CommonValidators
     {
         return function (string $value) {
             $value = trim($value);
-            if (!\preg_match('/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?:[0-9]*$/im', $value)) {
+            if (!\preg_match('/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?:\d*$/im', $value)) {
                 throw new \InvalidArgumentException('Invalid value "' . $value . '". Hint: the domain name must not start with "http(s)://".');
             }
             return $value;
@@ -72,7 +72,7 @@ final class CommonValidators
     {
         return function (string $value) {
             $value = trim($value);
-            if (!\preg_match('/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/', $value)) {
+            if (!\preg_match('/^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/', $value)) {
                 throw new \InvalidArgumentException('Invalid value "' . $value . '".');
             }
             return $value;
