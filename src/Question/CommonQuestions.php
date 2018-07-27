@@ -41,14 +41,11 @@ final class CommonQuestions
         $this->factory = new QuestionFactory($input, $output, $questionHelper);
     }
 
-    public function spacer(): void
+    private function spacer(): void
     {
         $this->output->writeln('');
     }
 
-    /**
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
     public function askForDockerImageTag(string $dockerHubImage, string $applicationName = ''): string
     {
         $registryClient = new RegistryClient();
@@ -183,6 +180,7 @@ final class CommonQuestions
             ->ask();
         $this->spacer();
 
+        $version = null;
         if ($image === 'other') {
             do {
                 $image = $this->factory->question('Name of your reverse proxy image (without tag)')
@@ -193,7 +191,7 @@ final class CommonQuestions
                 try {
                     $version = $this->askForDockerImageTag($image, $image);
                 } catch (GuzzleException $e) {
-                    $this->output->writeln("It seems that your image <info>$image</info>does not exist in the docker hub, please try again.");
+                    $this->output->writeln("<error>It seems that your image $image does not exist in the docker hub, please try again.</error>");
                     $this->spacer();
                     $version = null;
                 }
@@ -238,6 +236,7 @@ final class CommonQuestions
             ->ask();
         $this->spacer();
 
+        $version = null;
         if ($image === 'other') {
             do {
                 $image = $this->factory->question('Name of your CI image (without tag)')
@@ -248,9 +247,8 @@ final class CommonQuestions
                 try {
                     $version = $this->askForDockerImageTag($image, $image);
                 } catch (GuzzleException $e) {
-                    $this->output->writeln("It seems that your image <info>$image</info>does not exist in the docker hub, please try again.");
+                    $this->output->writeln("<error>It seems that $image does not exist in the docker hub, please try again.</error>");
                     $this->spacer();
-                    $version = null;
                 }
             } while ($version === null);
         }

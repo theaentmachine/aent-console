@@ -120,8 +120,8 @@ final class Question extends AbstractQuestion
                 $answerStr = $answer;
             }
             $this->output->writeln("<info>Your answer: $answerStr</info>");
-            $this->spacer();
         }
+        $this->spacer();
 
         return $answer;
     }

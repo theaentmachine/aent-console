@@ -10,7 +10,6 @@ class RegistryClient
      * Returns the list of tags available for an image stored on Docker Hub.
      *
      * @return string[]
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getImageTagsOnDockerHub(string $image): array
     {

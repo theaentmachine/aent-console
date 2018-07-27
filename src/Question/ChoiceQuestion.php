@@ -140,7 +140,7 @@ final class ChoiceQuestion extends AbstractQuestion
             }
             if ($multiselect) {
                 if ($this->printAnswer) {
-                    $this->output->writeln('<info>You selected: ' . \implode(", ", $multiselectChoices) . '</info>');
+                    $this->output->writeln('<info>You selected: ' . \implode(', ', $multiselectChoices) . '</info>');
                     $this->spacer();
                 }
                 return $multiselectChoices;
@@ -149,8 +149,8 @@ final class ChoiceQuestion extends AbstractQuestion
             $answer = current($multiselectChoices);
             if ($this->printAnswer) {
                 $this->output->writeln("<info>You selected: $answer</info>");
-                $this->spacer();
             }
+            $this->spacer();
 
             return $answer;
         };
