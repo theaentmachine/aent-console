@@ -40,6 +40,11 @@ final class CommonQuestions
         $this->factory = new QuestionFactory($input, $output, $questionHelper);
     }
 
+    public function spacer(): void
+    {
+        $this->output->writeln('');
+    }
+
     public function askForDockerImageTag(string $dockerHubImage, string $applicationName = ''): string
     {
         $registryClient = new RegistryClient();
@@ -83,19 +88,21 @@ final class CommonQuestions
         } while ($version === 'v' || $version === '?');
 
         $this->output->writeln("<info>Selected version: $version</info>");
-        $this->output->writeln('');
+        $this->spacer();
 
         return $version;
     }
 
     public function askForServiceName(string $serviceName, string $applicationName = ''): string
     {
-        return $this->factory->question("$applicationName service name")
+        $answer = $this->factory->question("$applicationName service name")
             ->setDefault($serviceName)
             ->compulsory()
             ->setHelpText('The "service name" is used as an identifier for the container you are creating. It is also bound in Docker internal network DNS and can be used from other containers to reference your container.')
             ->setValidator(CommonValidators::getAlphaValidator(['_', '.', '-']))
             ->ask();
+        $this->spacer();
+        return $answer;
     }
 
     /**
@@ -122,7 +129,7 @@ final class CommonQuestions
             ->askWithMultipleChoices();
 
         $this->output->writeln('<info>Environments: ' . \implode($chosen, ', ') . '</info>');
-        $this->output->writeln('');
+        $this->spacer();
 
         $results = [];
         foreach ($chosen as $c) {
@@ -136,6 +143,7 @@ final class CommonQuestions
     {
         $envType = $this->factory->choiceQuestion('Environment type', [CommonMetadata::ENV_TYPE_DEV, CommonMetadata::ENV_TYPE_TEST, CommonMetadata::ENV_TYPE_PROD])
             ->ask();
+        $this->spacer();
         Manifest::addMetadata(CommonMetadata::ENV_TYPE_KEY, $envType);
 
         return $envType;
@@ -152,8 +160,8 @@ final class CommonQuestions
         }
 
         $envName = $question->ask();
+        $this->spacer();
         Manifest::addMetadata(CommonMetadata::ENV_NAME_KEY, $envName);
-
         return $envName;
     }
 
@@ -169,6 +177,15 @@ final class CommonQuestions
             ->setDefault($available[0])
             ->setHelpText('A reverse proxy is useful for public facing services with a domain name. It handles the incoming requests and forward them to the correct container.')
             ->ask();
+        $this->spacer();
+
+        if ($image === 'other') {
+            $image = $this->factory->question('Name of your reverse proxy image')
+                ->compulsory()
+                ->setValidator(CommonValidators::getAlphaValidator(['_', '.', '-']))
+                ->ask();
+            $this->spacer();
+        }
 
         $version = $this->askForDockerImageTag($image, $image);
 
@@ -197,15 +214,26 @@ final class CommonQuestions
             ->compulsory()
             ->yesNoQuestion()
             ->ask();
+        $this->spacer();
 
         if (empty($installCIAent)) {
             return null;
         }
 
         $available = CommonAents::getAentsListByDependencyKey(CommonDependencies::CI_KEY);
+        $available[] = 'other';
         $image = $this->factory->choiceQuestion('CI/CD', $available)
             ->setDefault($available[0])
             ->ask();
+        $this->spacer();
+
+        if ($image === 'other') {
+            $image = $this->factory->question('Name of your CI image')
+                ->compulsory()
+                ->setValidator(CommonValidators::getAlphaValidator(['_', '.', '-']))
+                ->ask();
+            $this->spacer();
+        }
 
         $version = $this->askForDockerImageTag($image, $image);
 
