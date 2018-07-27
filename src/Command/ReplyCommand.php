@@ -19,7 +19,7 @@ final class ReplyCommand extends AbstractEventCommand
         $this->replyAggregator = $replyAggregator;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setHidden(true);

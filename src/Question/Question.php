@@ -114,9 +114,14 @@ final class Question extends AbstractQuestion
         } while ($this->helpText !== null && $answer === '?');
 
         if ($this->printAnswer) {
-            $this->output->writeln("<info>Your answer: $answer</info>");
-            $this->spacer();
+            if ($this->yesNoQuestion) {
+                $answerStr = $answer === null ? 'no' : 'yes';
+            } else {
+                $answerStr = $answer;
+            }
+            $this->output->writeln("<info>Your answer: $answerStr</info>");
         }
+        $this->spacer();
 
         return $answer;
     }
