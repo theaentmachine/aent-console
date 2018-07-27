@@ -3,6 +3,7 @@
 
 namespace TheAentMachine\Question;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -45,6 +46,9 @@ final class CommonQuestions
         $this->output->writeln('');
     }
 
+    /**
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function askForDockerImageTag(string $dockerHubImage, string $applicationName = ''): string
     {
         $registryClient = new RegistryClient();
@@ -180,14 +184,21 @@ final class CommonQuestions
         $this->spacer();
 
         if ($image === 'other') {
-            $image = $this->factory->question('Name of your reverse proxy image')
-                ->compulsory()
-                ->setValidator(CommonValidators::getDockerImageWithoutTagValidator())
-                ->ask();
-            $this->spacer();
+            do {
+                $image = $this->factory->question('Name of your reverse proxy image (without tag)')
+                    ->compulsory()
+                    ->setValidator(CommonValidators::getDockerImageWithoutTagValidator())
+                    ->ask();
+                $this->spacer();
+                try {
+                    $version = $this->askForDockerImageTag($image, $image);
+                } catch (GuzzleException $e) {
+                    $this->output->writeln("It seems that your image <info>$image</info>does not exist in the docker hub, please try again.");
+                    $this->spacer();
+                    $version = null;
+                }
+            } while ($version === null);
         }
-
-        $version = $this->askForDockerImageTag($image, $image);
 
         Manifest::addDependency("$image:$version", CommonDependencies::REVERSE_PROXY_KEY, [
             CommonMetadata::ENV_NAME_KEY => Manifest::mustGetMetadata(CommonMetadata::ENV_NAME_KEY),
@@ -228,14 +239,21 @@ final class CommonQuestions
         $this->spacer();
 
         if ($image === 'other') {
-            $image = $this->factory->question('Name of your CI image (with tag)')
-                ->compulsory()
-                ->setValidator(CommonValidators::getDockerImageWithoutTagValidator())
-                ->ask();
-            $this->spacer();
+            do {
+                $image = $this->factory->question('Name of your CI image (without tag)')
+                    ->compulsory()
+                    ->setValidator(CommonValidators::getDockerImageWithoutTagValidator())
+                    ->ask();
+                $this->spacer();
+                try {
+                    $version = $this->askForDockerImageTag($image, $image);
+                } catch (GuzzleException $e) {
+                    $this->output->writeln("It seems that your image <info>$image</info>does not exist in the docker hub, please try again.");
+                    $this->spacer();
+                    $version = null;
+                }
+            } while ($version === null);
         }
-
-        $version = $this->askForDockerImageTag($image, $image);
 
         Manifest::addDependency("$image:$version", CommonDependencies::CI_KEY, [
             CommonMetadata::ENV_NAME_KEY => Manifest::mustGetMetadata(CommonMetadata::ENV_NAME_KEY),
