@@ -209,11 +209,11 @@ final class CommonQuestions
 
         $version = $this->askForDockerImageTag($image, $image);
 
-        Manifest::addDependency("$image:$version", CommonDependencies::REVERSE_PROXY_KEY, [
+        Manifest::addDependency("$image:$version", CommonDependencies::CI_KEY, [
             CommonMetadata::ENV_NAME_KEY => Manifest::mustGetMetadata(CommonMetadata::ENV_NAME_KEY),
             CommonMetadata::ENV_TYPE_KEY => Manifest::mustGetMetadata(CommonMetadata::ENV_TYPE_KEY)
         ]);
 
-        return Manifest::mustGetDependency(CommonDependencies::REVERSE_PROXY_KEY);
+        return Manifest::mustGetDependency(CommonDependencies::CI_KEY);
     }
 }
