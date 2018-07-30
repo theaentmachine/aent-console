@@ -173,7 +173,7 @@ final class CommonQuestions
         $version = null;
         if ($image === 'other') {
             do {
-                $image = $this->factory->question('Name of your reverse proxy image (without tag)')
+                $image = $this->factory->question('Docker image of your reverse proxy (without tag)')
                     ->compulsory()
                     ->setValidator(CommonValidators::getDockerImageWithoutTagValidator())
                     ->ask();
@@ -227,7 +227,7 @@ final class CommonQuestions
         $version = null;
         if ($image === 'other') {
             do {
-                $image = $this->factory->question('Name of your CI image (without tag)')
+                $image = $this->factory->question('Docker image of your CI tool (without tag)')
                     ->compulsory()
                     ->setValidator(CommonValidators::getDockerImageWithoutTagValidator())
                     ->ask();
@@ -248,5 +248,51 @@ final class CommonQuestions
         ]);
 
         return Manifest::mustGetDependency(CommonDependencies::CI_KEY);
+    }
+
+    /**
+     * @return null|string
+     * @throws CommonAentsException
+     * @throws ManifestException
+     */
+    public function askForImageBuilder(): ?string
+    {
+        $envType = Manifest::mustGetMetadata(CommonMetadata::ENV_TYPE_KEY);
+
+        if ($envType === CommonMetadata::ENV_TYPE_DEV) {
+            return null;
+        }
+
+        $available = CommonAents::getAentsListByDependencyKey(CommonDependencies::IMAGE_BUILDER_KEY);
+        $available[] = 'other';
+        $image = $this->factory->choiceQuestion('Image builder', $available)
+            ->setDefault($available[0])
+            ->setHelpText('An image builder can generate Dockerfiles, which then can be used to build images of your project.')
+            ->ask();
+
+        $version = null;
+        if ($image === 'other') {
+            do {
+                $image = $this->factory->question('Docker image of your image builder (without tag)')
+                    ->compulsory()
+                    ->setValidator(CommonValidators::getDockerImageWithoutTagValidator())
+                    ->ask();
+                try {
+                    $version = $this->askForDockerImageTag($image, $image);
+                } catch (GuzzleException $e) {
+                    $this->output->writeln("<error>It seems that $image does not exist in the docker hub, please try again.</error>");
+                    $this->output->writeln('');
+                }
+            } while ($version === null);
+        } else {
+            $version = $this->askForDockerImageTag($image, $image);
+        }
+
+        Manifest::addDependency("$image:$version", CommonDependencies::IMAGE_BUILDER_KEY, [
+            CommonMetadata::ENV_NAME_KEY => Manifest::mustGetMetadata(CommonMetadata::ENV_NAME_KEY),
+            CommonMetadata::ENV_TYPE_KEY => Manifest::mustGetMetadata(CommonMetadata::ENV_TYPE_KEY)
+        ]);
+
+        return Manifest::mustGetDependency(CommonDependencies::IMAGE_BUILDER_KEY);
     }
 }
