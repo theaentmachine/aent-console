@@ -2,6 +2,7 @@
 
 namespace TheAentMachine\Service;
 
+use JsonSerializable;
 use Opis\JsonSchema\ValidationError;
 use Opis\JsonSchema\Validator;
 use TheAentMachine\Aenthill\Manifest;
@@ -14,7 +15,7 @@ use TheAentMachine\Service\Volume\BindVolume;
 use TheAentMachine\Service\Volume\NamedVolume;
 use TheAentMachine\Service\Volume\TmpfsVolume;
 
-class Service implements \JsonSerializable
+class Service implements JsonSerializable
 {
     /** @var string */
     private $serviceName = '';
@@ -36,6 +37,10 @@ class Service implements \JsonSerializable
     private $volumes = [];
     /** @var null|bool */
     private $needVirtualHost;
+    /** @var null|bool */
+    private $needBuild;
+    /** @var null|bool */
+    private $needDeploy;
     /** @var \stdClass */
     private $validatorSchema;
     /** @var string[] */
@@ -77,6 +82,8 @@ class Service implements \JsonSerializable
                 }
             }
             $service->needVirtualHost = $s['needVirtualHost'] ?? null;
+            $service->needBuild = $s['needBuild'] ?? null;
+            $service->needDeploy = $s['needDeploy'] ?? null;
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
         $service->destEnvTypes = $payload['destEnvTypes'] ?? [];
@@ -93,7 +100,7 @@ class Service implements \JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        $jsonSerializeMap = function (\JsonSerializable $obj): array {
+        $jsonSerializeMap = function (JsonSerializable $obj): array {
             return $obj->jsonSerialize();
         };
 
@@ -111,6 +118,8 @@ class Service implements \JsonSerializable
             'environment' => array_map($jsonSerializeMap, $this->environment),
             'volumes' => array_map($jsonSerializeMap, $this->volumes),
             'needVirtualHost' => $this->needVirtualHost,
+            'needBuild' => $this->needBuild,
+            'needDeploy' => $this->needDeploy,
         ]);
 
         if (!empty($service)) {
@@ -238,6 +247,17 @@ class Service implements \JsonSerializable
         return $this->needVirtualHost;
     }
 
+    public function getNeedBuild(): ?bool
+    {
+        return $this->needBuild;
+    }
+
+    public function getNeedDeploy(): ?bool
+    {
+        return $this->needDeploy;
+    }
+
+
     /** @return string[] */
     public function getDockerfileCommands(): array
     {
@@ -286,6 +306,16 @@ class Service implements \JsonSerializable
     public function setNeedVirtualHost(?bool $needVirtualHost): void
     {
         $this->needVirtualHost = $needVirtualHost;
+    }
+
+    public function setNeedBuild(?bool $needBuild): void
+    {
+        $this->needBuild = $needBuild;
+    }
+
+    public function setNeedDeploy(?bool $needDeploy): void
+    {
+        $this->needDeploy = $needDeploy;
     }
 
 
@@ -432,10 +462,9 @@ class Service implements \JsonSerializable
         return empty($this->destEnvTypes) || \in_array(CommonMetadata::ENV_TYPE_PROD, $this->destEnvTypes);
     }
 
-    /** @throws \TheAentMachine\Exception\ManifestException */
     public function isForMyEnvType(): bool
     {
         $myEnvType = Manifest::getMetadata(CommonMetadata::ENV_TYPE_KEY);
-        return empty($this->destEnvTypes) || \in_array($myEnvType, $this->destEnvTypes);
+        return empty($this->destEnvTypes) || \in_array($myEnvType, $this->destEnvTypes, true);
     }
 }

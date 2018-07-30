@@ -137,6 +137,12 @@
         },
         "needVirtualHost": {
           "type": "boolean"
+        },
+        "needBuild": {
+          "type": "boolean"
+        },
+        "needDeploy": {
+          "type": "boolean"
         }
       }
     },

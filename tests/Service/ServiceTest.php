@@ -1,7 +1,5 @@
 <?php
-
 namespace TheAentMachine\Registry;
-
 
 use PHPUnit\Framework\TestCase;
 use TheAentMachine\Aenthill\CommonMetadata;
@@ -34,7 +32,9 @@ class ServiceTest extends TestCase
                         {"type": "bind", "source": "/bar", "target": "/bar", "readOnly": false},
                         {"type": "tmpfs", "source": "baz"}
                       ],
-    "needVirtualHost": true
+    "needVirtualHost": true,
+    "needBuild": true,
+    "needDeploy": true
   },
   "dockerfileCommands": [
     "RUN composer install"
@@ -136,6 +136,8 @@ JSON;
         $s->addTmpfsVolume('baz');
         $s->addDockerfileCommand('RUN composer install');
         $s->setNeedVirtualHost(true);
+        $s->setNeedBuild(true);
+        $s->setNeedDeploy(true);
         $s->addDestEnvType(CommonMetadata::ENV_TYPE_DEV, true);
         $outArray = $s->jsonSerialize();
         $expectedArray = json_decode(self::VALID_PAYLOAD, true);
