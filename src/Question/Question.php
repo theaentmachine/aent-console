@@ -105,6 +105,14 @@ final class Question extends AbstractQuestion
                 }
                 return $validator ? $validator($response) : $response;
             };
+        } else {
+            $validator = function (?string $response) use ($validator) {
+                $response = $response ?? '';
+                if (trim($response) === '') {
+                    return $response;
+                }
+                return $validator ? $validator($response) : $response;
+            };
         }
 
         $question->setValidator($validator);
