@@ -266,7 +266,6 @@ class Service implements JsonSerializable
         return $this->volumes;
     }
 
-    /** @return string[] */
     public function getNeedVirtualHost(): ?bool
     {
         return $this->needVirtualHost;
