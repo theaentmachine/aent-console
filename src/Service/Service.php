@@ -39,8 +39,6 @@ class Service implements JsonSerializable
     private $needVirtualHost;
     /** @var null|bool */
     private $needBuild;
-    /** @var null|bool */
-    private $needDeploy;
     /** @var \stdClass */
     private $validatorSchema;
     /** @var string[] */
@@ -83,7 +81,6 @@ class Service implements JsonSerializable
             }
             $service->needVirtualHost = $s['needVirtualHost'] ?? null;
             $service->needBuild = $s['needBuild'] ?? null;
-            $service->needDeploy = $s['needDeploy'] ?? null;
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
         $service->destEnvTypes = $payload['destEnvTypes'] ?? [];
@@ -119,7 +116,6 @@ class Service implements JsonSerializable
             'volumes' => array_map($jsonSerializeMap, $this->volumes),
             'needVirtualHost' => $this->needVirtualHost,
             'needBuild' => $this->needBuild,
-            'needDeploy' => $this->needDeploy,
         ]);
 
         if (!empty($service)) {
@@ -252,12 +248,6 @@ class Service implements JsonSerializable
         return $this->needBuild;
     }
 
-    public function getNeedDeploy(): ?bool
-    {
-        return $this->needDeploy;
-    }
-
-
     /** @return string[] */
     public function getDockerfileCommands(): array
     {
@@ -311,11 +301,6 @@ class Service implements JsonSerializable
     public function setNeedBuild(?bool $needBuild): void
     {
         $this->needBuild = $needBuild;
-    }
-
-    public function setNeedDeploy(?bool $needDeploy): void
-    {
-        $this->needDeploy = $needDeploy;
     }
 
 
