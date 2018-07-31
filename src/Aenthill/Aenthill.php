@@ -1,34 +1,37 @@
 <?php
 
 
-namespace TheAentMachine;
+namespace TheAentMachine\Aenthill;
 
 use Symfony\Component\Process\Process;
-use TheAentMachine\Exception\MissingEnvironmentVariableException;
+use TheAentMachine\Helper\ReplyAggregator;
 
-class Aenthill
+final class Aenthill
 {
     /**
-     * Installs or updates current aent in the manifest.
+     * Updates current aent in the manifest.
      *
      * @param null|array<string,string> $metadata
      * @param null|string[] $events
      */
-    public static function installOrUpdate(?array $metadata = null, ?array $events = null): void
+    public static function update(?array $metadata = null, ?array $events = null): void
     {
-        $command = ['aenthill', 'install'];
+        $command = ['aenthill', 'update'];
+
         if (!empty($metadata)) {
             foreach ($metadata as $key => $value) {
                 $command[] = '-m';
                 $command[] = $key . '=' . $value;
             }
         }
+
         if (!empty($events)) {
             foreach ($events as $event) {
                 $command[] = '-e';
                 $command[] = $event;
             }
         }
+
         $process = new Process($command);
         $process->enableOutput();
         $process->setTty(true);
@@ -42,21 +45,38 @@ class Aenthill
      * @param string $key
      * @param null|array<string,string> $metadata
      */
-    public static function addDependency(string $image, string $key, ?array $metadata = null): void
+    public static function register(string $image, string $key, ?array $metadata = null): void
     {
         $command = ['aenthill', 'register', $image, $key];
+
         if (!empty($metadata)) {
-            foreach ($metadata as $key => $value) {
+            foreach ($metadata as $k => $value) {
                 $command[] = '-m';
-                $command[] = $key . '=' . $value;
+                $command[] = $k . '=' . $value;
             }
         }
+
         $process = new Process($command);
         $process->enableOutput();
         $process->setTty(true);
         $process->mustRun();
     }
 
+    public static function metadata(string $key): string
+    {
+        $command = ['aenthill', 'metadata', $key];
+        $process = new Process($command);
+        $process->mustRun();
+        return $process->getOutput();
+    }
+
+    public static function dependency(string $key): string
+    {
+        $command = ['aenthill', 'dependency', $key];
+        $process = new Process($command);
+        $process->mustRun();
+        return $process->getOutput();
+    }
 
     /**
      * Starts an aent.
@@ -64,27 +84,35 @@ class Aenthill
      * @param string $target the image name or a key from the manifest.
      * @param string $event
      * @param null|string $payload
+     * @return string[]
      */
-    public static function run(string $target, string $event, ?string $payload = null): void
+    public static function run(string $target, string $event, ?string $payload = null): array
     {
+        $replyAggregator = new ReplyAggregator();
+        $replyAggregator->clear();
         $command = ['aenthill', 'run', $target, $event];
-        if (!empty($payload)) {
+
+        if (null !== $payload) {
             $command[] = $payload;
         }
+
         $process = new Process($command);
         $process->enableOutput();
         $process->setTty(true);
         $process->mustRun();
+
+        return $replyAggregator->getReplies();
     }
 
     /**
      * @param string $target
      * @param string $event
      * @param mixed[] $payload
+     * @return string[]
      */
-    public static function runJson(string $target, string $event, array $payload): void
+    public static function runJson(string $target, string $event, array $payload): array
     {
-        self::run($target, $event, \GuzzleHttp\json_encode($payload));
+        return self::run($target, $event, \GuzzleHttp\json_encode($payload));
     }
 
     /**
@@ -98,14 +126,17 @@ class Aenthill
     {
         $replyAggregator = new ReplyAggregator();
         $replyAggregator->clear();
+
         $command = ['aenthill', 'dispatch', $event];
-        if (!empty($payload)) {
+
+        if (null !== $payload) {
             $command[] = $payload;
         }
         $process = new Process($command);
         $process->enableOutput();
         $process->setTty(true);
         $process->mustRun();
+
         return $replyAggregator->getReplies();
     }
 
@@ -133,9 +164,11 @@ class Aenthill
     public static function reply(string $event, ?string $payload = null): void
     {
         $command = ['aenthill', 'reply', $event];
-        if (!empty($payload)) {
+
+        if (null !== $payload) {
             $command[] = $payload;
         }
+
         $process = new Process($command);
         $process->enableOutput();
         $process->setTty(true);
@@ -149,38 +182,5 @@ class Aenthill
     public static function replyJson(string $event, array $payload): void
     {
         self::reply($event, \GuzzleHttp\json_encode($payload));
-    }
-
-    /**
-     * Returns the list of aents in the manifest which handles the given event.
-     *
-     * @param string $handledEvent
-     * @return string[]
-     * @throws MissingEnvironmentVariableException
-     */
-    public static function findAentsByHandledEvent(string $handledEvent): array
-    {
-        $manifest = Pheromone::getAenthillManifestContent();
-        $aents = array();
-        if (isset($manifest['aents'])) {
-            foreach ($manifest['aents'] as $aent) {
-                if (array_key_exists('events', $aent) && \in_array($handledEvent, $aent['events'], true)) {
-                    $aents[] = $aent;
-                }
-            }
-        }
-        return $aents;
-    }
-
-    /**
-     * Returns true if one of the aents installed can explicitly handle events of type $handledEvent
-     *
-     * @param string $handledEvent
-     * @return bool
-     * @throws MissingEnvironmentVariableException
-     */
-    public static function canHandleEvent(string $handledEvent): bool
-    {
-        return count(self::findAentsByHandledEvent($handledEvent)) > 0;
     }
 }

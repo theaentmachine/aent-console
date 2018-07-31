@@ -1,9 +1,8 @@
 <?php
-
 namespace TheAentMachine\Registry;
 
-
 use PHPUnit\Framework\TestCase;
+use TheAentMachine\Aenthill\CommonMetadata;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Service;
 
@@ -32,10 +31,15 @@ class ServiceTest extends TestCase
                         {"type": "volume", "source": "foo", "target": "/foo", "readOnly": true},
                         {"type": "bind", "source": "/bar", "target": "/bar", "readOnly": false},
                         {"type": "tmpfs", "source": "baz"}
-                      ]
+                      ],
+    "needVirtualHost": true,
+    "needBuild": true
   },
   "dockerfileCommands": [
     "RUN composer install"
+  ],
+  "destEnvTypes": [
+    "DEV"
   ],
   "requestMemory": "64Mi",
   "requestCpu": "250m",
@@ -86,6 +90,9 @@ JSON;
         $service = Service::parsePayload($array);
         $out = $service->jsonSerialize();
         $this->assertEquals($array, $out);
+        $this->assertTrue($service->isForDevEnvType());
+        $this->assertFalse($service->isForTestEnvType());
+        $this->assertFalse($service->isForProdEnvType());
     }
 
     public function testMissingServiceNamePayload(): void
@@ -131,6 +138,9 @@ JSON;
         $s->addBindVolume('/bar', '/bar', false);
         $s->addTmpfsVolume('baz');
         $s->addDockerfileCommand('RUN composer install');
+        $s->setNeedVirtualHost(true);
+        $s->setNeedBuild(true);
+        $s->addDestEnvType(CommonMetadata::ENV_TYPE_DEV, true);
         $s->setRequestMemory('64Mi');
         $s->setRequestCpu('250m');
         $s->setLimitMemory('128Mi');
@@ -148,7 +158,8 @@ JSON;
                 'COPY /bar /bar',
                 'CMD foo -bar -baz --qux',
                 'RUN composer install'
-            ]
+            ],
+            'destEnvTypes' => ['DEV']
         ];
         $this->assertEquals($outArray, $expectedArray);
     }

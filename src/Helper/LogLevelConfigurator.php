@@ -1,10 +1,11 @@
 <?php
 
 
-namespace TheAentMachine;
+namespace TheAentMachine\Helper;
 
 use Symfony\Component\Console\Output\OutputInterface;
 use TheAentMachine\Exception\LogLevelException;
+use TheAentMachine\Aenthill\Pheromone;
 
 class LogLevelConfigurator
 {

@@ -134,10 +134,25 @@
             ],
             "additionalProperties": false
           }
+        },
+        "needVirtualHost": {
+          "type": "boolean"
+        },
+        "needBuild": {
+          "type": "boolean"
+        },
+        "needDeploy": {
+          "type": "boolean"
         }
       }
     },
     "dockerFileCommands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "destEnvTypes": {
       "type": "array",
       "items": {
         "type": "string"

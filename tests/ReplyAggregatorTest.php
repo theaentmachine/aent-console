@@ -3,6 +3,7 @@
 namespace TheAentMachine;
 
 use PHPUnit\Framework\TestCase;
+use TheAentMachine\Helper\ReplyAggregator;
 
 class ReplyAggregatorTest extends TestCase
 {

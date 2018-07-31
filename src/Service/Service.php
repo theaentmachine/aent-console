@@ -2,8 +2,11 @@
 
 namespace TheAentMachine\Service;
 
+use JsonSerializable;
 use Opis\JsonSchema\ValidationError;
 use Opis\JsonSchema\Validator;
+use TheAentMachine\Aenthill\Manifest;
+use TheAentMachine\Aenthill\CommonMetadata;
 use TheAentMachine\Service\Enum\EnvVariableTypeEnum;
 use TheAentMachine\Service\Enum\VolumeTypeEnum;
 use TheAentMachine\Service\Environment\EnvVariable;
@@ -12,12 +15,12 @@ use TheAentMachine\Service\Volume\BindVolume;
 use TheAentMachine\Service\Volume\NamedVolume;
 use TheAentMachine\Service\Volume\TmpfsVolume;
 
-class Service implements \JsonSerializable
+class Service implements JsonSerializable
 {
     /** @var string */
     private $serviceName = '';
     /** @var string|null */
-    private $image = null;
+    private $image;
     /** @var string[] */
     private $command = [];
     /** @var int[] */
@@ -32,6 +35,10 @@ class Service implements \JsonSerializable
     private $environment = [];
     /** @var mixed[] */
     private $volumes = [];
+    /** @var null|bool */
+    private $needVirtualHost;
+    /** @var null|bool */
+    private $needBuild;
     /** @var \stdClass */
     private $validatorSchema;
     /** @var string[] */
@@ -45,6 +52,8 @@ class Service implements \JsonSerializable
     /** @var string */
     private $limitCpu = '';
 
+    /** @var string[] */
+    private $destEnvTypes = []; // empty === all env types
 
     /**
      * Service constructor.
@@ -52,12 +61,7 @@ class Service implements \JsonSerializable
      */
     public function __construct()
     {
-        $jsonSchemaPathname = __DIR__ . '/ServiceJsonSchema.json';
-        $jsonSchema = file_get_contents($jsonSchemaPathname);
-        if ($jsonSchema === false) {
-            throw ServiceException::jsonSchemaNotFound($jsonSchemaPathname);
-        }
-        $this->validatorSchema = \GuzzleHttp\json_decode($jsonSchema, false);
+        $this->validatorSchema = \GuzzleHttp\json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
 
     /**
@@ -88,7 +92,11 @@ class Service implements \JsonSerializable
                     $service->addVolume($vol['type'], $vol['source'], $vol['target'] ?? '', $vol['readOnly'] ?? false);
                 }
             }
+            $service->needVirtualHost = $s['needVirtualHost'] ?? null;
+            $service->needBuild = $s['needBuild'] ?? null;
         }
+        $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
+        $service->destEnvTypes = $payload['destEnvTypes'] ?? [];
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? '';
 
         $service->requestMemory = $payload['requestMemory'] ?? '';
@@ -108,7 +116,7 @@ class Service implements \JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        $jsonSerializeMap = function (\JsonSerializable $obj): array {
+        $jsonSerializeMap = function (JsonSerializable $obj): array {
             return $obj->jsonSerialize();
         };
 
@@ -125,6 +133,8 @@ class Service implements \JsonSerializable
             'labels' => $this->labels,
             'environment' => array_map($jsonSerializeMap, $this->environment),
             'volumes' => array_map($jsonSerializeMap, $this->volumes),
+            'needVirtualHost' => $this->needVirtualHost,
+            'needBuild' => $this->needBuild,
         ]);
 
         if (!empty($service)) {
@@ -134,6 +144,8 @@ class Service implements \JsonSerializable
         if (!empty($this->dockerfileCommands)) {
             $json['dockerfileCommands'] = $this->dockerfileCommands;
         }
+
+        $json['destEnvTypes'] = $this->destEnvTypes;
 
         $resources = array_filter([
             'requestMemory' => $this->requestMemory,
@@ -175,6 +187,7 @@ class Service implements \JsonSerializable
         return [
             'serviceName' => $this->serviceName,
             'dockerfileCommands' => $dockerfileCommands,
+            'destEnvTypes' => $this->destEnvTypes,
         ];
     }
 
@@ -197,6 +210,9 @@ class Service implements \JsonSerializable
         }
         return $result->isValid();
     }
+
+
+    /************************ getters **********************/
 
     public function getServiceName(): string
     {
@@ -251,6 +267,17 @@ class Service implements \JsonSerializable
     }
 
     /** @return string[] */
+    public function getNeedVirtualHost(): ?bool
+    {
+        return $this->needVirtualHost;
+    }
+
+    public function getNeedBuild(): ?bool
+    {
+        return $this->needBuild;
+    }
+
+    /** @return string[] */
     public function getDockerfileCommands(): array
     {
         return $this->dockerfileCommands;
@@ -275,6 +302,15 @@ class Service implements \JsonSerializable
     {
         return $this->limitCpu;
     }
+
+    /**  @return string[] */
+    public function getDestEnvTypes(): array
+    {
+        return $this->destEnvTypes;
+    }
+
+
+    /************************ setters **********************/
 
     public function setServiceName(string $serviceName): void
     {
@@ -324,6 +360,19 @@ class Service implements \JsonSerializable
         $this->limitCpu = $limitCpu;
     }
 
+    public function setNeedVirtualHost(?bool $needVirtualHost): void
+    {
+        $this->needVirtualHost = $needVirtualHost;
+    }
+
+    public function setNeedBuild(?bool $needBuild): void
+    {
+        $this->needBuild = $needBuild;
+    }
+
+
+    /************************ adders **********************/
+
     public function addCommand(string $command): void
     {
         $this->command[] = $command;
@@ -353,6 +402,9 @@ class Service implements \JsonSerializable
             'value' => $value,
         );
     }
+
+
+    /************************ environment adders **********************/
 
     /** @throws ServiceException */
     private function addEnvVar(string $key, string $value, string $type): void
@@ -384,6 +436,9 @@ class Service implements \JsonSerializable
     {
         $this->environment[$key] = new EnvVariable($value, 'sharedSecret');
     }
+
+
+    /************************ volumes adders **********************/
 
     public function addImageEnvVariable(string $key, string $value): void
     {
@@ -431,5 +486,37 @@ class Service implements \JsonSerializable
     public function addDockerfileCommand(string $dockerfileCommand): void
     {
         $this->dockerfileCommands[] = $dockerfileCommand;
+    }
+
+
+    /************************ forSpecificEnvTypes stuffs **********************/
+
+    public function addDestEnvType(string $envType, bool $keepTheOtherEnvTypes = true): void
+    {
+        if (!$keepTheOtherEnvTypes) {
+            $this->destEnvTypes = [];
+        }
+        $this->destEnvTypes[] = $envType;
+    }
+
+    public function isForDevEnvType(): bool
+    {
+        return empty($this->destEnvTypes) || \in_array(CommonMetadata::ENV_TYPE_DEV, $this->destEnvTypes);
+    }
+
+    public function isForTestEnvType(): bool
+    {
+        return empty($this->destEnvTypes) || \in_array(CommonMetadata::ENV_TYPE_TEST, $this->destEnvTypes);
+    }
+
+    public function isForProdEnvType(): bool
+    {
+        return empty($this->destEnvTypes) || \in_array(CommonMetadata::ENV_TYPE_PROD, $this->destEnvTypes);
+    }
+
+    public function isForMyEnvType(): bool
+    {
+        $myEnvType = Manifest::getMetadata(CommonMetadata::ENV_TYPE_KEY);
+        return empty($this->destEnvTypes) || \in_array($myEnvType, $this->destEnvTypes, true);
     }
 }
