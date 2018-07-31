@@ -33,8 +33,7 @@ class ServiceTest extends TestCase
                         {"type": "tmpfs", "source": "baz"}
                       ],
     "needVirtualHost": true,
-    "needBuild": true,
-    "needDeploy": true
+    "needBuild": true
   },
   "dockerfileCommands": [
     "RUN composer install"
@@ -137,7 +136,6 @@ JSON;
         $s->addDockerfileCommand('RUN composer install');
         $s->setNeedVirtualHost(true);
         $s->setNeedBuild(true);
-        $s->setNeedDeploy(true);
         $s->addDestEnvType(CommonMetadata::ENV_TYPE_DEV, true);
         $outArray = $s->jsonSerialize();
         $expectedArray = json_decode(self::VALID_PAYLOAD, true);
