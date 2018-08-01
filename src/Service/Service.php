@@ -14,6 +14,7 @@ use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Volume\BindVolume;
 use TheAentMachine\Service\Volume\NamedVolume;
 use TheAentMachine\Service\Volume\TmpfsVolume;
+use TheAentMachine\Service\Volume\Volume;
 
 class Service implements JsonSerializable
 {
@@ -57,7 +58,6 @@ class Service implements JsonSerializable
 
     /**
      * Service constructor.
-     * @throws ServiceException
      */
     public function __construct()
     {
@@ -428,26 +428,26 @@ class Service implements JsonSerializable
 
     public function addSharedEnvVariable(string $key, string $value): void
     {
-        $this->environment[$key] = new EnvVariable($value, 'sharedEnvVariable');
+        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::SHARED_ENV_VARIABLE);
     }
 
     public function addSharedSecret(string $key, string $value): void
     {
-        $this->environment[$key] = new EnvVariable($value, 'sharedSecret');
+        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::SHARED_SECRET);
     }
-
-
-    /************************ volumes adders **********************/
 
     public function addImageEnvVariable(string $key, string $value): void
     {
-        $this->environment[$key] = new EnvVariable($value, 'imageEnvVariable');
+        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::IMAGE_ENV_VARIABLE);
     }
 
     public function addContainerEnvVariable(string $key, string $value): void
     {
-        $this->environment[$key] = new EnvVariable($value, 'containerEnvVariable');
+        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::CONTAINER_ENV_VARIABLE);
     }
+
+
+    /************************ volumes adders & removers **********************/
 
     /** @throws ServiceException */
     private function addVolume(string $type, string $source, string $target = '', bool $readOnly = false): void
@@ -487,8 +487,39 @@ class Service implements JsonSerializable
         $this->dockerfileCommands[] = $dockerfileCommand;
     }
 
+    private function removeVolumesByType(string $type): void
+    {
+        $filterFunction = function (Volume $vol) use ($type) {
+            return $vol->getType() !== $type;
+        };
+        $this->volumes = array_values(array_filter($this->volumes, $filterFunction));
+    }
 
-    /************************ forSpecificEnvTypes stuffs **********************/
+    public function removeAllBindVolumes(): void
+    {
+        $this->removeVolumesByType(VolumeTypeEnum::BIND_VOLUME);
+    }
+
+    public function removeAllNamedVolumes(): void
+    {
+        $this->removeVolumesByType(VolumeTypeEnum::NAMED_VOLUME);
+    }
+
+    public function removeAllTmpfsVolumes(): void
+    {
+        $this->removeVolumesByType(VolumeTypeEnum::TMPFS_VOLUME);
+    }
+
+    public function removeVolumesBySource(string $source): void
+    {
+        $filterFunction = function (Volume $vol) use ($source) {
+            return $vol->getSource() !== $source;
+        };
+        $this->volumes = array_values(array_filter($this->volumes, $filterFunction));
+    }
+
+
+    /************************ destEnvTypes stuffs **********************/
 
     public function addDestEnvType(string $envType, bool $keepTheOtherEnvTypes = true): void
     {
