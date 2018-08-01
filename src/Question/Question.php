@@ -123,7 +123,7 @@ final class Question extends AbstractQuestion
 
         if ($this->printAnswer) {
             if ($this->yesNoQuestion) {
-                $answerStr = $answer === null ? 'no' : 'yes';
+                $answerStr = \in_array($answer, ['y', 'yes']) ? 'yes' : 'no';
             } else {
                 $answerStr = $answer;
             }
