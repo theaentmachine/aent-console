@@ -97,7 +97,6 @@ class Service implements JsonSerializable
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
         $service->destEnvTypes = $payload['destEnvTypes'] ?? [];
-        $service->dockerfileCommands = $payload['dockerfileCommands'] ?? '';
 
         $service->requestMemory = $payload['requestMemory'] ?? '';
         $service->requestCpu = $payload['requestCpu'] ?? '';

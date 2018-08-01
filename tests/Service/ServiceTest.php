@@ -193,7 +193,6 @@ JSON;
         $s->jsonSerialize();
     }
 
-    /** @throws ServiceException */
     public function testVolumeRemovers(): void
     {
         $s = new Service();
