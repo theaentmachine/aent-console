@@ -1,10 +1,14 @@
 <?php
+
 namespace TheAentMachine\Registry;
 
 use PHPUnit\Framework\TestCase;
 use TheAentMachine\Aenthill\CommonMetadata;
+use TheAentMachine\Service\Enum\VolumeTypeEnum;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Service;
+use TheAentMachine\Service\Volume\BindVolume;
+use TheAentMachine\Service\Volume\NamedVolume;
 
 class ServiceTest extends TestCase
 {
@@ -40,7 +44,11 @@ class ServiceTest extends TestCase
   ],
   "destEnvTypes": [
     "DEV"
-  ]
+  ],
+  "requestMemory": "64Mi",
+  "requestCpu": "250m",
+  "limitMemory": "128Mi",
+  "limitCpu": "500m"
 }
 JSON;
 
@@ -72,7 +80,7 @@ JSON;
   "service": {
     "volumes": [
       {
-        "type": "AGAIN?WTF",
+        "type": "AGAIN?WTH",
         "source": "foo"
       }
     ]
@@ -80,9 +88,10 @@ JSON;
 }
 JSON;
 
+    /** @throws ServiceException */
     public function testValidPayload(): void
     {
-        $array = json_decode(self::VALID_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::VALID_PAYLOAD, true);
         $service = Service::parsePayload($array);
         $out = $service->jsonSerialize();
         $this->assertEquals($array, $out);
@@ -91,27 +100,31 @@ JSON;
         $this->assertFalse($service->isForProdEnvType());
     }
 
+    /** @throws ServiceException */
     public function testMissingServiceNamePayload(): void
     {
         $this->expectException(ServiceException::class);
-        $array = json_decode(self::MISSING_SERVICE_NAME_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::MISSING_SERVICE_NAME_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
+    /** @throws ServiceException */
     public function testUnknownEnvVariableTypePayload(): void
     {
         $this->expectException(ServiceException::class);
-        $array = json_decode(self::UNKNOWN_ENV_VARIABLE_TYPE_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::UNKNOWN_ENV_VARIABLE_TYPE_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
+    /** @throws ServiceException */
     public function testUnknownVolumeTypePayload(): void
     {
         $this->expectException(ServiceException::class);
-        $array = json_decode(self::UNKNOWN_VOLUME_TYPE_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::UNKNOWN_VOLUME_TYPE_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
+    /** @throws ServiceException */
     public function testSettersAndAdders(): void
     {
         $s = new Service();
@@ -137,8 +150,12 @@ JSON;
         $s->setNeedVirtualHost(true);
         $s->setNeedBuild(true);
         $s->addDestEnvType(CommonMetadata::ENV_TYPE_DEV, true);
+        $s->setRequestMemory('64Mi');
+        $s->setRequestCpu('250m');
+        $s->setLimitMemory('128Mi');
+        $s->setLimitCpu('500m');
         $outArray = $s->jsonSerialize();
-        $expectedArray = json_decode(self::VALID_PAYLOAD, true);
+        $expectedArray = \GuzzleHttp\json_decode(self::VALID_PAYLOAD, true);
         $this->assertEquals($outArray, $expectedArray);
 
         $outArray = $s->imageJsonSerialize();
@@ -154,5 +171,50 @@ JSON;
             'destEnvTypes' => ['DEV']
         ];
         $this->assertEquals($outArray, $expectedArray);
+    }
+
+    /** @throws ServiceException */
+    public function testUnvalidRequestMemoryPattern(): void
+    {
+        $s = new Service();
+        $s->setServiceName('foo');
+        $s->setRequestMemory('0.5Zi');
+        $this->expectException(ServiceException::class);
+        $s->jsonSerialize();
+    }
+
+    /** @throws ServiceException */
+    public function testUnvalidRequestCpuPattern(): void
+    {
+        $s = new Service();
+        $s->setServiceName('foo');
+        $s->setRequestCpu('0,1');
+        $this->expectException(ServiceException::class);
+        $s->jsonSerialize();
+    }
+
+    /** @throws ServiceException */
+    public function testVolumeRemovers(): void
+    {
+        $s = new Service();
+        $s->setServiceName('my_service');
+        $s->addBindVolume('./foo', '/opt/app/foo', true);
+        $s->addBindVolume('./bar', '/opt/app/baz', false);
+        $s->addNamedVolume('my_data', '/data', true);
+        $s->removeVolumesBySource('./bar');
+        /** @var BindVolume[]|NamedVolume[] $volumes */
+        $volumes = $s->getVolumes();
+        print_r($volumes);
+        $this->assertEquals(count($volumes), 2);
+        $this->assertEquals($volumes[0]->getType(), VolumeTypeEnum::BIND_VOLUME);
+        $this->assertEquals($volumes[0]->getSource(), './foo');
+        $this->assertEquals($volumes[1]->getType(), VolumeTypeEnum::NAMED_VOLUME);
+
+        $s->addBindVolume('./bar', '/opt/app/baz', false);
+        $s->removeAllBindVolumes();
+        $volumes = $s->getVolumes();
+        $this->assertEquals(count($volumes), 1);
+        $this->assertEquals($volumes[0]->getType(), VolumeTypeEnum::NAMED_VOLUME);
+        $this->assertEquals($volumes[0]->getTarget(), '/data');
     }
 }

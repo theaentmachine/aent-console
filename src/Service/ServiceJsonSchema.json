@@ -157,6 +157,22 @@
       "items": {
         "type": "string"
       }
+    },
+    "requestMemory": {
+      "type": "string",
+      "pattern": "^([0-9]+[.])?[0-9]+([EPTGMK][i]?)?$"
+    },
+    "requestCpu": {
+      "type": "string",
+      "pattern": "^([0-9]+[.])?[0-9]+[m]?$"
+    },
+    "limitMemory": {
+      "type": "string",
+      "pattern": "^([0-9]+[.])?[0-9]+([EPTGMK][i]?)?$"
+    },
+    "limitCpu": {
+      "type": "string",
+      "pattern": "^([0-9]+[.])?[0-9]+[m]?$"
     }
   },
   "required": [
