@@ -204,7 +204,6 @@ JSON;
         $s->removeVolumesBySource('./bar');
         /** @var BindVolume[]|NamedVolume[] $volumes */
         $volumes = $s->getVolumes();
-        print_r($volumes);
         $this->assertEquals(count($volumes), 2);
         $this->assertEquals($volumes[0]->getType(), VolumeTypeEnum::BIND_VOLUME);
         $this->assertEquals($volumes[0]->getSource(), './foo');
