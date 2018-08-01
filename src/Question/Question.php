@@ -78,10 +78,10 @@ final class Question extends AbstractQuestion
             $validator = function (?string $response) use ($validator) {
                 $response = $response ?? '';
                 $response = \strtolower(trim($response));
-                if (!\in_array($response, ['y', 'n', 'yes', 'no'])) {
+                if (!\in_array($response, ['y', 'n', 'yes', 'no'], true)) {
                     throw new \InvalidArgumentException('Answer must be "y" or "n"');
                 }
-                $response = \in_array($response, ['y', 'yes']) ? '1' : '';
+                $response = \in_array($response, ['y', 'yes'], true) ? '1' : '';
                 return $validator ? $validator($response) : $response;
             };
         }
@@ -123,7 +123,7 @@ final class Question extends AbstractQuestion
 
         if ($this->printAnswer) {
             if ($this->yesNoQuestion) {
-                $answerStr = $answer === null ? 'no' : 'yes';
+                $answerStr = \in_array($answer, ['y', 'yes', '1'], true) ? 'yes' : 'no';
             } else {
                 $answerStr = $answer;
             }
