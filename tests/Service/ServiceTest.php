@@ -196,10 +196,10 @@ JSON;
     public function testVolumeRemovers(): void
     {
         $s = new Service();
-        $s->setServiceName('my_service');
+        $s->setServiceName('my-service');
         $s->addBindVolume('./foo', '/opt/app/foo', true);
         $s->addBindVolume('./bar', '/opt/app/baz', false);
-        $s->addNamedVolume('my_data', '/data', true);
+        $s->addNamedVolume('my-data', '/data', true);
         $s->removeVolumesBySource('./bar');
         /** @var BindVolume[]|NamedVolume[] $volumes */
         $volumes = $s->getVolumes();
@@ -214,5 +214,16 @@ JSON;
         $this->assertEquals(count($volumes), 1);
         $this->assertEquals($volumes[0]->getType(), VolumeTypeEnum::NAMED_VOLUME);
         $this->assertEquals($volumes[0]->getTarget(), '/data');
+    }
+
+    public function testEnvVariableContains(): void
+    {
+        $s = new Service();
+        $s->setServiceName('my-service');
+        $s->addSharedSecret('MYSQL_ROOT_PASSWORD', 'foo');
+        self::assertEquals(false, $s->containsSharedEnvVariable());
+        self::assertEquals(true, $s->containsSharedSecret());
+        self::assertEquals(false, $s->containsImageEnvVariable());
+        self::assertEquals(false, $s->containsContainerEnvVariable());
     }
 }

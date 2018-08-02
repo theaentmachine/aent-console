@@ -402,7 +402,7 @@ class Service implements JsonSerializable
     }
 
 
-    /************************ environment adders **********************/
+    /************************ environment adders & contains **********************/
 
     /** @throws ServiceException */
     private function addEnvVar(string $key, string $value, string $type): void
@@ -443,6 +443,37 @@ class Service implements JsonSerializable
     public function addContainerEnvVariable(string $key, string $value): void
     {
         $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::CONTAINER_ENV_VARIABLE);
+    }
+
+    private function containsEnvVariableByType(string $type): bool
+    {
+        /** @var EnvVariable $envVar */
+        foreach ($this->environment as $key => $envVar) {
+            if ($envVar->getType() === $type) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function containsSharedEnvVariable(): bool
+    {
+        return $this->containsEnvVariableByType(EnvVariableTypeEnum::SHARED_ENV_VARIABLE);
+    }
+
+    public function containsSharedSecret(): bool
+    {
+        return $this->containsEnvVariableByType(EnvVariableTypeEnum::SHARED_SECRET);
+    }
+
+    public function containsImageEnvVariable(): bool
+    {
+        return $this->containsEnvVariableByType(EnvVariableTypeEnum::IMAGE_ENV_VARIABLE);
+    }
+
+    public function containsContainerEnvVariable(): bool
+    {
+        return $this->containsEnvVariableByType(EnvVariableTypeEnum::CONTAINER_ENV_VARIABLE);
     }
 
 
