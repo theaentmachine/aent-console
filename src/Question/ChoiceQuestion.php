@@ -45,7 +45,7 @@ final class ChoiceQuestion extends AbstractQuestion
             $answer = $this->helper->ask($this->input, $this->output, $question);
         } while ($this->helpText !== null && $answer === '?');
 
-        return $answer;
+        return \is_string($answer)? $answer: (string)$answer;
     }
 
     /** @return string[] */
@@ -57,7 +57,7 @@ final class ChoiceQuestion extends AbstractQuestion
             $answer = $this->helper->ask($this->input, $this->output, $question);
         } while ($this->helpText !== null && $answer === '?');
 
-        return $answer;
+        return \is_array($answer) ? $answer : [\is_string($answer) ? $answer : (string)$answer];
     }
 
     private function initQuestion(bool $multiselect): SymfonyChoiceQuestion
@@ -67,8 +67,7 @@ final class ChoiceQuestion extends AbstractQuestion
             $text .= ' (? for help)';
         }
         if (null !== $this->default) {
-            $defaultText = (\is_array($this->default) ? implode(', ', $this->default) : $this->default);
-            $text .= ' [' . $defaultText . ']';
+            $text .= ' [' . $this->default . ']';
         }
         $text .= ': ';
         $this->question = $text;

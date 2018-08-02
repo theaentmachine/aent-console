@@ -32,7 +32,7 @@ final class ReplyCommand extends AbstractEventCommand
 
     protected function executeEvent(?string $payload): ?string
     {
-        $this->replyAggregator->storeReply($payload);
+        $this->replyAggregator->storeReply($payload ?? '');
         return null;
     }
 }
