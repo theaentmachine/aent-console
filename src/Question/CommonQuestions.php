@@ -122,7 +122,7 @@ final class CommonQuestions
         $chosen = $this->factory->choiceQuestion('Environments', $environmentsStr, false)
             ->askWithMultipleChoices();
 
-        $this->output->writeln('<info>Environments: ' . \implode($chosen, ', ') . '</info>');
+        $this->output->writeln('<info>Environments: ' . \implode(', ', $chosen) . '</info>');
         $this->output->writeln('');
 
         $results = [];

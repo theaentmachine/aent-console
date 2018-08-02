@@ -131,6 +131,6 @@ final class Question extends AbstractQuestion
         }
         $this->spacer();
 
-        return $answer;
+        return \is_string($answer)? $answer: (string)$answer;
     }
 }
