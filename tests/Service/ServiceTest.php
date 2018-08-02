@@ -20,21 +20,21 @@ class ServiceTest extends TestCase
     "command"       : ["foo", "-bar", "-baz", "--qux"],
     "internalPorts" : [1, 2, 3],
     "dependsOn"     : ["foo", "bar"],
-    "ports"         : [{"source": 80, "target": 8080}],
+    "ports"         : [{"source": 80, "target": 8080, "comment": "a line of comment"}],
     "environment"   : {
-                        "FOO": {"value": "foo", "type": "sharedEnvVariable"},
-                        "BAR": {"value": "bar", "type": "sharedSecret"},
-                        "BAZ": {"value": "baz", "type": "imageEnvVariable"},
-                        "QUX": {"value": "qux", "type": "containerEnvVariable"}
+                        "FOO": {"value": "foo", "type": "sharedEnvVariable", "comment": "foo"},
+                        "BAR": {"value": "bar", "type": "sharedSecret", "comment": "bar"},
+                        "BAZ": {"value": "baz", "type": "imageEnvVariable", "comment": "baz"},
+                        "QUX": {"value": "qux", "type": "containerEnvVariable", "comment": "qux"}
                       },
     "labels"        : {
-                        "foo": {"value": "fooo"},
-                        "bar": {"value": "baar"}
+                        "foo": {"value": "fooo", "comment": "fooo"},
+                        "bar": {"value": "baar", "comment": "baar"}
                       },               
     "volumes"       : [
-                        {"type": "volume", "source": "foo", "target": "/foo", "readOnly": true},
-                        {"type": "bind", "source": "/bar", "target": "/bar", "readOnly": false},
-                        {"type": "tmpfs", "source": "baz"}
+                        {"type": "volume", "source": "foo", "target": "/foo", "readOnly": true, "comment": "it's a named volume tho"},
+                        {"type": "bind", "source": "/bar", "target": "/bar", "readOnly": false, "comment": "a bind volume"},
+                        {"type": "tmpfs", "source": "baz", "comment": "a tmpfs"}
                       ],
     "needVirtualHost": true,
     "needBuild": true
@@ -136,16 +136,16 @@ JSON;
         $s->addInternalPort(3);
         $s->setDependsOn(['foo']);
         $s->addDependsOn('bar');
-        $s->addPort(80, 8080);
-        $s->addLabel('foo', 'fooo');
-        $s->addLabel('bar', 'baar');
-        $s->addSharedEnvVariable('FOO', 'foo');
-        $s->addSharedSecret('BAR', 'bar');
-        $s->addImageEnvVariable('BAZ', 'baz');
-        $s->addContainerEnvVariable('QUX', 'qux');
-        $s->addNamedVolume('foo', '/foo', true);
-        $s->addBindVolume('/bar', '/bar', false);
-        $s->addTmpfsVolume('baz');
+        $s->addPort(80, 8080, 'a line of comment');
+        $s->addLabel('foo', 'fooo', 'fooo');
+        $s->addLabel('bar', 'baar', 'baar');
+        $s->addSharedEnvVariable('FOO', 'foo', 'foo');
+        $s->addSharedSecret('BAR', 'bar', 'bar');
+        $s->addImageEnvVariable('BAZ', 'baz', 'baz');
+        $s->addContainerEnvVariable('QUX', 'qux', 'qux');
+        $s->addNamedVolume('foo', '/foo', true, 'it\'s a named volume tho');
+        $s->addBindVolume('/bar', '/bar', false, 'a bind volume');
+        $s->addTmpfsVolume('baz', 'a tmpfs');
         $s->addDockerfileCommand('RUN composer install');
         $s->setNeedVirtualHost(true);
         $s->setNeedBuild(true);

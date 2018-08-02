@@ -52,7 +52,6 @@ class Service implements JsonSerializable
     private $limitMemory = '';
     /** @var string */
     private $limitCpu = '';
-
     /** @var string[] */
     private $destEnvTypes = []; // empty === all env types
 
@@ -61,7 +60,7 @@ class Service implements JsonSerializable
      */
     public function __construct()
     {
-        $this->validatorSchema = \GuzzleHttp\json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
+        $this->validatorSchema = \GuzzleHttp\json_decode((string) file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
 
     /**
@@ -84,12 +83,12 @@ class Service implements JsonSerializable
             $service->labels = $s['labels'] ?? [];
             if (!empty($s['environment'])) {
                 foreach ($s['environment'] as $key => $env) {
-                    $service->addEnvVar($key, $env['value'], $env['type']);
+                    $service->addEnvVar($key, $env['value'], $env['type'], $env['comment'] ?? null);
                 }
             }
             if (!empty($s['volumes'])) {
                 foreach ($s['volumes'] as $vol) {
-                    $service->addVolume($vol['type'], $vol['source'], $vol['target'] ?? '', $vol['readOnly'] ?? false);
+                    $service->addVolume($vol['type'], $vol['source'], $vol['comment'] ?? null, $vol['target'] ?? '', $vol['readOnly'] ?? false);
                 }
             }
             $service->needVirtualHost = $s['needVirtualHost'] ?? null;
@@ -386,63 +385,69 @@ class Service implements JsonSerializable
         $this->dependsOn[] = $dependsOn;
     }
 
-    public function addPort(int $source, int $target): void
+    public function addPort(int $source, int $target, ?string $comment = null): void
     {
-        $this->ports[] = array(
+        $this->ports[] = array_filter([
             'source' => $source,
             'target' => $target,
-        );
+            'comment' => $comment,
+        ], function ($v) {
+            return null !== $v;
+        });
     }
 
-    public function addLabel(string $key, string $value): void
+    public function addLabel(string $key, string $value, ?string $comment = null): void
     {
-        $this->labels[$key] = array(
+        $this->labels[$key] = array_filter([
             'value' => $value,
-        );
+            'comment' => $comment
+        ], function ($v) {
+            return null !== $v;
+        });
     }
 
 
     /************************ environment adders & contains **********************/
 
     /** @throws ServiceException */
-    private function addEnvVar(string $key, string $value, string $type): void
+    private function addEnvVar(string $key, string $value, string $type, ?string $comment = null): void
     {
         switch ($type) {
             case EnvVariableTypeEnum::SHARED_ENV_VARIABLE:
-                $this->addSharedEnvVariable($key, $value);
+                $this->addSharedEnvVariable($key, $value, $comment);
                 break;
             case EnvVariableTypeEnum::SHARED_SECRET:
-                $this->addSharedSecret($key, $value);
+                $this->addSharedSecret($key, $value, $comment);
                 break;
             case EnvVariableTypeEnum::IMAGE_ENV_VARIABLE:
-                $this->addImageEnvVariable($key, $value);
+                $this->addImageEnvVariable($key, $value, $comment);
                 break;
             case EnvVariableTypeEnum::CONTAINER_ENV_VARIABLE:
-                $this->addContainerEnvVariable($key, $value);
+                $this->addContainerEnvVariable($key, $value, $comment);
                 break;
             default:
                 throw ServiceException::unknownEnvVariableType($type);
         }
     }
 
-    public function addSharedEnvVariable(string $key, string $value): void
+    public function addSharedEnvVariable(string $key, string $value, ?string $comment = null): void
     {
-        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::SHARED_ENV_VARIABLE);
+        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::SHARED_ENV_VARIABLE, $comment);
     }
 
-    public function addSharedSecret(string $key, string $value): void
+    public function addSharedSecret(string $key, string $value, ?string $comment = null): void
     {
-        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::SHARED_SECRET);
+        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::SHARED_SECRET, $comment);
     }
 
-    public function addImageEnvVariable(string $key, string $value): void
+    public function addImageEnvVariable(string $key, string $value, ?string $comment = null): void
     {
-        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::IMAGE_ENV_VARIABLE);
+        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::IMAGE_ENV_VARIABLE, $comment);
     }
 
-    public function addContainerEnvVariable(string $key, string $value): void
+    public function addContainerEnvVariable(string $key, string $value, ?string $comment = null): void
     {
-        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::CONTAINER_ENV_VARIABLE);
+        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::CONTAINER_ENV_VARIABLE, $comment);
     }
 
     /** @return array<string, EnvVariable> */
@@ -489,36 +494,36 @@ class Service implements JsonSerializable
     /************************ volumes adders & removers **********************/
 
     /** @throws ServiceException */
-    private function addVolume(string $type, string $source, string $target = '', bool $readOnly = false): void
+    private function addVolume(string $type, string $source, ?string $comment = null, string $target = '', bool $readOnly = false): void
     {
         switch ($type) {
             case VolumeTypeEnum::NAMED_VOLUME:
-                $this->addNamedVolume($source, $target, $readOnly);
+                $this->addNamedVolume($source, $target, $readOnly, $comment);
                 break;
             case VolumeTypeEnum::BIND_VOLUME:
-                $this->addBindVolume($source, $target, $readOnly);
+                $this->addBindVolume($source, $target, $readOnly, $comment);
                 break;
             case VolumeTypeEnum::TMPFS_VOLUME:
-                $this->addTmpfsVolume($source);
+                $this->addTmpfsVolume($source, $comment);
                 break;
             default:
                 throw ServiceException::unknownVolumeType($type);
         }
     }
 
-    public function addNamedVolume(string $source, string $target, bool $readOnly = false): void
+    public function addNamedVolume(string $source, string $target, bool $readOnly = false, ?string $comment = null): void
     {
-        $this->volumes[] = new NamedVolume($source, $target, $readOnly);
+        $this->volumes[] = new NamedVolume($source, $target, $readOnly, $comment);
     }
 
-    public function addBindVolume(string $source, string $target, bool $readOnly = false): void
+    public function addBindVolume(string $source, string $target, bool $readOnly = false, ?string $comment = null): void
     {
-        $this->volumes[] = new BindVolume($source, $target, $readOnly);
+        $this->volumes[] = new BindVolume($source, $target, $readOnly, $comment);
     }
 
-    public function addTmpfsVolume(string $source): void
+    public function addTmpfsVolume(string $source, ?string $comment = null): void
     {
-        $this->volumes[] = new TmpfsVolume($source);
+        $this->volumes[] = new TmpfsVolume($source, $comment);
     }
 
     public function addDockerfileCommand(string $dockerfileCommand): void
