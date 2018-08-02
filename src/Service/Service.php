@@ -391,7 +391,9 @@ class Service implements JsonSerializable
             'source' => $source,
             'target' => $target,
             'comment' => $comment,
-        ]);
+        ], function ($v) {
+            return null !== $v;
+        });
     }
 
     public function addLabel(string $key, string $value, ?string $comment = null): void
@@ -399,7 +401,9 @@ class Service implements JsonSerializable
         $this->labels[$key] = array_filter([
             'value' => $value,
             'comment' => $comment
-        ]);
+        ], function ($v) {
+            return null !== $v;
+        });
     }
 
 
