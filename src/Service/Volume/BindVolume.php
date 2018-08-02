@@ -14,14 +14,16 @@ class BindVolume extends Volume
     /**
      * BindVolume constructor.
      * @param string $source
-     * @param bool $readOnly
      * @param string $target
+     * @param bool $readOnly
+     * @param null|string $comment
      */
-    public function __construct(string $source, string $target, bool $readOnly = false)
+    public function __construct(string $source, string $target, bool $readOnly = false, ?string $comment = null)
     {
-        parent::__construct($source);
+        parent::__construct($source, $comment);
         $this->target = $target;
         $this->readOnly = $readOnly;
+        $this->comment = $comment;
     }
 
     /**
@@ -58,11 +60,14 @@ class BindVolume extends Volume
      */
     public function jsonSerialize(): array
     {
-        return array(
+        return array_filter([
             'type' => $this->getType(),
             'source' => $this->source,
             'target' => $this->target,
             'readOnly' => $this->readOnly,
-        );
+            'comment' => $this->comment,
+        ], function ($v) {
+            return null !== $v;
+        });
     }
 }

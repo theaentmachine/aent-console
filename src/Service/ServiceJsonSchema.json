@@ -37,12 +37,13 @@
             "type": "object",
             "properties": {
               "source": {
-                "type": [
-                  "number"
-                ]
+                "type": "number"
               },
               "target": {
                 "type": "number"
+              },
+              "comment": {
+                "type": "string"
               }
             },
             "required": [
@@ -126,6 +127,9 @@
               },
               "readOnly": {
                 "type": "boolean"
+              },
+              "comment": {
+                "type": "string"
               }
             },
             "required": [
