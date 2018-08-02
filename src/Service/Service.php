@@ -445,35 +445,44 @@ class Service implements JsonSerializable
         $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::CONTAINER_ENV_VARIABLE);
     }
 
-    private function containsEnvVariableByType(string $type): bool
+    /** @return array<string, EnvVariable> */
+    private function getAllEnvVariablesByType(string $type): array
     {
-        /** @var EnvVariable $envVar */
+        $res = [];
+        /**
+         * @var string $key
+         * @var EnvVariable $envVar
+         */
         foreach ($this->environment as $key => $envVar) {
             if ($envVar->getType() === $type) {
-                return true;
+                $res[$key] = $envVar;
             }
         }
-        return false;
+        return $res;
     }
 
-    public function containsSharedEnvVariable(): bool
+    /** @return array<string, EnvVariable> */
+    public function getAllSharedEnvVariable(): array
     {
-        return $this->containsEnvVariableByType(EnvVariableTypeEnum::SHARED_ENV_VARIABLE);
+        return $this->getAllEnvVariablesByType(EnvVariableTypeEnum::SHARED_ENV_VARIABLE);
     }
 
-    public function containsSharedSecret(): bool
+    /** @return array<string, EnvVariable> */
+    public function getAllSharedSecret(): array
     {
-        return $this->containsEnvVariableByType(EnvVariableTypeEnum::SHARED_SECRET);
+        return $this->getAllEnvVariablesByType(EnvVariableTypeEnum::SHARED_SECRET);
     }
 
-    public function containsImageEnvVariable(): bool
+    /** @return array<string, EnvVariable> */
+    public function getAllImageEnvVariable(): array
     {
-        return $this->containsEnvVariableByType(EnvVariableTypeEnum::IMAGE_ENV_VARIABLE);
+        return $this->getAllEnvVariablesByType(EnvVariableTypeEnum::IMAGE_ENV_VARIABLE);
     }
 
-    public function containsContainerEnvVariable(): bool
+    /** @return array<string, EnvVariable> */
+    public function getAllContainerEnvVariable(): array
     {
-        return $this->containsEnvVariableByType(EnvVariableTypeEnum::CONTAINER_ENV_VARIABLE);
+        return $this->getAllEnvVariablesByType(EnvVariableTypeEnum::CONTAINER_ENV_VARIABLE);
     }
 
 

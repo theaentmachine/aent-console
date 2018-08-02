@@ -221,9 +221,9 @@ JSON;
         $s = new Service();
         $s->setServiceName('my-service');
         $s->addSharedSecret('MYSQL_ROOT_PASSWORD', 'foo');
-        self::assertEquals(false, $s->containsSharedEnvVariable());
-        self::assertEquals(true, $s->containsSharedSecret());
-        self::assertEquals(false, $s->containsImageEnvVariable());
-        self::assertEquals(false, $s->containsContainerEnvVariable());
+        self::assertCount(0, $s->getAllSharedEnvVariable());
+        self::assertCount(1, $s->getAllSharedSecret());
+        self::assertCount(0, $s->getAllImageEnvVariable());
+        self::assertCount(0, $s->getAllContainerEnvVariable());
     }
 }
