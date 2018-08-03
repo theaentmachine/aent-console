@@ -174,7 +174,7 @@ JSON;
     }
 
     /** @throws ServiceException */
-    public function testUnvalidRequestMemoryPattern(): void
+    public function testInvalidRequestMemoryPattern(): void
     {
         $s = new Service();
         $s->setServiceName('foo');
@@ -184,7 +184,7 @@ JSON;
     }
 
     /** @throws ServiceException */
-    public function testUnvalidRequestCpuPattern(): void
+    public function testInvalidRequestCpuPattern(): void
     {
         $s = new Service();
         $s->setServiceName('foo');
