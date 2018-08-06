@@ -65,7 +65,6 @@ class Dumper
         } else {
             //$comment = null;
             $output = '';
-
         }
 
 //        $output = '';
@@ -95,7 +94,11 @@ class Dumper
                     $blockIndentationIndicator = (' ' === substr($value, 0, 1)) ? (string) $this->indentation : '';
                     $output .= sprintf("%s%s%s |%s\n", $prefix, $dumpAsMap ? Inline::dump($key, $flags).':' : '-', '', $blockIndentationIndicator);
 
-                    foreach (preg_split('/\n|\r\n/', $value) as $row) {
+                    $pregSplit = preg_split('/\n|\r\n/', $value);
+                    if ($pregSplit === false) {
+                        throw new \RuntimeException('An error occured in preg_split');
+                    }
+                    foreach ($pregSplit as $row) {
                         $output .= sprintf("%s%s%s\n", $prefix, str_repeat(' ', $this->indentation), $row);
                     }
 
@@ -113,7 +116,8 @@ class Dumper
                 if ($comment) {
                     $output .= sprintf("%s# %s\n", $prefix, $comment);
                 }
-                $output .= sprintf('%s%s%s%s',
+                $output .= sprintf(
+                    '%s%s%s%s',
                     $prefix,
                     $dumpAsMap ? Inline::dump($key, $flags).':' : '-',
                     $willBeInlined ? ' ' : "\n",
