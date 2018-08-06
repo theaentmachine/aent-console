@@ -23,9 +23,10 @@ class TmpfsVolume extends Volume
      */
     public function jsonSerialize(): array
     {
-        return array(
+        return array_filter([
             'type' => $this->getType(),
             'source' => $this->source,
-        );
+            'comment' => $this->comment,
+        ]);
     }
 }

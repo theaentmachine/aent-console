@@ -1,6 +1,5 @@
 <?php
 
-
 namespace TheAentMachine\Registry;
 
 class TagsAnalyzer
@@ -76,7 +75,7 @@ class TagsAnalyzer
         foreach ($subtree as $key => $subsubtree) {
             $values = $this->getMaxLeafs($subsubtree);
             foreach ($values as $val) {
-                $arr[] = $key.'.'.$val;
+                $arr[] = $key . '.' . $val;
             }
         }
         return $arr;

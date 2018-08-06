@@ -1,58 +1,34 @@
 <?php
-namespace TheAentMachine\Helper;
 
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+
+namespace TheAentMachine\Question;
+
+use Symfony\Component\Console\Question\Question as SymfonyQuestion;
 
 /**
  * A helper class to easily create questions.
  */
-class Question
+final class Question extends AbstractQuestion
 {
-    /**
-     * @var QuestionHelper
-     */
-    private $helper;
-    /**
-     * @var InputInterface
-     */
-    private $input;
-    /**
-     * @var OutputInterface
-     */
-    private $output;
-    /**
-     * @var string
-     */
-    private $question;
-    /**
-     * @var string|null
-     */
-    private $default;
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $compulsory = false;
-    /**
-     * @var callable|null
-     */
+
+    /** @var callable|null */
     private $validator;
-    /**
-     * @var string|null
-     */
-    private $helpText;
-    /**
-     * @var bool
-     */
+
+    /** @var bool */
     private $yesNoQuestion = false;
 
-    public function __construct(QuestionHelper $helper, InputInterface $input, OutputInterface $output, string $question)
+    public function setDefault(string $default): self
     {
-        $this->helper = $helper;
-        $this->input = $input;
-        $this->output = $output;
-        $this->question = $question;
+        $this->default = $default;
+        return $this;
+    }
+
+    public function setHelpText(string $helpText): self
+    {
+        $this->helpText = $helpText;
+        return $this;
     }
 
     public function compulsory(): self
@@ -64,18 +40,6 @@ class Question
     public function setValidator(callable $validator): self
     {
         $this->validator = $validator;
-        return $this;
-    }
-
-    public function setHelpText(string $helpText): self
-    {
-        $this->helpText = $helpText;
-        return $this;
-    }
-
-    public function setDefault(string $default): self
-    {
-        $this->default = $default;
         return $this;
     }
 
@@ -91,9 +55,9 @@ class Question
         if ($this->helpText) {
             $text .= ' (? for help)';
         }
-        if ($this->default) {
+        if (null !== $this->default) {
             if (!$this->yesNoQuestion) {
-                $text .= ' ['.$this->default.']';
+                $text .= ' [' . $this->default . ']';
             } elseif ($this->default === 'y') {
                 $text .= ' [Y/n]';
             } elseif ($this->default === 'n') {
@@ -106,7 +70,7 @@ class Question
         }
         $text .= ': ';
 
-        $question = new \Symfony\Component\Console\Question\Question($text, $this->default);
+        $question = new SymfonyQuestion($text, $this->default);
 
         $validator = $this->validator;
 
@@ -114,15 +78,15 @@ class Question
             $validator = function (?string $response) use ($validator) {
                 $response = $response ?? '';
                 $response = \strtolower(trim($response));
-                if (!\in_array($response, ['y', 'n', 'yes', 'no'])) {
+                if (!\in_array($response, ['y', 'n', 'yes', 'no'], true)) {
                     throw new \InvalidArgumentException('Answer must be "y" or "n"');
                 }
-                $response = \in_array($response, ['y', 'yes']) ? '1' : '';
+                $response = \in_array($response, ['y', 'yes'], true) ? '1' : '';
                 return $validator ? $validator($response) : $response;
             };
         }
 
-        if ($this->helpText !== null) {
+        if (null !== $this->helpText) {
             $validator = function (?string $response) use ($validator) {
                 $response = $response ?? '';
                 if (trim($response) === '?') {
@@ -141,6 +105,14 @@ class Question
                 }
                 return $validator ? $validator($response) : $response;
             };
+        } else {
+            $validator = function (?string $response) use ($validator) {
+                $response = $response ?? '';
+                if (trim($response) === '') {
+                    return $response;
+                }
+                return $validator ? $validator($response) : $response;
+            };
         }
 
         $question->setValidator($validator);
@@ -149,6 +121,16 @@ class Question
             $answer = $this->helper->ask($this->input, $this->output, $question);
         } while ($this->helpText !== null && $answer === '?');
 
-        return $answer;
+        if ($this->printAnswer) {
+            if ($this->yesNoQuestion) {
+                $answerStr = \in_array($answer, ['y', 'yes', '1'], true) ? 'yes' : 'no';
+            } else {
+                $answerStr = $answer;
+            }
+            $this->output->writeln("<info>Your answer: $answerStr</info>");
+        }
+        $this->spacer();
+
+        return \is_string($answer)? $answer: (string)$answer;
     }
 }

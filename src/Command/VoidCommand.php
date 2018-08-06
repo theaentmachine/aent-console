@@ -1,16 +1,12 @@
 <?php
 
 
-namespace TheAentMachine;
-
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+namespace TheAentMachine\Command;
 
 /**
  * A command that does nothing
  */
-class VoidCommand extends EventCommand
+final class VoidCommand extends AbstractEventCommand
 {
     protected function configure()
     {

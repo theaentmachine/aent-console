@@ -2,10 +2,13 @@
 
 namespace TheAentMachine\Registry;
 
-
 use PHPUnit\Framework\TestCase;
+use TheAentMachine\Aenthill\CommonMetadata;
+use TheAentMachine\Service\Enum\VolumeTypeEnum;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Service;
+use TheAentMachine\Service\Volume\BindVolume;
+use TheAentMachine\Service\Volume\NamedVolume;
 
 class ServiceTest extends TestCase
 {
@@ -17,23 +20,35 @@ class ServiceTest extends TestCase
     "command"       : ["foo", "-bar", "-baz", "--qux"],
     "internalPorts" : [1, 2, 3],
     "dependsOn"     : ["foo", "bar"],
-    "ports"         : [{"source": 80, "target": 8080}],
+    "ports"         : [{"source": 80, "target": 8080, "comment": "a line of comment"}],
     "environment"   : {
-                        "FOO": {"value": "foo", "type": "sharedEnvVariable"},
-                        "BAR": {"value": "bar", "type": "sharedSecret"},
-                        "BAZ": {"value": "baz", "type": "imageEnvVariable"},
-                        "QUX": {"value": "qux", "type": "containerEnvVariable"}
+                        "FOO": {"value": "foo", "type": "sharedEnvVariable", "comment": "foo"},
+                        "BAR": {"value": "bar", "type": "sharedSecret", "comment": "bar"},
+                        "BAZ": {"value": "baz", "type": "imageEnvVariable", "comment": "baz"},
+                        "QUX": {"value": "qux", "type": "containerEnvVariable", "comment": "qux"}
                       },
     "labels"        : {
-                        "foo": {"value": "fooo"},
-                        "bar": {"value": "baar"}
+                        "foo": {"value": "fooo", "comment": "fooo"},
+                        "bar": {"value": "baar", "comment": "baar"}
                       },               
     "volumes"       : [
-                        {"type": "volume", "source": "foo", "target": "/foo", "readOnly": true},
-                        {"type": "bind", "source": "/bar", "target": "/bar", "readOnly": false},
-                        {"type": "tmpfs", "source": "baz"}
-                      ]
-  }
+                        {"type": "volume", "source": "foo", "target": "/foo", "readOnly": true, "comment": "it's a named volume tho"},
+                        {"type": "bind", "source": "/bar", "target": "/bar", "readOnly": false, "comment": "a bind volume"},
+                        {"type": "tmpfs", "source": "baz", "comment": "a tmpfs"}
+                      ],
+    "needVirtualHost": true,
+    "needBuild": true
+  },
+  "dockerfileCommands": [
+    "RUN composer install"
+  ],
+  "destEnvTypes": [
+    "DEV"
+  ],
+  "requestMemory": "64Mi",
+  "requestCpu": "250m",
+  "limitMemory": "128Mi",
+  "limitCpu": "500m"
 }
 JSON;
 
@@ -65,7 +80,7 @@ JSON;
   "service": {
     "volumes": [
       {
-        "type": "AGAIN?WTF",
+        "type": "AGAIN?WTH",
         "source": "foo"
       }
     ]
@@ -73,35 +88,43 @@ JSON;
 }
 JSON;
 
+    /** @throws ServiceException */
     public function testValidPayload(): void
     {
-        $array = json_decode(self::VALID_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::VALID_PAYLOAD, true);
         $service = Service::parsePayload($array);
         $out = $service->jsonSerialize();
         $this->assertEquals($array, $out);
+        $this->assertTrue($service->isForDevEnvType());
+        $this->assertFalse($service->isForTestEnvType());
+        $this->assertFalse($service->isForProdEnvType());
     }
 
+    /** @throws ServiceException */
     public function testMissingServiceNamePayload(): void
     {
         $this->expectException(ServiceException::class);
-        $array = json_decode(self::MISSING_SERVICE_NAME_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::MISSING_SERVICE_NAME_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
+    /** @throws ServiceException */
     public function testUnknownEnvVariableTypePayload(): void
     {
         $this->expectException(ServiceException::class);
-        $array = json_decode(self::UNKNOWN_ENV_VARIABLE_TYPE_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::UNKNOWN_ENV_VARIABLE_TYPE_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
+    /** @throws ServiceException */
     public function testUnknownVolumeTypePayload(): void
     {
         $this->expectException(ServiceException::class);
-        $array = json_decode(self::UNKNOWN_VOLUME_TYPE_PAYLOAD, true);
+        $array = \GuzzleHttp\json_decode(self::UNKNOWN_VOLUME_TYPE_PAYLOAD, true);
         Service::parsePayload($array)->jsonSerialize();
     }
 
+    /** @throws ServiceException */
     public function testSettersAndAdders(): void
     {
         $s = new Service();
@@ -113,18 +136,94 @@ JSON;
         $s->addInternalPort(3);
         $s->setDependsOn(['foo']);
         $s->addDependsOn('bar');
-        $s->addPort(80, 8080);
-        $s->addLabel('foo', 'fooo');
-        $s->addLabel('bar', 'baar');
-        $s->addSharedEnvVariable('FOO', 'foo');
-        $s->addSharedSecret('BAR', 'bar');
-        $s->addImageEnvVariable('BAZ', 'baz');
-        $s->addContainerEnvVariable('QUX', 'qux');
-        $s->addNamedVolume('foo', '/foo', true);
-        $s->addBindVolume('/bar', '/bar', false);
-        $s->addTmpfsVolume('baz');
+        $s->addPort(80, 8080, 'a line of comment');
+        $s->addLabel('foo', 'fooo', 'fooo');
+        $s->addLabel('bar', 'baar', 'baar');
+        $s->addSharedEnvVariable('FOO', 'foo', 'foo');
+        $s->addSharedSecret('BAR', 'bar', 'bar');
+        $s->addImageEnvVariable('BAZ', 'baz', 'baz');
+        $s->addContainerEnvVariable('QUX', 'qux', 'qux');
+        $s->addNamedVolume('foo', '/foo', true, 'it\'s a named volume tho');
+        $s->addBindVolume('/bar', '/bar', false, 'a bind volume');
+        $s->addTmpfsVolume('baz', 'a tmpfs');
+        $s->addDockerfileCommand('RUN composer install');
+        $s->setNeedVirtualHost(true);
+        $s->setNeedBuild(true);
+        $s->addDestEnvType(CommonMetadata::ENV_TYPE_DEV, true);
+        $s->setRequestMemory('64Mi');
+        $s->setRequestCpu('250m');
+        $s->setLimitMemory('128Mi');
+        $s->setLimitCpu('500m');
         $outArray = $s->jsonSerialize();
-        $expectedArray = json_decode(self::VALID_PAYLOAD, true);
+        $expectedArray = \GuzzleHttp\json_decode(self::VALID_PAYLOAD, true);
         $this->assertEquals($outArray, $expectedArray);
+
+        $outArray = $s->imageJsonSerialize();
+        $expectedArray = [
+            'serviceName' => 'foo',
+            'dockerfileCommands' => [
+                'FROM foo/bar:baz',
+                'ENV BAZ=baz',
+                'COPY /bar /bar',
+                'CMD foo -bar -baz --qux',
+                'RUN composer install'
+            ],
+            'destEnvTypes' => ['DEV']
+        ];
+        $this->assertEquals($outArray, $expectedArray);
+    }
+
+    /** @throws ServiceException */
+    public function testInvalidRequestMemoryPattern(): void
+    {
+        $s = new Service();
+        $s->setServiceName('foo');
+        $s->setRequestMemory('0.5Zi');
+        $this->expectException(ServiceException::class);
+        $s->jsonSerialize();
+    }
+
+    /** @throws ServiceException */
+    public function testInvalidRequestCpuPattern(): void
+    {
+        $s = new Service();
+        $s->setServiceName('foo');
+        $s->setRequestCpu('0,1');
+        $this->expectException(ServiceException::class);
+        $s->jsonSerialize();
+    }
+
+    public function testVolumeRemovers(): void
+    {
+        $s = new Service();
+        $s->setServiceName('my-service');
+        $s->addBindVolume('./foo', '/opt/app/foo', true);
+        $s->addBindVolume('./bar', '/opt/app/baz', false);
+        $s->addNamedVolume('my-data', '/data', true);
+        $s->removeVolumesBySource('./bar');
+        /** @var BindVolume[]|NamedVolume[] $volumes */
+        $volumes = $s->getVolumes();
+        $this->assertEquals(count($volumes), 2);
+        $this->assertEquals($volumes[0]->getType(), VolumeTypeEnum::BIND_VOLUME);
+        $this->assertEquals($volumes[0]->getSource(), './foo');
+        $this->assertEquals($volumes[1]->getType(), VolumeTypeEnum::NAMED_VOLUME);
+
+        $s->addBindVolume('./bar', '/opt/app/baz', false);
+        $s->removeAllBindVolumes();
+        $volumes = $s->getVolumes();
+        $this->assertEquals(count($volumes), 1);
+        $this->assertEquals($volumes[0]->getType(), VolumeTypeEnum::NAMED_VOLUME);
+        $this->assertEquals($volumes[0]->getTarget(), '/data');
+    }
+
+    public function testEnvVariableContains(): void
+    {
+        $s = new Service();
+        $s->setServiceName('my-service');
+        $s->addSharedSecret('MYSQL_ROOT_PASSWORD', 'foo');
+        self::assertCount(0, $s->getAllSharedEnvVariable());
+        self::assertCount(1, $s->getAllSharedSecret());
+        self::assertCount(0, $s->getAllImageEnvVariable());
+        self::assertCount(0, $s->getAllContainerEnvVariable());
     }
 }

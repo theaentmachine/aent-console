@@ -1,6 +1,5 @@
 <?php
 
-
 namespace TheAentMachine\Registry;
 
 use GuzzleHttp\Client;
@@ -15,7 +14,7 @@ class RegistryClient
     public function getImageTagsOnDockerHub(string $image): array
     {
         $client = new Client();
-        $res = $client->request('GET', 'https://registry.hub.docker.com/v1/repositories/'.$image.'/tags');
+        $res = $client->request('GET', 'https://registry.hub.docker.com/v1/repositories/' . $image . '/tags');
 
         $response = \GuzzleHttp\json_decode($res->getBody(), true);
 

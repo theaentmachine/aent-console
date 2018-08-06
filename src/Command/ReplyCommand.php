@@ -1,18 +1,16 @@
 <?php
 
 
-namespace TheAentMachine;
+namespace TheAentMachine\Command;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use TheAentMachine\Aenthill\CommonEvents;
+use TheAentMachine\Helper\ReplyAggregator;
 
 /**
  * A special command that is used to receive replies from a dispatch
  */
-class ReplyCommand extends EventCommand
+final class ReplyCommand extends AbstractEventCommand
 {
-
     private $replyAggregator;
 
     public function __construct(ReplyAggregator $replyAggregator)
@@ -21,7 +19,7 @@ class ReplyCommand extends EventCommand
         $this->replyAggregator = $replyAggregator;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setHidden(true);
@@ -29,12 +27,12 @@ class ReplyCommand extends EventCommand
 
     protected function getEventName(): string
     {
-        return 'reply';
+        return CommonEvents::REPLY_EVENT;
     }
 
     protected function executeEvent(?string $payload): ?string
     {
-        $this->replyAggregator->storeReply($payload);
+        $this->replyAggregator->storeReply($payload ?? '');
         return null;
     }
 }
