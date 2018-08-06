@@ -2,7 +2,6 @@
 
 namespace TheAentMachine\Service;
 
-use JsonSerializable;
 use Opis\JsonSchema\ValidationError;
 use Opis\JsonSchema\Validator;
 use TheAentMachine\Aenthill\Manifest;
@@ -16,7 +15,7 @@ use TheAentMachine\Service\Volume\NamedVolume;
 use TheAentMachine\Service\Volume\TmpfsVolume;
 use TheAentMachine\Service\Volume\Volume;
 
-class Service implements JsonSerializable
+class Service implements \JsonSerializable
 {
     /** @var string */
     private $serviceName = '';
@@ -28,16 +27,18 @@ class Service implements JsonSerializable
     private $internalPorts = [];
     /** @var string[] */
     private $dependsOn = [];
-    /** @var mixed[] */
+    /** @var array<int, array<string, string|int>> */
     private $ports = [];
-    /** @var mixed[] */
+    /** @var array<string, array<string, string>> */
     private $labels = [];
-    /** @var mixed[] */
+    /** @var array<string, EnvVariable> */
     private $environment = [];
     /** @var mixed[] */
     private $volumes = [];
     /** @var null|bool */
     private $needVirtualHost;
+    /** @var array<int, array<string, string|int>> */
+    private $virtualHosts= [];
     /** @var null|bool */
     private $needBuild;
     /** @var \stdClass */
@@ -92,6 +93,7 @@ class Service implements JsonSerializable
                 }
             }
             $service->needVirtualHost = $s['needVirtualHost'] ?? null;
+            $service->virtualHosts = $s['virtualHosts'] ?? [];
             $service->needBuild = $s['needBuild'] ?? null;
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
@@ -114,7 +116,7 @@ class Service implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        $jsonSerializeMap = function (JsonSerializable $obj): array {
+        $jsonSerializeMap = function (\JsonSerializable $obj): array {
             return $obj->jsonSerialize();
         };
 
@@ -132,6 +134,7 @@ class Service implements JsonSerializable
             'environment' => array_map($jsonSerializeMap, $this->environment),
             'volumes' => array_map($jsonSerializeMap, $this->volumes),
             'needVirtualHost' => $this->needVirtualHost,
+            'virtualHosts' => $this->virtualHosts,
             'needBuild' => $this->needBuild,
         ]);
 
@@ -404,6 +407,20 @@ class Service implements JsonSerializable
         ], function ($v) {
             return null !== $v;
         });
+    }
+
+    public function addVirtualHost(?string $host, int $port, ?string $comment): void
+    {
+        $this->needVirtualHost = true;
+        $array = [];
+        if (null !== $host && '' !== $host) {
+            $array['host'] = $host;
+        }
+        $array['port'] = $port;
+        if (null !== $comment && '' !== $comment) {
+            $array['comment'] = $comment;
+        }
+        $this->virtualHosts[] = $array;
     }
 
 

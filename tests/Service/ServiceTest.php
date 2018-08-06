@@ -37,6 +37,10 @@ class ServiceTest extends TestCase
                         {"type": "tmpfs", "source": "baz", "comment": "a tmpfs"}
                       ],
     "needVirtualHost": true,
+    "virtualHosts": [
+        {"host": "foo", "port": 80, "comment": "a default virtual host"},
+        {"port": 8080, "comment": "it's ok"}
+    ],
     "needBuild": true
   },
   "dockerfileCommands": [
@@ -148,6 +152,8 @@ JSON;
         $s->addTmpfsVolume('baz', 'a tmpfs');
         $s->addDockerfileCommand('RUN composer install');
         $s->setNeedVirtualHost(true);
+        $s->addVirtualHost('foo', 80, 'a default virtual host');
+        $s->addVirtualHost(null, 8080, "it's ok");
         $s->setNeedBuild(true);
         $s->addDestEnvType(CommonMetadata::ENV_TYPE_DEV, true);
         $s->setRequestMemory('64Mi');
