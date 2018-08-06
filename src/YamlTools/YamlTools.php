@@ -40,7 +40,7 @@ final class YamlTools
     }
 
     /**
-     * Merge yaml content into one file (which is created if not exist)
+     * Merge yaml content into one file (created if non existent, with its directory's owner and group code)
      * @param string|mixed[] $content
      * @param string $file
      */
