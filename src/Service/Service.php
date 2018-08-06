@@ -46,14 +46,16 @@ class Service implements \JsonSerializable
     private $validatorSchema;
     /** @var string[] */
     private $dockerfileCommands = [];
-    /** @var string */
-    private $requestMemory = '';
-    /** @var string */
-    private $requestCpu = '';
-    /** @var string */
-    private $limitMemory = '';
-    /** @var string */
-    private $limitCpu = '';
+    /** @var null|string */
+    private $requestMemory;
+    /** @var null|string */
+    private $requestCpu;
+    /** @var null|string */
+    private $requestStorage;
+    /** @var null|string */
+    private $limitMemory;
+    /** @var null|string */
+    private $limitCpu;
     /** @var string[] */
     private $destEnvTypes = []; // empty === all env types
 
@@ -104,10 +106,18 @@ class Service implements \JsonSerializable
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
         $service->destEnvTypes = $payload['destEnvTypes'] ?? [];
 
-        $service->requestMemory = $payload['requestMemory'] ?? '';
-        $service->requestCpu = $payload['requestCpu'] ?? '';
-        $service->limitMemory = $payload['limitMemory'] ?? '';
-        $service->limitCpu = $payload['limitCpu'] ?? '';
+        if (!empty($resources = $payload['resources'])) {
+            if (!empty($r = $resources['requests'])) {
+                $service->requestMemory = $r['memory'] ?? null;
+                $service->requestCpu = $r['cpu'] ?? null;
+                $service->requestStorage= $r['storage'] ?? null;
+            }
+            if (!empty($l = $resources['limits'])) {
+                $service->limitMemory = $l['memory'] ?? null;
+                $service->limitCpu = $l['cpu'] ?? null;
+            }
+        }
+
         return $service;
     }
 
@@ -160,14 +170,19 @@ class Service implements \JsonSerializable
         $json['destEnvTypes'] = $this->destEnvTypes;
 
         $resources = array_filter([
-            'requestMemory' => $this->requestMemory,
-            'requestCpu' => $this->requestCpu,
-            'limitMemory' => $this->limitMemory,
-            'limitCpu' => $this->limitCpu
+            'requests' => array_filter([
+                'memory' => $this->requestMemory,
+                'cpu' => $this->requestCpu,
+                'storage' => $this->requestStorage,
+            ]),
+            'limits' => array_filter([
+                'memory' => $this->limitMemory,
+                'cpu' => $this->limitCpu,
+            ]),
         ]);
 
         if (!empty($resources)) {
-            $json = array_merge($json, $resources);
+            $json['resources'] = $resources;
         }
 
         $this->checkValidity($json);
@@ -294,22 +309,27 @@ class Service implements \JsonSerializable
         return $this->dockerfileCommands;
     }
 
-    public function getRequestMemory(): string
+    public function getRequestMemory(): ?string
     {
         return $this->requestMemory;
     }
 
-    public function getRequestCpu(): string
+    public function getRequestCpu(): ?string
     {
         return $this->requestCpu;
     }
 
-    public function getLimitMemory(): string
+    public function getRequestStorage(): ?string
+    {
+        return $this->requestStorage;
+    }
+
+    public function getLimitMemory(): ?string
     {
         return $this->limitMemory;
     }
 
-    public function getLimitCpu(): string
+    public function getLimitCpu(): ?string
     {
         return $this->limitCpu;
     }
@@ -359,6 +379,11 @@ class Service implements \JsonSerializable
     public function setRequestCpu(string $requestCpu): void
     {
         $this->requestCpu = $requestCpu;
+    }
+
+    public function setRequestStorage(string $requestStorage): void
+    {
+        $this->requestStorage = $requestStorage;
     }
 
     public function setLimitMemory(string $limitMemory): void

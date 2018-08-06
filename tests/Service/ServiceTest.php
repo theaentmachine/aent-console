@@ -38,8 +38,8 @@ class ServiceTest extends TestCase
                       ],
     "needVirtualHost": true,
     "virtualHosts": [
-        {"host": "foo", "port": 80, "comment": "a default virtual host"},
-        {"port": 8080, "comment": "it's ok"}
+      {"host": "foo", "port": 80, "comment": "a default virtual host"},
+      {"port": 8080, "comment": "it's ok"}
     ],
     "needBuild": true
   },
@@ -49,10 +49,17 @@ class ServiceTest extends TestCase
   "destEnvTypes": [
     "DEV"
   ],
-  "requestMemory": "64Mi",
-  "requestCpu": "250m",
-  "limitMemory": "128Mi",
-  "limitCpu": "500m"
+  "resources": {
+    "requests": {
+      "memory": "64Mi",
+      "cpu": "250m",
+      "storage": "8Gi"
+    },
+    "limits": {
+      "memory": "128Mi",
+      "cpu": "500m"
+    }
+  }
 }
 JSON;
 
@@ -158,6 +165,7 @@ JSON;
         $s->addDestEnvType(CommonMetadata::ENV_TYPE_DEV, true);
         $s->setRequestMemory('64Mi');
         $s->setRequestCpu('250m');
+        $s->setRequestStorage('8Gi');
         $s->setLimitMemory('128Mi');
         $s->setLimitCpu('500m');
         $outArray = $s->jsonSerialize();
