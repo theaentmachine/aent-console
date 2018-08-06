@@ -297,6 +297,12 @@ class Service implements \JsonSerializable
         return $this->needVirtualHost;
     }
 
+    /** @return array<int, array<string, string|int>> */
+    public function getVirtualHosts(): array
+    {
+        return $this->virtualHosts;
+    }
+
     public function getNeedBuild(): ?bool
     {
         return $this->needBuild;
