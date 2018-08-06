@@ -10,15 +10,15 @@ class CommentedItem
      */
     private $item;
     /**
-     * @var string
+     * @var string|null
      */
     private $comment;
 
     /**
      * @param mixed $item
-     * @param string $comment
+     * @param string|null $comment
      */
-    public function __construct($item, string $comment)
+    public function __construct($item, ?string $comment)
     {
 
         $this->item = $item;
@@ -34,9 +34,9 @@ class CommentedItem
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getComment(): string
+    public function getComment(): ?string
     {
         return $this->comment;
     }

@@ -30,7 +30,7 @@ class ServiceTest extends TestCase
     "labels"        : {
                         "foo": {"value": "fooo", "comment": "fooo"},
                         "bar": {"value": "baar", "comment": "baar"}
-                      },               
+                      },
     "volumes"       : [
                         {"type": "volume", "source": "foo", "target": "/foo", "readOnly": true, "comment": "it's a named volume tho"},
                         {"type": "bind", "source": "/bar", "target": "/bar", "readOnly": false, "comment": "a bind volume"},
