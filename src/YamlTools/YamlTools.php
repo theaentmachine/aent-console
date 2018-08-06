@@ -4,6 +4,8 @@ namespace TheAentMachine\YamlTools;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Yaml\Yaml;
+use TheAentMachine\Yaml\Dumper;
 
 final class YamlTools
 {
@@ -86,5 +88,17 @@ final class YamlTools
         $process->enableOutput();
         $process->setTty(true);
         $process->mustRun();
+    }
+
+    /**
+     * Dumps $item in YAML.
+     *
+     * @param mixed $item
+     * @return string
+     */
+    public function dump($item): string
+    {
+        $yaml = new Dumper(2);
+        return $yaml->dump($item, 256, 0, Yaml::DUMP_OBJECT_AS_MAP);
     }
 }
