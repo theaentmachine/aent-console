@@ -83,20 +83,17 @@ class Service implements \JsonSerializable
             $service->internalPorts = $s['internalPorts'] ?? [];
             $service->dependsOn = $s['dependsOn'] ?? [];
             $service->ports = $s['ports'] ?? [];
-            if (!empty($labels = $s['labels'])) {
-                foreach ($labels as $key => $label) {
-                    $service->addLabel($key, $label['value'], $label['comment'] ?? null);
-                }
+            $labels = $s['labels'] ?? [];
+            foreach ($labels as $key => $label) {
+                $service->addLabel($key, $label['value'], $label['comment'] ?? null);
             }
-            if (!empty($environment = $s['environment'])) {
-                foreach ($environment as $key => $env) {
-                    $service->addEnvVar($key, $env['value'], $env['type'], $env['comment'] ?? null);
-                }
+            $environment = $s['environment'] ?? [];
+            foreach ($environment as $key => $env) {
+                $service->addEnvVar($key, $env['value'], $env['type'], $env['comment'] ?? null);
             }
-            if (!empty($volumes = $s['volumes'])) {
-                foreach ($volumes as $vol) {
-                    $service->addVolume($vol['type'], $vol['source'], $vol['comment'] ?? null, $vol['target'] ?? '', $vol['readOnly'] ?? false);
-                }
+            $volumes = $s['volumes'] ?? [];
+            foreach ($volumes as $vol) {
+                $service->addVolume($vol['type'], $vol['source'], $vol['comment'] ?? null, $vol['target'] ?? '', $vol['readOnly'] ?? false);
             }
             $service->needVirtualHost = $s['needVirtualHost'] ?? null;
             $service->virtualHosts = $s['virtualHosts'] ?? [];
@@ -105,16 +102,17 @@ class Service implements \JsonSerializable
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
         $service->destEnvTypes = $payload['destEnvTypes'] ?? [];
 
-        if (!empty($resources = $payload['resources'])) {
-            if (!empty($r = $resources['requests'])) {
-                $service->requestMemory = $r['memory'] ?? null;
-                $service->requestCpu = $r['cpu'] ?? null;
-                $service->requestStorage= $r['storage'] ?? null;
-            }
-            if (!empty($l = $resources['limits'])) {
-                $service->limitMemory = $l['memory'] ?? null;
-                $service->limitCpu = $l['cpu'] ?? null;
-            }
+        $resources = $payload['resources'] ?? [];
+        if (isset($resources['requests'])) {
+            $r = $resources['requests'];
+            $service->requestMemory = $r['memory'] ?? null;
+            $service->requestCpu = $r['cpu'] ?? null;
+            $service->requestStorage= $r['storage'] ?? null;
+        }
+        if (isset($resources['limits'])) {
+            $l = $resources['limits'];
+            $service->limitMemory = $l['memory'] ?? null;
+            $service->limitCpu = $l['cpu'] ?? null;
         }
 
         return $service;
