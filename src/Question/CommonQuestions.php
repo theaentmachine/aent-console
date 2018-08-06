@@ -100,6 +100,7 @@ final class CommonQuestions
     }
 
     /**
+     * Return an array of {"ENV_NAME": "foo", "ENV_TYPE": "bar"}, chosen by the user
      * @return mixed[]|null
      * @throws CommonAentsException
      */

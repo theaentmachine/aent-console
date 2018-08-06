@@ -2,11 +2,10 @@
 
 namespace TheAentMachine\Service;
 
-use JsonSerializable;
 use Opis\JsonSchema\ValidationError;
 use Opis\JsonSchema\Validator;
-use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Aenthill\CommonMetadata;
+use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Service\Enum\EnvVariableTypeEnum;
 use TheAentMachine\Service\Enum\VolumeTypeEnum;
 use TheAentMachine\Service\Environment\EnvVariable;
@@ -15,8 +14,9 @@ use TheAentMachine\Service\Volume\BindVolume;
 use TheAentMachine\Service\Volume\NamedVolume;
 use TheAentMachine\Service\Volume\TmpfsVolume;
 use TheAentMachine\Service\Volume\Volume;
+use TheAentMachine\Yaml\CommentedItem;
 
-class Service implements JsonSerializable
+class Service implements \JsonSerializable
 {
     /** @var string */
     private $serviceName = '';
@@ -28,16 +28,18 @@ class Service implements JsonSerializable
     private $internalPorts = [];
     /** @var string[] */
     private $dependsOn = [];
-    /** @var mixed[] */
+    /** @var array<int, array<string, string|int>> */
     private $ports = [];
-    /** @var mixed[] */
+    /** @var array<string, CommentedItem> */
     private $labels = [];
-    /** @var mixed[] */
+    /** @var array<string, EnvVariable> */
     private $environment = [];
     /** @var mixed[] */
     private $volumes = [];
     /** @var null|bool */
     private $needVirtualHost;
+    /** @var array<int, array<string, string|int>> */
+    private $virtualHosts = [];
     /** @var null|bool */
     private $needBuild;
     /** @var \stdClass */
@@ -60,7 +62,7 @@ class Service implements JsonSerializable
      */
     public function __construct()
     {
-        $this->validatorSchema = \GuzzleHttp\json_decode((string) file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
+        $this->validatorSchema = \GuzzleHttp\json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
 
     /**
@@ -80,7 +82,11 @@ class Service implements JsonSerializable
             $service->internalPorts = $s['internalPorts'] ?? [];
             $service->dependsOn = $s['dependsOn'] ?? [];
             $service->ports = $s['ports'] ?? [];
-            $service->labels = $s['labels'] ?? [];
+            if (!empty($s['labels'])) {
+                foreach ($s['labels'] as $key => $label) {
+                    $service->addLabel($key, $label['value'], $label['comment'] ?? null);
+                }
+            }
             if (!empty($s['environment'])) {
                 foreach ($s['environment'] as $key => $env) {
                     $service->addEnvVar($key, $env['value'], $env['type'], $env['comment'] ?? null);
@@ -92,6 +98,7 @@ class Service implements JsonSerializable
                 }
             }
             $service->needVirtualHost = $s['needVirtualHost'] ?? null;
+            $service->virtualHosts = $s['virtualHosts'] ?? [];
             $service->needBuild = $s['needBuild'] ?? null;
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
@@ -114,7 +121,13 @@ class Service implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        $jsonSerializeMap = function (JsonSerializable $obj): array {
+        $labelMap = function (CommentedItem $commentedItem): array {
+            return null === $commentedItem->getComment() ?
+                ['value' => $commentedItem->getItem()] :
+                ['value' => $commentedItem->getItem(), 'comment' => $commentedItem->getComment()];
+        };
+
+        $jsonSerializeMap = function (\JsonSerializable $obj): array {
             return $obj->jsonSerialize();
         };
 
@@ -128,10 +141,11 @@ class Service implements JsonSerializable
             'internalPorts' => $this->internalPorts,
             'dependsOn' => $this->dependsOn,
             'ports' => $this->ports,
-            'labels' => $this->labels,
+            'labels' => array_map($labelMap, $this->labels),
             'environment' => array_map($jsonSerializeMap, $this->environment),
             'volumes' => array_map($jsonSerializeMap, $this->volumes),
             'needVirtualHost' => $this->needVirtualHost,
+            'virtualHosts' => $this->virtualHosts,
             'needBuild' => $this->needBuild,
         ]);
 
@@ -398,12 +412,21 @@ class Service implements JsonSerializable
 
     public function addLabel(string $key, string $value, ?string $comment = null): void
     {
-        $this->labels[$key] = array_filter([
-            'value' => $value,
-            'comment' => $comment
-        ], function ($v) {
-            return null !== $v;
-        });
+        $this->labels[$key] = new CommentedItem($value, $comment);
+    }
+
+    public function addVirtualHost(?string $host, int $port, ?string $comment): void
+    {
+        $this->needVirtualHost = true;
+        $array = [];
+        if (null !== $host && '' !== $host) {
+            $array['host'] = $host;
+        }
+        $array['port'] = $port;
+        if (null !== $comment && '' !== $comment) {
+            $array['comment'] = $comment;
+        }
+        $this->virtualHosts[] = $array;
     }
 
 
