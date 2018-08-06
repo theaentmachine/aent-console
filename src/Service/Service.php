@@ -77,25 +77,24 @@ class Service implements \JsonSerializable
         $service = new self();
         $service->checkValidity($payload);
         $service->serviceName = $payload['serviceName'] ?? '';
-        $s = $payload['service'] ?? [];
-        if (!empty($s)) {
+        if (!empty($s = $payload['service'] ?? [])) {
             $service->image = $s['image'] ?? null;
             $service->command = $s['command'] ?? [];
             $service->internalPorts = $s['internalPorts'] ?? [];
             $service->dependsOn = $s['dependsOn'] ?? [];
             $service->ports = $s['ports'] ?? [];
-            if (!empty($s['labels'])) {
-                foreach ($s['labels'] as $key => $label) {
+            if (!empty($labels = $s['labels'])) {
+                foreach ($labels as $key => $label) {
                     $service->addLabel($key, $label['value'], $label['comment'] ?? null);
                 }
             }
-            if (!empty($s['environment'])) {
-                foreach ($s['environment'] as $key => $env) {
+            if (!empty($environment = $s['environment'])) {
+                foreach ($environment as $key => $env) {
                     $service->addEnvVar($key, $env['value'], $env['type'], $env['comment'] ?? null);
                 }
             }
-            if (!empty($s['volumes'])) {
-                foreach ($s['volumes'] as $vol) {
+            if (!empty($volumes = $s['volumes'])) {
+                foreach ($volumes as $vol) {
                     $service->addVolume($vol['type'], $vol['source'], $vol['comment'] ?? null, $vol['target'] ?? '', $vol['readOnly'] ?? false);
                 }
             }
@@ -269,19 +268,19 @@ class Service implements \JsonSerializable
         return $this->dependsOn;
     }
 
-    /** @return mixed[] */
+    /** @return array<int, array<string, string|int>> */
     public function getPorts(): array
     {
         return $this->ports;
     }
 
-    /** @return mixed[] */
+    /** @return array<string, CommentedItem> */
     public function getLabels(): array
     {
         return $this->labels;
     }
 
-    /** @return mixed[] */
+    /** @return array<string, EnvVariable> */
     public function getEnvironment(): array
     {
         return $this->environment;
