@@ -40,17 +40,29 @@ final class YamlTools
     }
 
     /**
-     * Merge yaml content into one file
-     * @param string $content
+     * Merge yaml content into one file (which is created if not exist)
+     * @param string|mixed[] $content
      * @param string $file
      */
-    public static function mergeContentIntoFile(string $content, string $file): void
+    public static function mergeContentIntoFile($content, string $file): void
     {
+        if (\is_array($content)) {
+            $content = self::dump($content);
+        }
+
         $fileSystem = new Filesystem();
-        $tmpFile = $fileSystem->tempnam(sys_get_temp_dir(), 'yaml-tools-merge-');
-        $fileSystem->dumpFile($tmpFile, $content);
-        self::mergeTwoFiles($file, $tmpFile);
-        $fileSystem->remove($tmpFile);
+
+        if ($fileSystem->exists($file)) {
+            $tmpFile = $fileSystem->tempnam(sys_get_temp_dir(), 'yaml-tools-merge-');
+            $fileSystem->dumpFile($tmpFile, $content);
+            self::mergeTwoFiles($file, $tmpFile);
+            $fileSystem->remove($tmpFile);
+        } else {
+            $fileSystem->dumpFile($file, $content);
+            $dirInfo = new \SplFileInfo(\dirname($file));
+            chown($file, $dirInfo->getOwner());
+            chgrp($file, $dirInfo->getGroup());
+        }
     }
 
     /**
