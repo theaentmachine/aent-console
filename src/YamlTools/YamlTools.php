@@ -96,7 +96,7 @@ final class YamlTools
      * @param mixed $item
      * @return string
      */
-    public function dump($item): string
+    public static function dump($item): string
     {
         $yaml = new Dumper(2);
         return $yaml->dump($item, 256, 0, Yaml::DUMP_OBJECT_AS_MAP);
