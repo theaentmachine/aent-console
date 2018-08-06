@@ -281,7 +281,7 @@ class Service implements \JsonSerializable
         return $this->labels;
     }
 
-    /** @return mixed[] */
+    /** @return array<string,EnvVariable> */
     public function getEnvironment(): array
     {
         return $this->environment;
