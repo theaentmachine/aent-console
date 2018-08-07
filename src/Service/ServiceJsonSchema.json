@@ -139,9 +139,6 @@
             "additionalProperties": false
           }
         },
-        "needVirtualHost": {
-          "type": "boolean"
-        },
         "needBuild": {
           "type": "boolean"
         },
