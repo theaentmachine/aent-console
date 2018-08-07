@@ -22,7 +22,7 @@
         "internalPorts": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "integer"
           }
         },
         "dependsOn": {
@@ -37,10 +37,10 @@
             "type": "object",
             "properties": {
               "source": {
-                "type": "number"
+                "type": "integer"
               },
               "target": {
-                "type": "number"
+                "type": "integer"
               },
               "comment": {
                 "type": "string"
@@ -142,14 +142,32 @@
             "additionalProperties": false
           }
         },
+        "virtualHosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string"
+              },
+              "port": {
+                "type": "integer"
+              },
+              "comment": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "port"
+            ],
+            "additionalProperties": false
+          }
+        },
         "needBuild": {
           "type": "boolean"
-        },
-        "needDeploy": {
-          "type": "boolean"
-        },
-        "additionalProperties": false
-      }
+        }
+      },
+      "additionalProperties": false
     },
     "dockerFileCommands": {
       "type": "array",
