@@ -9,6 +9,7 @@ use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Service\Enum\EnvVariableTypeEnum;
 use TheAentMachine\Service\Enum\VolumeTypeEnum;
 use TheAentMachine\Service\Environment\EnvVariable;
+use TheAentMachine\Service\Environment\SharedEnvVariable;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Volume\BindVolume;
 use TheAentMachine\Service\Volume\NamedVolume;
@@ -89,7 +90,7 @@ class Service implements \JsonSerializable
             }
             $environment = $s['environment'] ?? [];
             foreach ($environment as $key => $env) {
-                $service->addEnvVar($key, $env['value'], $env['type'], $env['comment'] ?? null);
+                $service->addEnvVar($key, $env['value'], $env['type'], $env['comment'] ?? null, $env['containerId'] ?? null);
             }
             $volumes = $s['volumes'] ?? [];
             foreach ($volumes as $vol) {
@@ -461,14 +462,14 @@ class Service implements \JsonSerializable
     /************************ environment adders & contains **********************/
 
     /** @throws ServiceException */
-    private function addEnvVar(string $key, string $value, string $type, ?string $comment = null): void
+    private function addEnvVar(string $key, string $value, string $type, ?string $comment = null, ?string $containerId = null): void
     {
         switch ($type) {
             case EnvVariableTypeEnum::SHARED_ENV_VARIABLE:
-                $this->addSharedEnvVariable($key, $value, $comment);
+                $this->addSharedEnvVariable($key, $value, $comment, $containerId);
                 break;
             case EnvVariableTypeEnum::SHARED_SECRET:
-                $this->addSharedSecret($key, $value, $comment);
+                $this->addSharedSecret($key, $value, $comment, $containerId);
                 break;
             case EnvVariableTypeEnum::IMAGE_ENV_VARIABLE:
                 $this->addImageEnvVariable($key, $value, $comment);
@@ -481,14 +482,26 @@ class Service implements \JsonSerializable
         }
     }
 
-    public function addSharedEnvVariable(string $key, string $value, ?string $comment = null): void
+    /**
+     * @param string $key
+     * @param string $value
+     * @param null|string $comment
+     * @param null|string $containerId A string representing the ID of the container of environment variables. Typically the name of the env_file in docker_compose or the name of the ConfigMap in Kubernetes
+     */
+    public function addSharedEnvVariable(string $key, string $value, ?string $comment = null, ?string $containerId = null): void
     {
-        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::SHARED_ENV_VARIABLE, $comment);
+        $this->environment[$key] = new SharedEnvVariable($value, EnvVariableTypeEnum::SHARED_ENV_VARIABLE, $comment, $containerId);
     }
 
-    public function addSharedSecret(string $key, string $value, ?string $comment = null): void
+    /**
+     * @param string $key
+     * @param string $value
+     * @param null|string $comment
+     * @param null|string $containerId A string representing the ID of the container of environment variables. Typically the name of the env_file in docker_compose or the name of the Secret in Kubernetes
+     */
+    public function addSharedSecret(string $key, string $value, ?string $comment = null, ?string $containerId = null): void
     {
-        $this->environment[$key] = new EnvVariable($value, EnvVariableTypeEnum::SHARED_SECRET, $comment);
+        $this->environment[$key] = new SharedEnvVariable($value, EnvVariableTypeEnum::SHARED_SECRET, $comment, $containerId);
     }
 
     public function addImageEnvVariable(string $key, string $value, ?string $comment = null): void
@@ -517,13 +530,13 @@ class Service implements \JsonSerializable
         return $res;
     }
 
-    /** @return array<string, EnvVariable> */
+    /** @return array<string,SharedEnvVariable> */
     public function getAllSharedEnvVariable(): array
     {
         return $this->getAllEnvVariablesByType(EnvVariableTypeEnum::SHARED_ENV_VARIABLE);
     }
 
-    /** @return array<string, EnvVariable> */
+    /** @return array<string,SharedEnvVariable> */
     public function getAllSharedSecret(): array
     {
         return $this->getAllEnvVariablesByType(EnvVariableTypeEnum::SHARED_SECRET);
