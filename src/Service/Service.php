@@ -36,8 +36,6 @@ class Service implements \JsonSerializable
     private $environment = [];
     /** @var mixed[] */
     private $volumes = [];
-    /** @var null|bool */
-    private $needVirtualHost;
     /** @var array<int, array<string, string|int>> */
     private $virtualHosts = [];
     /** @var null|bool */
@@ -95,7 +93,6 @@ class Service implements \JsonSerializable
             foreach ($volumes as $vol) {
                 $service->addVolume($vol['type'], $vol['source'], $vol['comment'] ?? null, $vol['target'] ?? '', $vol['readOnly'] ?? false);
             }
-            $service->needVirtualHost = $s['needVirtualHost'] ?? null;
             $service->virtualHosts = $s['virtualHosts'] ?? [];
             $service->needBuild = $s['needBuild'] ?? null;
         }
@@ -151,7 +148,6 @@ class Service implements \JsonSerializable
             'labels' => array_map($labelMap, $this->labels),
             'environment' => array_map($jsonSerializeMap, $this->environment),
             'volumes' => array_map($jsonSerializeMap, $this->volumes),
-            'needVirtualHost' => $this->needVirtualHost,
             'virtualHosts' => $this->virtualHosts,
             'needBuild' => $this->needBuild,
         ]);
@@ -290,11 +286,6 @@ class Service implements \JsonSerializable
         return $this->volumes;
     }
 
-    public function getNeedVirtualHost(): ?bool
-    {
-        return $this->needVirtualHost;
-    }
-
     /** @return array<int, array<string, string|int>> */
     public function getVirtualHosts(): array
     {
@@ -399,11 +390,6 @@ class Service implements \JsonSerializable
         $this->limitCpu = $limitCpu;
     }
 
-    public function setNeedVirtualHost(?bool $needVirtualHost): void
-    {
-        $this->needVirtualHost = $needVirtualHost;
-    }
-
     public function setNeedBuild(?bool $needBuild): void
     {
         $this->needBuild = $needBuild;
@@ -445,7 +431,6 @@ class Service implements \JsonSerializable
 
     public function addVirtualHost(?string $host, int $port, ?string $comment): void
     {
-        $this->needVirtualHost = true;
         $array = [];
         if (null !== $host && '' !== $host) {
             $array['host'] = $host;
