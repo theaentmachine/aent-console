@@ -96,6 +96,9 @@
                 },
                 "isCommented": {
                   "type": "boolean"
+                },
+                "containerId": {
+                  "type": "string"
                 }
               },
               "required": [

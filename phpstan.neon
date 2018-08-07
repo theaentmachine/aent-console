@@ -1,5 +1,5 @@
-#parameters:
-#    ignoreErrors:
-#     - "#Instantiated class WeakRef not found.#"
+parameters:
+    ignoreErrors:
+     - "#should return array.*SharedEnvVariable.*EnvVariable#"
 includes:
     - vendor/thecodingmachine/phpstan-strict-rules/phpstan-strict-rules.neon

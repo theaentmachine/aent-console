@@ -5,6 +5,7 @@ namespace TheAentMachine\Registry;
 use PHPUnit\Framework\TestCase;
 use TheAentMachine\Aenthill\CommonMetadata;
 use TheAentMachine\Service\Enum\VolumeTypeEnum;
+use TheAentMachine\Service\Environment\SharedEnvVariable;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Service;
 use TheAentMachine\Service\Volume\BindVolume;
@@ -22,7 +23,7 @@ class ServiceTest extends TestCase
     "dependsOn"     : ["foo", "bar"],
     "ports"         : [{"source": 80, "target": 8080, "comment": "a line of comment"}],
     "environment"   : {
-                        "FOO": {"value": "foo", "type": "sharedEnvVariable", "comment": "foo"},
+                        "FOO": {"value": "foo", "type": "sharedEnvVariable", "comment": "foo", "containerId": "baz"},
                         "BAR": {"value": "bar", "type": "sharedSecret", "comment": "bar"},
                         "BAZ": {"value": "baz", "type": "imageEnvVariable", "comment": "baz"},
                         "QUX": {"value": "qux", "type": "containerEnvVariable", "comment": "qux"}
@@ -149,7 +150,7 @@ JSON;
         $s->addPort(80, 8080, 'a line of comment');
         $s->addLabel('foo', 'fooo', 'fooo');
         $s->addLabel('bar', 'baar', 'baar');
-        $s->addSharedEnvVariable('FOO', 'foo', 'foo');
+        $s->addSharedEnvVariable('FOO', 'foo', 'foo', 'baz');
         $s->addSharedSecret('BAR', 'bar', 'bar');
         $s->addImageEnvVariable('BAZ', 'baz', 'baz');
         $s->addContainerEnvVariable('QUX', 'qux', 'qux');
@@ -232,10 +233,15 @@ JSON;
     {
         $s = new Service();
         $s->setServiceName('my-service');
-        $s->addSharedSecret('MYSQL_ROOT_PASSWORD', 'foo');
+        $s->addSharedSecret('MYSQL_ROOT_PASSWORD', 'foo', 'comment', 'container');
         self::assertCount(0, $s->getAllSharedEnvVariable());
         self::assertCount(1, $s->getAllSharedSecret());
         self::assertCount(0, $s->getAllImageEnvVariable());
         self::assertCount(0, $s->getAllContainerEnvVariable());
+        $variable = $s->getAllSharedSecret()['MYSQL_ROOT_PASSWORD'];
+        $this->assertInstanceOf(SharedEnvVariable::class, $variable);
+        $this->assertSame('foo', $variable->getValue());
+        $this->assertSame('comment', $variable->getComment());
+        $this->assertSame('container', $variable->getContainerId());
     }
 }
