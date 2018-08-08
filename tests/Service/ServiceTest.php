@@ -39,7 +39,8 @@ class ServiceTest extends TestCase
                       ],
     "virtualHosts": [
       {"host": "foo", "port": 80, "comment": "a default virtual host"},
-      {"port": 8080, "comment": "it's ok"}
+      {"port": 8080, "comment": "it's ok"},
+      {"hostPrefix": "foo", "port": 80}
     ],
     "needBuild": true
   },
@@ -160,6 +161,7 @@ JSON;
         $s->addDockerfileCommand('RUN composer install');
         $s->addVirtualHost('foo', 80, 'a default virtual host');
         $s->addVirtualHost(null, 8080, "it's ok");
+        $s->addVirtualHostPrefix('foo', 80, null);
         $s->setNeedBuild(true);
         $s->addDestEnvType(CommonMetadata::ENV_TYPE_DEV, true);
         $s->setRequestMemory('64Mi');
