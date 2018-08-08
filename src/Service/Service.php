@@ -460,7 +460,7 @@ class Service implements \JsonSerializable
         $this->virtualHosts[] = $array;
     }
 
-    /************************ environment adders & contains **********************/
+    /************************ environment adders & getters by type **********************/
 
     /** @throws ServiceException */
     private function addEnvVar(string $key, string $value, string $type, ?string $comment = null, ?string $containerId = null): void
@@ -626,7 +626,6 @@ class Service implements \JsonSerializable
         };
         $this->volumes = array_values(array_filter($this->volumes, $filterFunction));
     }
-
 
     /************************ destEnvTypes stuffs **********************/
 
