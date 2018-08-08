@@ -150,6 +150,9 @@
               "host": {
                 "type": "string"
               },
+              "hostPrefix": {
+                "type": "string"
+              },
               "port": {
                 "type": "integer"
               },
