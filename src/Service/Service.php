@@ -443,6 +443,18 @@ class Service implements \JsonSerializable
         $this->virtualHosts[] = $array;
     }
 
+    public function addVirtualHostPrefix(?string $hostPrefix, int $port, ?string $comment): void
+    {
+        $array = [];
+        if (null !== $hostPrefix && '' !== $hostPrefix) {
+            $array['hostPrefix'] = $hostPrefix;
+        }
+        $array['port'] = $port;
+        if (null !== $comment && '' !== $comment) {
+            $array['comment'] = $comment;
+        }
+        $this->virtualHosts[] = $array;
+    }
 
     /************************ environment adders & contains **********************/
 
