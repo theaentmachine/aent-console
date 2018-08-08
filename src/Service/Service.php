@@ -168,11 +168,15 @@ class Service implements \JsonSerializable
                 'memory' => $this->requestMemory,
                 'cpu' => $this->requestCpu,
                 'storage' => $this->requestStorage,
-            ]),
+            ], function ($v) {
+                return null !== $v;
+            }),
             'limits' => array_filter([
                 'memory' => $this->limitMemory,
                 'cpu' => $this->limitCpu,
-            ]),
+            ], function ($v) {
+                return null !== $v;
+            }),
         ]);
 
         if (!empty($resources)) {
@@ -456,7 +460,7 @@ class Service implements \JsonSerializable
         $this->virtualHosts[] = $array;
     }
 
-    /************************ environment adders & contains **********************/
+    /************************ environment adders & getters by type **********************/
 
     /** @throws ServiceException */
     private function addEnvVar(string $key, string $value, string $type, ?string $comment = null, ?string $containerId = null): void
@@ -622,7 +626,6 @@ class Service implements \JsonSerializable
         };
         $this->volumes = array_values(array_filter($this->volumes, $filterFunction));
     }
-
 
     /************************ destEnvTypes stuffs **********************/
 

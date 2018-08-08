@@ -27,6 +27,8 @@ class TmpfsVolume extends Volume
             'type' => $this->getType(),
             'source' => $this->source,
             'comment' => $this->comment,
-        ]);
+        ], function ($v) {
+            return null !== $v;
+        });
     }
 }
