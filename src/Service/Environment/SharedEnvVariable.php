@@ -37,6 +37,8 @@ class SharedEnvVariable extends EnvVariable
             'type' => $this->getType(),
             'comment' => $this->getComment(),
             'containerId' => $this->containerId
-        ]);
+        ], function ($v) {
+            return null !== $v;
+        });
     }
 }

@@ -61,6 +61,8 @@ class EnvVariable implements \JsonSerializable
             'value' => $this->value,
             'type' => $this->type,
             'comment' => $this->comment
-        ]);
+        ], function ($v) {
+            return null !== $v;
+        });
     }
 }

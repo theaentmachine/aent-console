@@ -168,11 +168,15 @@ class Service implements \JsonSerializable
                 'memory' => $this->requestMemory,
                 'cpu' => $this->requestCpu,
                 'storage' => $this->requestStorage,
-            ]),
+            ], function ($v) {
+                return null !== $v;
+            }),
             'limits' => array_filter([
                 'memory' => $this->limitMemory,
                 'cpu' => $this->limitCpu,
-            ]),
+            ], function ($v) {
+                return null !== $v;
+            }),
         ]);
 
         if (!empty($resources)) {
