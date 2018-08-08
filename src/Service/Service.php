@@ -434,7 +434,7 @@ class Service implements \JsonSerializable
         $this->labels[$key] = new CommentedItem($value, $comment);
     }
 
-    public function addVirtualHost(?string $host, int $port, ?string $comment): void
+    public function addVirtualHost(?string $host, int $port, ?string $comment = null): void
     {
         $array = [];
         if (null !== $host && '' !== $host) {
@@ -447,7 +447,7 @@ class Service implements \JsonSerializable
         $this->virtualHosts[] = $array;
     }
 
-    public function addVirtualHostPrefix(?string $hostPrefix, int $port, ?string $comment): void
+    public function addVirtualHostPrefix(?string $hostPrefix, int $port, ?string $comment = null): void
     {
         $array = [];
         if (null !== $hostPrefix && '' !== $hostPrefix) {
