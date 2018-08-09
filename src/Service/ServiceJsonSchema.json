@@ -133,6 +133,10 @@
               },
               "comment": {
                 "type": "string"
+              },
+              "requestStorage": {
+                "type": "string",
+                "pattern": "^([0-9]+[.])?[0-9]+([EPTGMK][i]?)?$"
               }
             },
             "required": [
@@ -202,10 +206,6 @@
             "cpu": {
               "type": "string",
               "pattern": "^([0-9]+[.])?[0-9]+[m]?$"
-            },
-            "storage": {
-              "type": "string",
-              "pattern": "^([0-9]+[.])?[0-9]+([EPTGMK][i]?)?$"
             }
           },
           "additionalProperties": false

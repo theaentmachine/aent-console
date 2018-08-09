@@ -33,7 +33,7 @@ class ServiceTest extends TestCase
                         "bar": {"value": "baar", "comment": "baar"}
                       },
     "volumes"       : [
-                        {"type": "volume", "source": "foo", "target": "/foo", "readOnly": true, "comment": "it's a named volume tho"},
+                        {"type": "volume", "source": "foo", "target": "/foo", "readOnly": true, "comment": "it's a named volume tho", "requestStorage": "8Gi"},
                         {"type": "bind", "source": "/bar", "target": "/bar", "readOnly": false, "comment": "a bind volume"},
                         {"type": "tmpfs", "source": "baz", "comment": "a tmpfs"}
                       ],
@@ -53,8 +53,7 @@ class ServiceTest extends TestCase
   "resources": {
     "requests": {
       "memory": "64Mi",
-      "cpu": "250m",
-      "storage": "8Gi"
+      "cpu": "250m"
     },
     "limits": {
       "memory": "128Mi",
@@ -155,7 +154,7 @@ JSON;
         $s->addSharedSecret('BAR', 'bar', 'bar');
         $s->addImageEnvVariable('BAZ', 'baz', 'baz');
         $s->addContainerEnvVariable('QUX', 'qux', 'qux');
-        $s->addNamedVolume('foo', '/foo', true, 'it\'s a named volume tho');
+        $s->addNamedVolume('foo', '/foo', true, 'it\'s a named volume tho', '8Gi');
         $s->addBindVolume('/bar', '/bar', false, 'a bind volume');
         $s->addTmpfsVolume('baz', 'a tmpfs');
         $s->addDockerfileCommand('RUN composer install');
@@ -166,7 +165,6 @@ JSON;
         $s->addDestEnvType(CommonMetadata::ENV_TYPE_DEV, true);
         $s->setRequestMemory('64Mi');
         $s->setRequestCpu('250m');
-        $s->setRequestStorage('8Gi');
         $s->setLimitMemory('128Mi');
         $s->setLimitCpu('500m');
         $outArray = $s->jsonSerialize();

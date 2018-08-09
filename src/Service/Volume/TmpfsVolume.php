@@ -6,9 +6,6 @@ use TheAentMachine\Service\Enum\VolumeTypeEnum;
 
 class TmpfsVolume extends Volume
 {
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return VolumeTypeEnum::TMPFS_VOLUME;

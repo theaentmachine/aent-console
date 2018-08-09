@@ -10,43 +10,35 @@ class NamedVolume extends Volume
     private $target;
     /** @var bool */
     private $readOnly;
+    /** @var null|string */
+    private $requestStorage;
 
-    /**
-     * BindVolume constructor.
-     * @param string $source
-     * @param string $target
-     * @param bool $readOnly
-     * @param null|string $comment
-     */
-    public function __construct(string $source, string $target, bool $readOnly = false, ?string $comment = null)
+    public function __construct(string $source, string $target, bool $readOnly = false, ?string $comment = null, ?string $requestStorage = null)
     {
         parent::__construct($source, $comment);
         $this->target = $target;
         $this->readOnly = $readOnly;
+        $this->requestStorage = $requestStorage;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return VolumeTypeEnum::NAMED_VOLUME;
     }
 
-    /**
-     * @return string
-     */
     public function getTarget(): string
     {
         return $this->target;
     }
 
-    /**
-     * @return bool
-     */
     public function isReadOnly(): bool
     {
         return $this->readOnly;
+    }
+
+    public function getRequestStorage(): ?string
+    {
+        return $this->requestStorage;
     }
 
     /**
@@ -64,6 +56,7 @@ class NamedVolume extends Volume
             'target' => $this->target,
             'readOnly' => $this->readOnly,
             'comment' => $this->comment,
+            'requestStorage' => $this->requestStorage,
         ], function ($v) {
             return null !== $v;
         });
