@@ -50,8 +50,6 @@ class Service implements \JsonSerializable
     /** @var null|string */
     private $requestCpu;
     /** @var null|string */
-    private $requestStorage;
-    /** @var null|string */
     private $limitMemory;
     /** @var null|string */
     private $limitCpu;
@@ -92,7 +90,14 @@ class Service implements \JsonSerializable
             }
             $volumes = $s['volumes'] ?? [];
             foreach ($volumes as $vol) {
-                $service->addVolume($vol['type'], $vol['source'], $vol['comment'] ?? null, $vol['target'] ?? '', $vol['readOnly'] ?? false);
+                $service->addVolume(
+                    $vol['type'],
+                    $vol['source'],
+                    $vol['comment'] ?? null,
+                    $vol['target'] ?? '',
+                    $vol['readOnly'] ?? false,
+                    $vol['requestStorage'] ?? null
+                );
             }
             $service->virtualHosts = $s['virtualHosts'] ?? [];
             $service->needBuild = $s['needBuild'] ?? null;
@@ -105,7 +110,6 @@ class Service implements \JsonSerializable
             $r = $resources['requests'];
             $service->requestMemory = $r['memory'] ?? null;
             $service->requestCpu = $r['cpu'] ?? null;
-            $service->requestStorage= $r['storage'] ?? null;
         }
         if (isset($resources['limits'])) {
             $l = $resources['limits'];
@@ -167,7 +171,6 @@ class Service implements \JsonSerializable
             'requests' => array_filter([
                 'memory' => $this->requestMemory,
                 'cpu' => $this->requestCpu,
-                'storage' => $this->requestStorage,
             ], function ($v) {
                 return null !== $v;
             }),
@@ -318,11 +321,6 @@ class Service implements \JsonSerializable
         return $this->requestCpu;
     }
 
-    public function getRequestStorage(): ?string
-    {
-        return $this->requestStorage;
-    }
-
     public function getLimitMemory(): ?string
     {
         return $this->limitMemory;
@@ -379,12 +377,6 @@ class Service implements \JsonSerializable
     {
         $this->requestCpu = $requestCpu;
     }
-
-    public function setRequestStorage(string $requestStorage): void
-    {
-        $this->requestStorage = $requestStorage;
-    }
-
     public function setLimitMemory(string $limitMemory): void
     {
         $this->limitMemory = $limitMemory;
@@ -559,11 +551,11 @@ class Service implements \JsonSerializable
     /************************ volumes adders & removers **********************/
 
     /** @throws ServiceException */
-    private function addVolume(string $type, string $source, ?string $comment = null, string $target = '', bool $readOnly = false): void
+    private function addVolume(string $type, string $source, ?string $comment = null, string $target = '', bool $readOnly = false, ?string $requestStorage = null): void
     {
         switch ($type) {
             case VolumeTypeEnum::NAMED_VOLUME:
-                $this->addNamedVolume($source, $target, $readOnly, $comment);
+                $this->addNamedVolume($source, $target, $readOnly, $comment, $requestStorage);
                 break;
             case VolumeTypeEnum::BIND_VOLUME:
                 $this->addBindVolume($source, $target, $readOnly, $comment);
@@ -576,9 +568,9 @@ class Service implements \JsonSerializable
         }
     }
 
-    public function addNamedVolume(string $source, string $target, bool $readOnly = false, ?string $comment = null): void
+    public function addNamedVolume(string $source, string $target, bool $readOnly = false, ?string $comment = null, string $requestStorage = null): void
     {
-        $this->volumes[] = new NamedVolume($source, $target, $readOnly, $comment);
+        $this->volumes[] = new NamedVolume($source, $target, $readOnly, $comment, $requestStorage);
     }
 
     public function addBindVolume(string $source, string $target, bool $readOnly = false, ?string $comment = null): void

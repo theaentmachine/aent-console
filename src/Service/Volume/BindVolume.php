@@ -11,13 +11,6 @@ class BindVolume extends Volume
     /** @var bool */
     private $readOnly;
 
-    /**
-     * BindVolume constructor.
-     * @param string $source
-     * @param string $target
-     * @param bool $readOnly
-     * @param null|string $comment
-     */
     public function __construct(string $source, string $target, bool $readOnly = false, ?string $comment = null)
     {
         parent::__construct($source, $comment);
@@ -26,30 +19,20 @@ class BindVolume extends Volume
         $this->comment = $comment;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return VolumeTypeEnum::BIND_VOLUME;
     }
 
-    /**
-     * @return string
-     */
     public function getTarget(): string
     {
         return $this->target;
     }
 
-    /**
-     * @return bool
-     */
     public function isReadOnly(): bool
     {
         return $this->readOnly;
     }
-
 
     /**
      * Specify data which should be serialized to JSON
@@ -65,7 +48,7 @@ class BindVolume extends Volume
             'source' => $this->source,
             'target' => $this->target,
             'readOnly' => $this->readOnly,
-            'comment' => $this->comment,
+            'comment' => $this->comment
         ], function ($v) {
             return null !== $v;
         });
