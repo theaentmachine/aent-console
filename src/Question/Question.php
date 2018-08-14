@@ -55,7 +55,7 @@ final class Question extends AbstractQuestion
         if ($this->helpText) {
             $text .= ' (? for help)';
         }
-        if (null !== $this->default) {
+        if (null !== $this->default && '' !== $this->default) {
             if (!$this->yesNoQuestion) {
                 $text .= ' [' . $this->default . ']';
             } elseif ($this->default === 'y') {

@@ -63,10 +63,10 @@ final class ChoiceQuestion extends AbstractQuestion
     private function initQuestion(bool $multiselect): SymfonyChoiceQuestion
     {
         $text = $this->question;
-        if (null !== $this->helpText) {
+        if ($this->helpText) {
             $text .= ' (? for help)';
         }
-        if (null !== $this->default) {
+        if (null !== $this->default && '' !== $this->default) {
             $text .= ' [' . $this->default . ']';
         }
         $text .= ': ';
