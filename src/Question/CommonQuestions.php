@@ -210,15 +210,6 @@ final class CommonQuestions
             return null;
         }
 
-        $installCIAent = $this->factory->question('Do you use a CI/CD tool?')
-            ->compulsory()
-            ->yesNoQuestion()
-            ->ask();
-
-        if (empty($installCIAent)) {
-            return null;
-        }
-
         $available = CommonAents::getAentsListByDependencyKey(CommonDependencies::CI_KEY);
         $available[] = 'other';
         $image = $this->factory->choiceQuestion('CI/CD', $available)
