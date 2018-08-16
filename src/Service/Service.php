@@ -41,8 +41,6 @@ class Service implements \JsonSerializable
     private $virtualHosts = [];
     /** @var null|bool */
     private $needBuild;
-    /** @var null|bool */
-    private $isVariableEnvironment;
     /** @var \stdClass */
     private $validatorSchema;
     /** @var string[] */
@@ -103,7 +101,6 @@ class Service implements \JsonSerializable
             }
             $service->virtualHosts = $s['virtualHosts'] ?? [];
             $service->needBuild = $s['needBuild'] ?? null;
-            $service->isVariableEnvironment = $s['isVariableEnvironment'] ?? null;
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
         $service->destEnvTypes = $payload['destEnvTypes'] ?? [];
@@ -158,7 +155,6 @@ class Service implements \JsonSerializable
             'volumes' => array_map($jsonSerializeMap, $this->volumes),
             'virtualHosts' => $this->virtualHosts,
             'needBuild' => $this->needBuild,
-            'isVariableEnvironment' => $this->isVariableEnvironment,
         ]);
 
         if (!empty($service)) {
@@ -309,11 +305,6 @@ class Service implements \JsonSerializable
         return $this->needBuild;
     }
 
-    public function isVariableEnvironment(): ?bool
-    {
-        return $this->isVariableEnvironment;
-    }
-
     /** @return string[] */
     public function getDockerfileCommands(): array
     {
@@ -399,11 +390,6 @@ class Service implements \JsonSerializable
     public function setNeedBuild(?bool $needBuild): void
     {
         $this->needBuild = $needBuild;
-    }
-
-    public function setIsVariableEnvironment(bool $isVariableEnvironment): void
-    {
-        $this->isVariableEnvironment = $isVariableEnvironment;
     }
 
     /************************ adders **********************/

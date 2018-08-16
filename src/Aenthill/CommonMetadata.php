@@ -14,4 +14,6 @@ final class CommonMetadata
     public const ENV_TYPE_DEV = 'DEV';
     public const ENV_TYPE_TEST = 'TEST';
     public const ENV_TYPE_PROD = 'PROD';
+
+    public const IS_VARIABLE_ENVIRONMENT = 'IS_VARIABLE_ENVIRONMENT';
 }

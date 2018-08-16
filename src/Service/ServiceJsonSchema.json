@@ -172,9 +172,6 @@
         },
         "needBuild": {
           "type": "boolean"
-        },
-        "isVariableEnvironment": {
-          "type": "boolean"
         }
       },
       "additionalProperties": false
