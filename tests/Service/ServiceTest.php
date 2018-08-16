@@ -42,8 +42,7 @@ class ServiceTest extends TestCase
       {"port": 8080, "comment": "it's ok"},
       {"hostPrefix": "foo", "port": 80}
     ],
-    "needBuild": true,
-    "isVariableEnvironment": true
+    "needBuild": true
   },
   "dockerfileCommands": [
     "RUN composer install"
@@ -163,7 +162,6 @@ JSON;
         $s->addVirtualHost(null, 8080, "it's ok");
         $s->addVirtualHostPrefix('foo', 80, null);
         $s->setNeedBuild(true);
-        $s->setIsVariableEnvironment(true);
         $s->addDestEnvType(CommonMetadata::ENV_TYPE_DEV, true);
         $s->setRequestMemory('64Mi');
         $s->setRequestCpu('250m');
