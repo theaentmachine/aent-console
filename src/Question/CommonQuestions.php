@@ -7,6 +7,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question as SymfonyQuestion;
 use TheAentMachine\Aenthill\Aenthill;
 use TheAentMachine\Aenthill\CommonAents;
 use TheAentMachine\Aenthill\CommonDependencies;
@@ -17,7 +18,6 @@ use TheAentMachine\Exception\CommonAentsException;
 use TheAentMachine\Exception\ManifestException;
 use TheAentMachine\Registry\RegistryClient;
 use TheAentMachine\Registry\TagsAnalyzer;
-use Symfony\Component\Console\Question\Question as SymfonyQuestion;
 
 final class CommonQuestions
 {
@@ -41,10 +41,16 @@ final class CommonQuestions
         $this->factory = new QuestionFactory($input, $output, $questionHelper);
     }
 
-    public function askForDockerImageTag(string $dockerHubImage, string $applicationName = ''): string
+    /** @return string[] */
+    private function getAvailableVersions(string $dockerHubImage): array
     {
         $registryClient = new RegistryClient();
-        $availableVersions = $registryClient->getImageTagsOnDockerHub($dockerHubImage);
+        return $registryClient->getImageTagsOnDockerHub($dockerHubImage);
+    }
+
+    public function askForDockerImageTag(string $dockerHubImage, string $applicationName = ''): string
+    {
+        $availableVersions = $this->getAvailableVersions($dockerHubImage);
 
         $tagsAnalyzer = new TagsAnalyzer();
         $proposedTags = $tagsAnalyzer->filterBestTags($availableVersions);
@@ -117,7 +123,7 @@ final class CommonQuestions
 
         $environmentsStr = [];
         foreach ($environments as $env) {
-            $environmentsStr[] = $env[CommonMetadata::ENV_NAME_KEY] . ' (of type '. $env[CommonMetadata::ENV_TYPE_KEY]  .')';
+            $environmentsStr[] = $env[CommonMetadata::ENV_NAME_KEY] . ' (of type ' . $env[CommonMetadata::ENV_TYPE_KEY] . ')';
         }
 
         $chosen = $this->factory->choiceQuestion('Environments', $environmentsStr, false)
@@ -165,14 +171,14 @@ final class CommonQuestions
     public function askForReverseProxy(): string
     {
         $available = CommonAents::getAentsListByDependencyKey(CommonDependencies::REVERSE_PROXY_KEY);
-        $available[] = 'other';
+        $available[] = 'Enter my own image';
         $image = $this->factory->choiceQuestion('Reverse proxy', $available)
             ->setDefault($available[0])
             ->setHelpText('A reverse proxy is useful for public facing services with a domain name. It handles the incoming requests and forward them to the correct container.')
             ->ask();
 
         $version = null;
-        if ($image === 'other') {
+        if ($image === 'Enter my own image') {
             do {
                 $image = $this->factory->question('Docker image of your reverse proxy (without tag)')
                     ->compulsory()
@@ -186,7 +192,12 @@ final class CommonQuestions
                 }
             } while ($version === null);
         } else {
-            $version = $this->askForDockerImageTag($image, $image);
+            $availableVersions = $this->getAvailableVersions($image);
+            if (count($availableVersions) === 1) {
+                $version = $availableVersions[0];
+            } else {
+                $version = $this->askForDockerImageTag($image, $image);
+            }
         }
 
         Manifest::addDependency("$image:$version", CommonDependencies::REVERSE_PROXY_KEY, [
@@ -211,13 +222,14 @@ final class CommonQuestions
         }
 
         $available = CommonAents::getAentsListByDependencyKey(CommonDependencies::CI_KEY);
-        $available[] = 'other';
+        $available[] = 'Enter my own image';
+
         $image = $this->factory->choiceQuestion('CI/CD', $available)
             ->setDefault($available[0])
             ->ask();
 
         $version = null;
-        if ($image === 'other') {
+        if ($image === 'Enter my own image') {
             do {
                 $image = $this->factory->question('Docker image of your CI tool (without tag)')
                     ->compulsory()
@@ -231,7 +243,12 @@ final class CommonQuestions
                 }
             } while ($version === null);
         } else {
-            $version = $this->askForDockerImageTag($image, $image);
+            $availableVersions = $this->getAvailableVersions($image);
+            if (count($availableVersions) === 1) {
+                $version = $availableVersions[0];
+            } else {
+                $version = $this->askForDockerImageTag($image, $image);
+            }
         }
 
         Manifest::addDependency("$image:$version", CommonDependencies::CI_KEY, [
@@ -255,15 +272,16 @@ final class CommonQuestions
             return null;
         }
 
-        $available = CommonAents::getAentsListByDependencyKey(CommonDependencies::IMAGE_BUILDER_KEY);
-        $available[] = 'other';
-        $image = $this->factory->choiceQuestion('Image builder', $available)
-            ->setDefault($available[0])
+        $availableImageBuilders = CommonAents::getAentsListByDependencyKey(CommonDependencies::IMAGE_BUILDER_KEY);
+        $availableImageBuilders[] = 'Enter my own image';
+
+        $image = $this->factory->choiceQuestion('Image builder', $availableImageBuilders)
+            ->setDefault($availableImageBuilders[0])
             ->setHelpText('An image builder can generate Dockerfiles, which then can be used to build images of your project.')
             ->ask();
-
         $version = null;
-        if ($image === 'other') {
+
+        if ($image === 'Enter my own image') {
             do {
                 $image = $this->factory->question('Docker image of your image builder (without tag)')
                     ->compulsory()
@@ -277,7 +295,12 @@ final class CommonQuestions
                 }
             } while ($version === null);
         } else {
-            $version = $this->askForDockerImageTag($image, $image);
+            $availableVersions = $this->getAvailableVersions($image);
+            if (count($availableVersions) === 1) {
+                $version = $availableVersions[0];
+            } else {
+                $version = $this->askForDockerImageTag($image, $image);
+            }
         }
 
         Manifest::addDependency("$image:$version", CommonDependencies::IMAGE_BUILDER_KEY, [
