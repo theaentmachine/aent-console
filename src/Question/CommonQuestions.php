@@ -127,6 +127,7 @@ final class CommonQuestions
         }
 
         $chosen = $this->factory->choiceQuestion('Environments', $environmentsStr, false)
+            ->setHelpText('Choose your environment. You can input several environments separated by commas (,)')
             ->askWithMultipleChoices();
 
         $this->output->writeln('<info>Environments: ' . \implode(', ', $chosen) . '</info>');
