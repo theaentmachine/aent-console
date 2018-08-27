@@ -29,7 +29,8 @@
     "symfony/filesystem": "^4.1",
     "guzzlehttp/guzzle": "^6.3.3",
     "psr/log": "^1",
-    "opis/json-schema": "^1.0"
+    "opis/json-schema": "^1.0",
+    "docker-php/docker-php": "^2"
   },
   "require-dev" : {
     "phpunit/phpunit": "^7",
