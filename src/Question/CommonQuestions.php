@@ -3,6 +3,7 @@
 
 namespace TheAentMachine\Question;
 
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -107,10 +108,10 @@ final class CommonQuestions
 
     /**
      * Return an array of {"ENV_NAME": "foo", "ENV_TYPE": "bar"}, chosen by the user
-     * @return mixed[]|null
+     * @return mixed[]
      * @throws CommonAentsException
      */
-    public function askForEnvironments(): ?array
+    public function askForEnvironments(): array
     {
         $environments = \array_unique(Aenthill::dispatchJson(CommonEvents::ENVIRONMENT_EVENT, []), SORT_REGULAR);
 
@@ -122,12 +123,17 @@ final class CommonQuestions
         }
 
         $environmentsStr = [];
+        $environmentsStr[] = 'All';
+        $environmentsByStr = [];
         foreach ($environments as $env) {
-            $environmentsStr[] = $env[CommonMetadata::ENV_NAME_KEY] . ' (of type ' . $env[CommonMetadata::ENV_TYPE_KEY] . ')';
+            $str = $env[CommonMetadata::ENV_NAME_KEY] . ' (of type ' . $env[CommonMetadata::ENV_TYPE_KEY] . ')';
+            $environmentsStr[] = $str;
+            $environmentsByStr[$str] = $env;
         }
 
         $chosen = $this->factory->choiceQuestion('Environments', $environmentsStr, false)
             ->setHelpText('Choose your environment. You can input several environments separated by commas (,)')
+            ->setDefault('All')
             ->askWithMultipleChoices();
 
         $this->output->writeln('<info>Environments: ' . \implode(', ', $chosen) . '</info>');
@@ -135,7 +141,11 @@ final class CommonQuestions
 
         $results = [];
         foreach ($chosen as $c) {
-            $results[] = $environments[\array_search($c, $environmentsStr, true)];
+            if ($c === 'All') {
+                $results = $environments;
+                break;
+            }
+            $results[] = $environmentsByStr[$c];
         }
 
         return $results;
@@ -187,7 +197,7 @@ final class CommonQuestions
                     ->ask();
                 try {
                     $version = $this->askForDockerImageTag($image, $image);
-                } catch (GuzzleException $e) {
+                } catch (ClientException $e) {
                     $this->output->writeln("<error>It seems that your image $image does not exist in the docker hub, please try again.</error>");
                     $this->output->writeln('');
                 }
@@ -238,7 +248,7 @@ final class CommonQuestions
                     ->ask();
                 try {
                     $version = $this->askForDockerImageTag($image, $image);
-                } catch (GuzzleException $e) {
+                } catch (ClientException $e) {
                     $this->output->writeln("<error>It seems that $image does not exist in the docker hub, please try again.</error>");
                     $this->output->writeln('');
                 }
