@@ -2,6 +2,7 @@
 
 namespace TheAentMachine\Docker;
 
+use Docker\API\Exception\ImageDeleteNotFoundException;
 use Gamez\Psr\Log\TestLogger;
 use PHPUnit\Framework\TestCase;
 
@@ -12,7 +13,11 @@ class ImageServiceTest extends TestCase
         $logger = new TestLogger();
         $imageService = new ImageService($logger);
 
-        $imageService->rmi('busybox:1.29.2');
+        try {
+            $imageService->rmi('busybox:1.29.2');
+        } catch(ImageDeleteNotFoundException $e) {
+            // Try to delete. If this fails, it's ok.
+        }
 
         $imageService->pull('busybox:1.29.2');
         $log = $logger->log;
