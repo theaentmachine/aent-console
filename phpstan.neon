@@ -1,5 +1,6 @@
 parameters:
     ignoreErrors:
      - "#should return array.*SharedEnvVariable.*EnvVariable#"
+     - "#Cannot call method getConfig\\(\\) on .*ResponseInterface|null#"
 includes:
     - vendor/thecodingmachine/phpstan-strict-rules/phpstan-strict-rules.neon

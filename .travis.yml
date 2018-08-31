@@ -1,8 +1,12 @@
 language: php
-sudo: false
 php:
   - 7.1
   - 7.2
+
+sudo: required
+services:
+- docker
+
 env:
   global:
   - DEFAULT_COMPOSER_FLAGS="--no-interaction --no-progress --optimize-autoloader"

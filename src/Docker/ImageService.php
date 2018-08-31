@@ -2,35 +2,40 @@
 namespace TheAentMachine\Docker;
 
 use Docker\API\Client;
+use Docker\API\Exception\ImageInspectNotFoundException;
+use Docker\API\Model\ContainerConfig;
+use Docker\API\Model\CreateImageInfo;
 use Docker\Docker;
+use Docker\Stream\CreateImageStream;
+use Psr\Log\LoggerInterface;
+use TheAentMachine\Exception\AenthillException;
 
 class ImageService
 {
-    public static function getInternalPorts(string $imageName) : array
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+    /**
+     * @var Docker
+     */
+    private $docker;
+
+    public function __construct(LoggerInterface $logger)
     {
-        $docker = Docker::create();
+        $this->docker = Docker::create();
+        $this->logger = $logger;
+    }
 
-        $hasImage = $docker->imageGet($imageName);
-
-        if (!$hasImage) {
-            $result = $docker->imageCreate($imageName, [
-                'fromImage' => $imageName,
-                //'fromSrc' => 'hub.docker.'
-            ])
-            ;
-            echo $result->;
+    /**
+     * @return int[]
+     */
+    public function getInternalPorts(string $imageName) : array
+    {
+        $ports = $this->getInspection($imageName)->getExposedPorts();
+        if ($ports === null) {
+            return [];
         }
-/*
-        {
-            *
-            *     @var string $fromImage Name of the image to pull. The name may include a tag or digest. This parameter may only be used when pulling an image. The pull is cancelled if the HTTP connection is closed.
-     *     @var string $fromSrc Source to import. The value may be a URL from which the image can be retrieved or `-` to read the image from the request body. This parameter may only be used when importing an image.
-     *     @var string $repo Repository name given to an image when it is imported. The repo may include a tag. This parameter may only be used when importing an image.
-     *     @var string $tag Tag or digest. If empty when pulling an image, this causes all tags for the given image to be pulled.
-     *     @var string $platform Platform in the format os[/arch[/variant]]
-     * }*/
-
-        $ports = $docker->imageInspect($imageName)->getConfig()->getExposedPorts();
 
         $finalPorts = [];
         foreach ($ports as $portStr => $obj) {
@@ -38,5 +43,59 @@ class ImageService
             $finalPorts[] = (int) $portStr;
         }
         return $finalPorts;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getVolumes(string $imageName) : array
+    {
+        $volumes = $this->getInspection($imageName)->getVolumes();
+        if ($volumes === null) {
+            return [];
+        }
+
+        return \array_keys($volumes->getArrayCopy());
+    }
+
+    private function getInspection(string $imageName) : ContainerConfig
+    {
+        try {
+            $config = $this->docker->imageInspect($imageName)->getConfig();
+        } catch (ImageInspectNotFoundException $e) {
+            $this->pull($imageName);
+            $config = $this->docker->imageInspect($imageName)->getConfig();
+        }
+        if ($config === null) {
+            throw new AenthillException('Cannot inspect container '.$imageName.'. Missing config key.');
+        }
+        return $config;
+    }
+
+    public function pullIfNotAvailable(string $imageName): void
+    {
+        try {
+            $this->docker->imageInspect($imageName);
+        } catch (ImageInspectNotFoundException $e) {
+            $this->pull($imageName);
+        }
+    }
+
+    public function pull(string $imageName): void
+    {
+        /** @var CreateImageStream $result */
+        $result = $this->docker->imageCreate($imageName, [
+            'fromImage' => $imageName
+        ]);
+
+        $result->onFrame(function (CreateImageInfo $frame) {
+            $this->logger->info($frame->getStatus());
+        });
+        $result->wait();
+    }
+
+    public function rmi(string $imageName): void
+    {
+        $this->docker->imageDelete($imageName);
     }
 }
