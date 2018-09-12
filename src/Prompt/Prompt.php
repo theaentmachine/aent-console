@@ -70,12 +70,12 @@ final class Prompt
 
     /**
      * @param string $text
-     * @param array<string,string> $items
+     * @param string[] $items
      * @param null|string $helpText
      * @param null|string $default
      * @param bool $compulsory
      * @param callable|null $validator
-     * @return string
+     * @return null|string
      */
     public function select(string $text, array $items, ?string $helpText = null, ?string $default = null, bool $compulsory = false, ?callable $validator = null): ?string
     {

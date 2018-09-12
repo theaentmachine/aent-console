@@ -7,11 +7,11 @@ use Symfony\Component\Console\Question\Question;
 
 class Select extends Input
 {
-    /** @var array<string,string> */
+    /** @var string[] */
     private $items;
 
     /**
-     * @param array<string,string> $items
+     * @param string[] $items
      * @return self
      */
     public function setItems(array $items): self
