@@ -4,14 +4,15 @@ namespace TheAentMachine\Prompt;
 
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
+use TheAentMachine\Prompt\Helper\ValidatorHelper;
 
 class Select extends Input
 {
-    /** @var string[] */
+    /** @var mixed[] */
     private $items;
 
     /**
-     * @param string[] $items
+     * @param mixed[] $items
      * @return self
      */
     public function setItems(array $items): self
@@ -29,7 +30,7 @@ class Select extends Input
         $message = $question->getQuestion();
         $validator = $question->getValidator();
         $question = new ChoiceQuestion($message, $this->items, $this->default);
-        $question->setValidator($validator);
+        $question->setValidator(ValidatorHelper::merge($validator, $question->getValidator()));
         return $question;
     }
 }

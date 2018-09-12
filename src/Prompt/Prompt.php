@@ -70,7 +70,7 @@ final class Prompt
 
     /**
      * @param string $text
-     * @param string[] $items
+     * @param mixed[] $items
      * @param null|string $helpText
      * @param null|string $default
      * @param bool $compulsory
