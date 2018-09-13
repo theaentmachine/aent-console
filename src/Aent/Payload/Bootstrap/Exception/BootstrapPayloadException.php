@@ -12,7 +12,7 @@ final class BootstrapPayloadException extends AentException
      */
     public static function environmentNameDoesAlreadyExist(string $name): self
     {
-        return new self("Environment $name does already exist!");
+        return new self("Environment \"$name\" does already exist!");
     }
 
     /**
@@ -21,6 +21,6 @@ final class BootstrapPayloadException extends AentException
      */
     public static function baseVirtualHostDoesAlreadyExist(string $baseVirtualHost): self
     {
-        return new self("Base virtual host $baseVirtualHost does already exist!");
+        return new self("Base virtual host \"$baseVirtualHost\" does already exist!");
     }
 }

@@ -12,6 +12,6 @@ final class AentRegistryException extends AentException
      */
     public static function aentNotFound(string $key): self
     {
-        return new self("Aent not found for key $key!");
+        return new self("Aent not found for key \"$key\"!");
     }
 }
