@@ -53,7 +53,6 @@ class Select extends Input
             // Collapse all spaces.
             $selectedChoices = \str_replace(' ', '', $selected);
             if (!empty($this->helpText) && $selectedChoices === '?') {
-                $this->output->writeln($this->helpText);
                 return '?';
             }
             if ($multiselect) {
