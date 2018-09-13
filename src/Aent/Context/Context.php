@@ -34,6 +34,18 @@ class Context implements JsonPayloadInterface
     }
 
     /**
+     * @return string[]
+     */
+    public static function getList(): array
+    {
+        return [
+            self::DEV,
+            self::TEST,
+            self::PROD,
+        ];
+    }
+
+    /**
      * @return void
      */
     public function toMetadata(): void
