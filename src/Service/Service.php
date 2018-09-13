@@ -16,6 +16,7 @@ use TheAentMachine\Service\Volume\NamedVolume;
 use TheAentMachine\Service\Volume\TmpfsVolume;
 use TheAentMachine\Service\Volume\Volume;
 use TheAentMachine\Yaml\CommentedItem;
+use function Safe\file_get_contents;
 
 class Service implements \JsonSerializable
 {
@@ -61,7 +62,7 @@ class Service implements \JsonSerializable
      */
     public function __construct()
     {
-        $this->validatorSchema = \GuzzleHttp\json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
+        $this->validatorSchema = \GuzzleHttp\json_decode(file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
 
     /**

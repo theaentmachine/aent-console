@@ -6,6 +6,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 use TheAentMachine\Yaml\Dumper;
+use function Safe\chown;
+use function Safe\chgrp;
 
 final class YamlTools
 {
