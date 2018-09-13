@@ -2,6 +2,11 @@
 
 namespace TheAentMachine\Helper;
 
+use function Safe\unlink;
+use function Safe\mkdir;
+use function Safe\glob;
+use function Safe\file_get_contents;
+
 /**
  * Class in charge of assembling replies from the different containers.
  */
@@ -19,9 +24,7 @@ class ReplyAggregator
         }
         $this->replyDirectory = rtrim($replyDirectory, '/').'/';
         if (!\file_exists($replyDirectory)) {
-            if (!mkdir($replyDirectory, 0777, true) && !is_dir($replyDirectory)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $replyDirectory));
-            }
+            mkdir($replyDirectory, 0777, true);
         }
     }
 
@@ -61,10 +64,7 @@ class ReplyAggregator
         $i = 0;
         $replies = [];
         while (\file_exists($this->replyDirectory.'tmp'.$i)) {
-            $content = \file_get_contents($this->replyDirectory.'tmp'.$i);
-            if ($content === false) {
-                throw new \RuntimeException('Failed to load file '.$this->replyDirectory.'tmp'.$i);
-            }
+            $content = file_get_contents($this->replyDirectory.'tmp'.$i);
             $replies[] = $content;
             $i++;
         }
