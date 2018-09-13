@@ -29,6 +29,9 @@ class Select extends Input
         $question = parent::build();
         $message = $question->getQuestion();
         $validator = $question->getValidator();
+        if (!empty($this->helpText)) {
+            $this->items['?'] = 'Help';
+        }
         $question = new ChoiceQuestion($message, $this->items, $this->default);
         $question->setValidator(ValidatorHelper::merge($validator, $question->getValidator()));
         return $question;

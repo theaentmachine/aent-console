@@ -20,6 +20,7 @@ final class BootstrapPayloadAggregator
     /**
      * @param string $orchestratorAent
      * @param BootstrapPayload $payload
+     * @return void
      * @throws BootstrapPayloadException
      */
     public function addBootstrapPayload(string $orchestratorAent, BootstrapPayload $payload): void
