@@ -6,6 +6,8 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 final class ValidatorHelper
 {
+    private const defaultErrorMessage = 'Value "%s" is invalid';
+
     /**
      * @param callable|null $v1
      * @param callable|null $v2
@@ -33,7 +35,7 @@ final class ValidatorHelper
     {
         return function (string $response) use ($func, $errorMessage) {
             $response = \trim($response);
-            $message = !empty($errorMessage) ? $errorMessage : 'Value "' . $response . '" is invalid';
+            $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::defaultErrorMessage), $response);
             if ($func($response)) {
                 throw new InvalidArgumentException($message);
             }
@@ -42,17 +44,33 @@ final class ValidatorHelper
     }
 
     /**
+     * @param null|string $errorMessage
      * @return callable
      */
-    public static function getAlphaValidator(): callable
+    public static function getAlphaValidator(?string $errorMessage = null): callable
     {
-        return function (string $response) {
+        return function (string $response) use ($errorMessage) {
             $response = \trim($response);
             $pattern = '/^[a-zA-Z0-9]+$/';
             if (!\preg_match($pattern, $response)) {
-                $message = 'Value "' . $response . '" is invalid';
-                $message .= "\nHint: only alphanumerical characters are allowed";
+                $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::defaultErrorMessage . '. Hint: only alphanumerical characters are allowed'), $response);
                 throw new InvalidArgumentException($message);
+            }
+            return $response;
+        };
+    }
+
+    /**
+     * @param null|string $errorMessage
+     * @return callable
+     */
+    public static function getDomainNameValidator(?string $errorMessage = null): callable
+    {
+        return function (string $response) use ($errorMessage) {
+            $response = trim($response);
+            if (!\preg_match('/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?$/im', $response)) {
+                $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::defaultErrorMessage . '. Hint: the domain name must not start with "http(s)://".'), $response);
+                throw new \InvalidArgumentException($message);
             }
             return $response;
         };
