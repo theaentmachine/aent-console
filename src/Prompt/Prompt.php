@@ -34,36 +34,20 @@ final class Prompt
      * @param string $text
      * @param null|string $helpText
      * @param null|string $default
+     * @param bool $compulsory
      * @param callable|null $validator
      * @return null|string
      */
-    public function input(string $text, ?string $helpText = null, ?string $default = null, ?callable $validator = null): ?string
+    public function input(string $text, ?string $helpText = null, ?string $default = null, bool $compulsory = false, ?callable $validator = null): ?string
     {
         $input = new Input($this->input, $this->output, $this->questionHelper);
         $input
             ->setText($text)
             ->setHelpText($helpText)
-            ->setCompulsory(false)
+            ->setCompulsory($compulsory)
             ->setValidator($validator);
         $input
             ->setDefault($default);
-        return $input->run();
-    }
-
-    /**
-     * @param string $text
-     * @param null|string $helpText
-     * @param callable|null $validator
-     * @return string
-     */
-    public function compulsoryInput(string $text, ?string $helpText = null, ?callable $validator = null): string
-    {
-        $input = new Input($this->input, $this->output, $this->questionHelper);
-        $input
-            ->setText($text)
-            ->setHelpText($helpText)
-            ->setCompulsory(true)
-            ->setValidator($validator);
         return $input->run();
     }
 
@@ -71,32 +55,18 @@ final class Prompt
      * @param string $text
      * @param null|string $helpText
      * @param null|bool $default
+     * @param bool $compulsory
      * @return bool
      */
-    public function confirm(string $text, ?string $helpText = null, ?bool $default = null): bool
+    public function confirm(string $text, ?string $helpText = null, ?bool $default = null, bool $compulsory = false): bool
     {
         $confirm = new Confirm($this->input, $this->output, $this->questionHelper);
         $confirm
             ->setText($text)
             ->setHelpText($helpText)
-            ->setCompulsory(false);
+            ->setCompulsory($compulsory);
         $confirm
             ->setDefault($default);
-        return $confirm->run();
-    }
-
-    /**
-     * @param string $text
-     * @param null|string $helpText
-     * @return bool
-     */
-    public function compulsoryConfirm(string $text, ?string $helpText = null): bool
-    {
-        $confirm = new Confirm($this->input, $this->output, $this->questionHelper);
-        $confirm
-            ->setText($text)
-            ->setHelpText($helpText)
-            ->setCompulsory(true);
         return $confirm->run();
     }
 
@@ -105,39 +75,20 @@ final class Prompt
      * @param mixed[] $items
      * @param null|string $helpText
      * @param null|string $default
+     * @param bool $compulsory
      * @param callable|null $validator
      * @return null|string
      */
-    public function select(string $text, array $items, ?string $helpText = null, ?string $default = null, ?callable $validator = null): ?string
+    public function select(string $text, array $items, ?string $helpText = null, ?string $default = null, bool $compulsory = false, ?callable $validator = null): ?string
     {
         $select = new Select($this->input, $this->output, $this->questionHelper);
         $select
             ->setText($text)
             ->setHelpText($helpText)
-            ->setCompulsory(false)
+            ->setCompulsory($compulsory)
             ->setValidator($validator);
         $select
             ->setDefault($default);
-        $select
-            ->setItems($items);
-        return $select->run();
-    }
-
-    /**
-     * @param string $text
-     * @param mixed[] $items
-     * @param null|string $helpText
-     * @param callable|null $validator
-     * @return string
-     */
-    public function compulsorySelect(string $text, array $items, ?string $helpText = null, ?callable $validator = null): string
-    {
-        $select = new Select($this->input, $this->output, $this->questionHelper);
-        $select
-            ->setText($text)
-            ->setHelpText($helpText)
-            ->setCompulsory(true)
-            ->setValidator($validator);
         $select
             ->setItems($items);
         return $select->run();
@@ -148,39 +99,20 @@ final class Prompt
      * @param mixed[] $items
      * @param null|string $helpText
      * @param null|string $default
+     * @param bool $compulsory
      * @param callable|null $validator
      * @return null|string[]
      */
-    public function multiselect(string $text, array $items, ?string $helpText = null, ?string $default = null, ?callable $validator = null): ?array
+    public function multiselect(string $text, array $items, ?string $helpText = null, ?string $default = null, bool $compulsory = false, ?callable $validator = null): ?array
     {
         $select = new Select($this->input, $this->output, $this->questionHelper);
         $select
             ->setText($text)
             ->setHelpText($helpText)
-            ->setCompulsory(false)
+            ->setCompulsory($compulsory)
             ->setValidator($validator);
         $select
             ->setDefault($default);
-        $select
-            ->setItems($items);
-        return $select->run();
-    }
-
-    /**
-     * @param string $text
-     * @param mixed[] $items
-     * @param null|string $helpText
-     * @param callable|null $validator
-     * @return string[]
-     */
-    public function compulsoryMultiselect(string $text, array $items, ?string $helpText = null, ?callable $validator = null): array
-    {
-        $select = new Select($this->input, $this->output, $this->questionHelper);
-        $select
-            ->setText($text)
-            ->setHelpText($helpText)
-            ->setCompulsory(true)
-            ->setValidator($validator);
         $select
             ->setItems($items);
         return $select->run();
