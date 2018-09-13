@@ -23,6 +23,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
      */
     protected function executeEvent(?string $payload): ?string
     {
+        $this->before();
         $aggregator = $this->process();
         /** @var BootstrapPayload $payload */
         foreach ($aggregator->getBootstrapPayloads() as $orchestratorAent => $payload) {
@@ -30,11 +31,22 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
             Aenthill::register($orchestratorAent, \uniqid());
             Aenthill::runJson($key, 'ADD', $payload->toArray());
         }
+        $this->after();
         return null;
     }
+
+    /**
+     * @return void
+     */
+    abstract protected function before(): void;
 
     /**
      * @return BootstrapPayloadAggregator
      */
     abstract protected function process(): BootstrapPayloadAggregator;
+
+    /**
+     * @return void
+     */
+    abstract protected function after(): void;
 }
