@@ -14,7 +14,7 @@ abstract class AbstractAentRegistry
      */
     public static function getList(): array
     {
-        return self::$aents;
+        return static::$aents;
     }
 
     /**
@@ -24,9 +24,9 @@ abstract class AbstractAentRegistry
      */
     public static function getImage(string $key): string
     {
-        if (!isset(self::$aents[$key])) {
+        if (!isset(static::$aents[$key])) {
             throw AentRegistryException::aentNotFound($key);
         }
-        return self::$aents[$key];
+        return static::$aents[$key];
     }
 }
