@@ -7,6 +7,8 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion as SymfonyChoiceQuestion;
+use function Safe\preg_match;
+use function Safe\sprintf;
 
 /**
  * A helper class to easily create choice questions.

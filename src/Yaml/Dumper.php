@@ -13,6 +13,9 @@ namespace TheAentMachine\Yaml;
 
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Yaml;
+use function Safe\substr;
+use function Safe\sprintf;
+use function Safe\preg_split;
 
 /**
  * Dumper dumps PHP variables to YAML strings.
@@ -95,9 +98,6 @@ class Dumper
                     $output .= sprintf("%s%s%s |%s\n", $prefix, $dumpAsMap ? Inline::dump($key, $flags).':' : '-', '', $blockIndentationIndicator);
 
                     $pregSplit = preg_split('/\n|\r\n/', $value);
-                    if ($pregSplit === false) {
-                        throw new \RuntimeException('An error occured in preg_split');
-                    }
                     foreach ($pregSplit as $row) {
                         $output .= sprintf("%s%s%s\n", $prefix, str_repeat(' ', $this->indentation), $row);
                     }
