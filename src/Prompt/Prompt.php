@@ -93,4 +93,28 @@ final class Prompt
             ->setItems($items);
         return $select->run();
     }
+
+    /**
+     * @param string $text
+     * @param mixed[] $items
+     * @param null|string $helpText
+     * @param null|string $default
+     * @param bool $compulsory
+     * @param callable|null $validator
+     * @return null|string[]
+     */
+    public function multiselect(string $text, array $items, ?string $helpText = null, ?string $default = null, bool $compulsory = false, ?callable $validator = null): ?array
+    {
+        $select = new Select($this->input, $this->output, $this->questionHelper);
+        $select
+            ->setText($text)
+            ->setHelpText($helpText)
+            ->setCompulsory($compulsory)
+            ->setValidator($validator);
+        $select
+            ->setDefault($default);
+        $select
+            ->setItems($items);
+        return $select->run();
+    }
 }

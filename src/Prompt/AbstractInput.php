@@ -54,7 +54,7 @@ abstract class AbstractInput
             $message .= ' (? for help)';
         }
         $question = new Question($message);
-        $validator = ValidatorHelper::merge($this->helpTextValidator(), $this->compulsoryValidator());
+        $validator = ValidatorHelper::merge($this->getHelpTextValidator(), $this->getCompulsoryValidator());
         $validator = ValidatorHelper::merge($validator, $this->validator);
         $question->setValidator($validator);
         return $question;
@@ -63,7 +63,7 @@ abstract class AbstractInput
     /**
      * @return callable|null
      */
-    private function helpTextValidator(): ?callable
+    private function getHelpTextValidator(): ?callable
     {
         if (!empty($this->helpText)) {
             return function (?string $response) {
@@ -81,7 +81,7 @@ abstract class AbstractInput
     /**
      * @return callable|null
      */
-    private function compulsoryValidator(): ?callable
+    private function getCompulsoryValidator(): ?callable
     {
         if ($this->compulsory && empty($this->default)) {
             return function (?string $response) {
@@ -102,7 +102,7 @@ abstract class AbstractInput
     }
 
     /**
-     * @return mixed
+     * @return null|mixed
      */
     abstract public function run();
 

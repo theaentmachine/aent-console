@@ -38,9 +38,9 @@ class Input extends AbstractInput
     }
 
     /**
-     * @return null|string
+     * @return null|mixed
      */
-    public function run(): ?string
+    public function run()
     {
         $question = $this->build();
         do {
