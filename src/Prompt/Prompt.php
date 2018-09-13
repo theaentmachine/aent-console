@@ -44,25 +44,27 @@ final class Prompt
         $input
             ->setText($text)
             ->setHelpText($helpText)
+            ->setCompulsory($compulsory)
             ->setValidator($validator);
         $input
-            ->setDefault($default)
-            ->setCompulsory($compulsory);
+            ->setDefault($default);
         return $input->run();
     }
 
     /**
      * @param string $text
      * @param null|string $helpText
-     * @param bool $default
+     * @param null|bool $default
+     * @param bool $compulsory
      * @return bool
      */
-    public function confirm(string $text, ?string $helpText = null, bool $default = true): bool
+    public function confirm(string $text, ?string $helpText = null, ?bool $default = null, bool $compulsory = false): bool
     {
         $confirm = new Confirm($this->input, $this->output, $this->questionHelper);
         $confirm
             ->setText($text)
-            ->setHelpText($helpText);
+            ->setHelpText($helpText)
+            ->setCompulsory($compulsory);
         $confirm
             ->setDefault($default);
         return $confirm->run();
@@ -83,10 +85,10 @@ final class Prompt
         $select
             ->setText($text)
             ->setHelpText($helpText)
+            ->setCompulsory($compulsory)
             ->setValidator($validator);
         $select
-            ->setDefault($default)
-            ->setCompulsory($compulsory);
+            ->setDefault($default);
         $select
             ->setItems($items);
         return $select->run();

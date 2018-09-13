@@ -6,6 +6,7 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use TheAentMachine\Prompt\Helper\ValidatorHelper;
 
 abstract class AbstractInput
 {
@@ -23,6 +24,9 @@ abstract class AbstractInput
 
     /** @var null|string */
     protected $helpText;
+
+    /** @var bool */
+    private $compulsory;
 
     /** @var callable|null */
     protected $validator;
@@ -50,7 +54,9 @@ abstract class AbstractInput
             $message .= ' (? for help)';
         }
         $question = new Question($message);
-        $question->setValidator($this->helpTextValidator());
+        $validator = ValidatorHelper::merge($this->helpTextValidator(), $this->compulsoryValidator());
+        $validator = ValidatorHelper::merge($validator, $this->validator);
+        $question->setValidator($validator);
         return $question;
     }
 
@@ -59,18 +65,40 @@ abstract class AbstractInput
      */
     private function helpTextValidator(): ?callable
     {
-        $validator = $this->validator;
         if (!empty($this->helpText)) {
-            return function (?string $response) use ($validator) {
+            return function (?string $response) {
                 $response = $response ?? '';
                 if (\trim($response) === '?') {
                     $this->output->writeln($this->helpText ?: '');
                     return '?';
                 }
-                return $validator ? $validator($response) : $response;
+                return $response;
             };
         }
         return null;
+    }
+
+    /**
+     * @return callable|null
+     */
+    private function compulsoryValidator(): ?callable
+    {
+        if ($this->compulsory && empty($this->default)) {
+            return function (?string $response) {
+                $response = $response ?? '';
+                if (\trim($response) === '') {
+                    throw new \InvalidArgumentException('Hey, this field is compulsory!');
+                }
+                return $response;
+            };
+        }
+        return function (?string $response) {
+            $response = $response ?? '';
+            if (\trim($response) === '') {
+                return $response;
+            }
+            return $response;
+        };
     }
 
     /**
@@ -95,6 +123,16 @@ abstract class AbstractInput
     public function setHelpText(?string $helpText): self
     {
         $this->helpText = $helpText;
+        return $this;
+    }
+
+    /**
+     * @param bool $compulsory
+     * @return self
+     */
+    public function setCompulsory(bool $compulsory): self
+    {
+        $this->compulsory = $compulsory;
         return $this;
     }
 
