@@ -29,6 +29,8 @@ class Input extends AbstractInput
         $validator = $question->getValidator();
         if (!empty($this->default)) {
             $message .= ' [' . $this->default . ']: ';
+        } else {
+            $message .= ': ';
         }
         $question = new Question($message, $this->default);
         $question->setValidator($validator);
