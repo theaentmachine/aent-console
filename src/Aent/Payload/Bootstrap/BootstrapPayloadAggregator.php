@@ -28,6 +28,10 @@ final class BootstrapPayloadAggregator
         if ($this->doesEnvironmentNameExist($name)) {
             throw BootstrapPayloadException::environmentNameDoesAlreadyExist($name);
         }
+        $baseVirtualHost = $payload->getContext()->getBaseVirtualHost();
+        if ($this->doesBaseVirtualHostExist($baseVirtualHost)) {
+            throw BootstrapPayloadException::baseVirtualHostDoesAlreadyExist($baseVirtualHost);
+        }
         $this->bootstrapPayloads[$orchestratorAent] = $payload;
     }
 
@@ -40,6 +44,21 @@ final class BootstrapPayloadAggregator
         /** @var BootstrapPayload $bootstrapPayload */
         foreach ($this->bootstrapPayloads as $k => $bootstrapPayload) {
             if ($bootstrapPayload->getContext()->getName() === $name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param string $baseVirtualHost
+     * @return bool
+     */
+    public function doesBaseVirtualHostExist(string $baseVirtualHost): bool
+    {
+        /** @var BootstrapPayload $bootstrapPayload */
+        foreach ($this->bootstrapPayloads as $k => $bootstrapPayload) {
+            if ($bootstrapPayload->getContext()->getBaseVirtualHost() === $baseVirtualHost) {
                 return true;
             }
         }
