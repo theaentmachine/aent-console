@@ -6,7 +6,7 @@ use TheAentMachine\Aent\Payload\Bootstrap\Exception\BootstrapPayloadException;
 
 final class BootstrapPayloadAggregator
 {
-    /** @var array<string,BootstrapPayload> */
+    /** @var BootstrapPayload[] */
     private $bootstrapPayloads;
 
     /**
@@ -18,12 +18,11 @@ final class BootstrapPayloadAggregator
     }
 
     /**
-     * @param string $orchestratorAent
      * @param BootstrapPayload $payload
      * @return void
      * @throws BootstrapPayloadException
      */
-    public function addBootstrapPayload(string $orchestratorAent, BootstrapPayload $payload): void
+    public function addBootstrapPayload(BootstrapPayload $payload): void
     {
         $name = $payload->getContext()->getName();
         if ($this->doesEnvironmentNameExist($name)) {
@@ -33,7 +32,7 @@ final class BootstrapPayloadAggregator
         if ($this->doesBaseVirtualHostExist($baseVirtualHost)) {
             throw BootstrapPayloadException::baseVirtualHostDoesAlreadyExist($baseVirtualHost);
         }
-        $this->bootstrapPayloads[$orchestratorAent] = $payload;
+        $this->bootstrapPayloads[] = $payload;
     }
 
     /**
@@ -43,7 +42,7 @@ final class BootstrapPayloadAggregator
     public function doesEnvironmentNameExist(string $name): bool
     {
         /** @var BootstrapPayload $bootstrapPayload */
-        foreach ($this->bootstrapPayloads as $k => $bootstrapPayload) {
+        foreach ($this->bootstrapPayloads as $bootstrapPayload) {
             if ($bootstrapPayload->getContext()->getName() === $name) {
                 return true;
             }
@@ -58,7 +57,7 @@ final class BootstrapPayloadAggregator
     public function doesBaseVirtualHostExist(string $baseVirtualHost): bool
     {
         /** @var BootstrapPayload $bootstrapPayload */
-        foreach ($this->bootstrapPayloads as $k => $bootstrapPayload) {
+        foreach ($this->bootstrapPayloads as $bootstrapPayload) {
             if ($bootstrapPayload->getContext()->getBaseVirtualHost() === $baseVirtualHost) {
                 return true;
             }
@@ -67,7 +66,7 @@ final class BootstrapPayloadAggregator
     }
 
     /**
-     * @return array<string,BootstrapPayload>
+     * @return BootstrapPayload[]
      */
     public function getBootstrapPayloads(): array
     {

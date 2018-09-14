@@ -10,6 +10,9 @@ final class BootstrapPayload implements JsonPayloadInterface
     /** @var Context */
     private $context;
 
+    /** @var string */
+    private $orchestratorAent;
+
     /** @var null|string */
     private $CIAent;
 
@@ -20,6 +23,7 @@ final class BootstrapPayload implements JsonPayloadInterface
     {
         return [
             'context' => $this->context->toArray(),
+            'orchestratorAent' => $this->orchestratorAent,
             'CIAent' => $this->CIAent,
         ];
     }
@@ -31,9 +35,11 @@ final class BootstrapPayload implements JsonPayloadInterface
     public static function fromArray(array $assoc): self
     {
         $context = Context::fromArray($assoc['context']);
+        $orchestratorAent = $assoc['orchestratorAent'];
         $CIAent = isset($assoc['CIAent']) ? $assoc['CIAent'] : null;
         $self = new self();
         $self->setContext($context);
+        $self->setOrchestratorAent($orchestratorAent);
         $self->setCIAent($CIAent);
         return $self;
     }
@@ -52,6 +58,22 @@ final class BootstrapPayload implements JsonPayloadInterface
     public function setContext(Context $context): void
     {
         $this->context = $context;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrchestratorAent(): string
+    {
+        return $this->orchestratorAent;
+    }
+
+    /**
+     * @param string $orchestratorAent
+     */
+    public function setOrchestratorAent(string $orchestratorAent): void
+    {
+        $this->orchestratorAent = $orchestratorAent;
     }
 
     /**
