@@ -46,18 +46,9 @@ final class PromptHelper
             ->setText("\nThe docker image of your custom aent (without tag)")
             ->setCompulsory(true)
             ->setValidator(ValidatorHelper::getDockerImageWithoutTagValidator());
+        $image = $dockerHubImageInput->run();
         $registryClient = new RegistryClient();
-        do {
-            $image = $dockerHubImageInput->run();
-            try {
-                $tags = $registryClient->getImageTagsOnDockerHub($image);
-            } catch (RequestException $e) {
-                $tags = [];
-            }
-            if (empty($tags)) {
-                $this->output->writeln("The image <info>$image</info> does not seem to exist on Docker Hub. Try again!");
-            }
-        } while (empty($tags));
+        $tags = $registryClient->getImageTagsOnDockerHub($image);
         $tagsAnalyzer = new TagsAnalyzer();
         $proposedTags = $tagsAnalyzer->filterBestTags($tags);
         $default = $proposedTags[0] ?? $tags[0];

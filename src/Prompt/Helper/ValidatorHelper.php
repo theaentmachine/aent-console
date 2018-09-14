@@ -2,7 +2,9 @@
 
 namespace TheAentMachine\Prompt\Helper;
 
+use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use TheAentMachine\Registry\RegistryClient;
 
 final class ValidatorHelper
 {
@@ -84,7 +86,14 @@ final class ValidatorHelper
         return function (string $response) {
             $response = \trim($response);
             if (!\preg_match('/^[a-z0-9]+\/([a-z0-9]+(?:[._-][a-z0-9]+)*)$/', $response)) {
-                throw new InvalidArgumentException(self::defaultErrorMessage . '. Hint: the docker image should be of type "username/repository"');
+                $message = \sprintf(self::defaultErrorMessage . '. Hint: the docker image should be of type "username/repository"', $response);
+                throw new InvalidArgumentException($message);
+            }
+            try {
+                $registryClient = new RegistryClient();
+                $registryClient->getImageTagsOnDockerHub($response);
+            } catch (RequestException $e) {
+                throw new InvalidArgumentException("The image \"$response\" does not seem to exist on Docker Hub. Try again!", $e->getCode(), $e);
             }
             return $response;
         };
