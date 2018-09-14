@@ -8,7 +8,7 @@ final class AentRegistryException extends AentException
 {
     /**
      * @param string $key
-     * @return AentRegistryException
+     * @return self
      */
     public static function aentNotFound(string $key): self
     {

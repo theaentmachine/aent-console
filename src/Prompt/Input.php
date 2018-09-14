@@ -9,6 +9,9 @@ class Input extends AbstractInput
     /** @var null|string */
     protected $default;
 
+    /** @var string[] */
+    private $autocompleterValues;
+
     /**
      * @param null|string $default
      * @return self
@@ -16,6 +19,16 @@ class Input extends AbstractInput
     public function setDefault(?string $default): self
     {
         $this->default = $default;
+        return $this;
+    }
+
+    /**
+     * @param string[] $autocompleterValues
+     * @return self
+     */
+    public function setAutocompleterValues(array $autocompleterValues): self
+    {
+        $this->autocompleterValues = $autocompleterValues;
         return $this;
     }
 

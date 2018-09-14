@@ -70,7 +70,21 @@ final class ValidatorHelper
             $response = trim($response);
             if (!\preg_match('/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?$/im', $response)) {
                 $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::defaultErrorMessage . '. Hint: the domain name must not start with "http(s)://".'), $response);
-                throw new \InvalidArgumentException($message);
+                throw new InvalidArgumentException($message);
+            }
+            return $response;
+        };
+    }
+
+    /**
+     * @return callable
+     */
+    public static function getDockerImageWithoutTagValidator(): callable
+    {
+        return function (string $response) {
+            $response = \trim($response);
+            if (!\preg_match('/^[a-z0-9]+\/([a-z0-9]+(?:[._-][a-z0-9]+)*)$/', $response)) {
+                throw new InvalidArgumentException(self::defaultErrorMessage . '. Hint: the docker image should be of type "username/repository"');
             }
             return $response;
         };

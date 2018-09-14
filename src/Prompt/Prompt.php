@@ -5,6 +5,7 @@ namespace TheAentMachine\Prompt;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use TheAentMachine\Prompt\Helper\PromptHelper;
 
 final class Prompt
 {
@@ -17,6 +18,9 @@ final class Prompt
     /** @var QuestionHelper */
     private $questionHelper;
 
+    /** @var PromptHelper */
+    private $promptHelper;
+
     /**
      * Prompt constructor.
      * @param InputInterface $input
@@ -28,6 +32,7 @@ final class Prompt
         $this->input = $input;
         $this->output = $output;
         $this->questionHelper = $questionHelper;
+        $this->promptHelper = new PromptHelper($input, $output, $questionHelper);
     }
 
     /**
@@ -105,7 +110,7 @@ final class Prompt
      */
     public function multiselect(string $text, array $items, ?string $helpText = null, ?string $default = null, bool $compulsory = false, ?callable $validator = null): ?array
     {
-        $select = new Select($this->input, $this->output, $this->questionHelper);
+        $select = new Multiselect($this->input, $this->output, $this->questionHelper);
         $select
             ->setText($text)
             ->setHelpText($helpText)
@@ -116,5 +121,13 @@ final class Prompt
         $select
             ->setItems($items);
         return $select->run();
+    }
+
+    /**
+     * @return PromptHelper
+     */
+    public function getPromptHelper(): PromptHelper
+    {
+        return $this->promptHelper;
     }
 }
