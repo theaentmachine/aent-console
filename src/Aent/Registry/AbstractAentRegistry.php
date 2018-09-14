@@ -25,8 +25,23 @@ abstract class AbstractAentRegistry
     public static function getImage(string $key): string
     {
         if (!isset(static::$aents[$key])) {
-            throw AentRegistryException::aentNotFound($key);
+            throw AentRegistryException::imageNotFound($key);
         }
         return static::$aents[$key];
+    }
+
+    /**
+     * @param string $image
+     * @return string
+     * @throws AentRegistryException
+     */
+    public static function getKey(string $image): string
+    {
+        foreach (static::$aents as $key => $aent) {
+            if ($image === $aent) {
+                return $key;
+            }
+        }
+        throw AentRegistryException::keyNotFound($image);
     }
 }
