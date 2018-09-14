@@ -2,6 +2,7 @@
 
 namespace TheAentMachine\Prompt\Helper;
 
+use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -48,8 +49,11 @@ final class PromptHelper
         $registryClient = new RegistryClient();
         do {
             $image = $dockerHubImageInput->run();
-            $tags = $registryClient->getImageTagsOnDockerHub($image);
-            var_dump($tags);
+            try {
+                $tags = $registryClient->getImageTagsOnDockerHub($image);
+            } catch (RequestException $e) {
+                $tags = [];
+            }
             if (empty($tags)) {
                 $this->output->writeln("\nThe image <info>$image</info> does not seem to exist on Docker Hub. Try again!");
             }
