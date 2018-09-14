@@ -49,6 +49,7 @@ final class PromptHelper
         do {
             $image = $dockerHubImageInput->run();
             $tags = $registryClient->getImageTagsOnDockerHub($image);
+            var_dump($tags);
             if (empty($tags)) {
                 $this->output->writeln("\nThe image <info>$image</info> does not seem to exist on Docker Hub. Try again!");
             }
@@ -56,17 +57,17 @@ final class PromptHelper
         $tagsAnalyzer = new TagsAnalyzer();
         $proposedTags = $tagsAnalyzer->filterBestTags($tags);
         $default = $proposedTags[0] ?? $tags[0];
-        $this->output->writeln("\nPlease choose your <info>$image</info> version.");
+        $this->output->writeln("\nGreat! You may now choose your <info>$image</info> image version.");
         if (!empty($proposedTags)) {
             $this->output->writeln('Possible values include: <info>' . \implode('</info>, <info>', $proposedTags) . '</info>');
         }
         $this->output->writeln('Enter "v" to view all available versions, "?" for help');
-        $question = new Question("Select your <image>$image</image> version [$default]: ", $default);
+        $question = new Question("Your <info>$image</info> image version [$default]: ", $default);
         $question->setAutocompleterValues($tags);
         $question->setValidator(function (string $response) use ($tags, $image) {
             $response = \trim($response);
             if ($response === 'v') {
-                $this->output->writeln('Available versions: <info>' . \implode('</info>, <info>', $response) . '</info>');
+                $this->output->writeln('Available versions: <info>' . \implode('</info>, <info>', $tags) . '</info>');
                 return 'v';
             }
             if ($response === '?') {
@@ -81,6 +82,8 @@ final class PromptHelper
         do {
             $version = $this->questionHelper->ask($this->input, $this->output, $question);
         } while ($version === 'v' || $version === '?');
-        return $image . ':' . $version;
+        $aent = $image . ':' . $version;
+        $this->output->writeln("\n👌 Alright, I'm going to use <info>$aent</info>!");
+        return $aent;
     }
 }
