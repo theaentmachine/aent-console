@@ -55,18 +55,18 @@ final class PromptHelper
                 $tags = [];
             }
             if (empty($tags)) {
-                $this->output->writeln("\nThe image <info>$image</info> does not seem to exist on Docker Hub. Try again!");
+                $this->output->writeln("The image <info>$image</info> does not seem to exist on Docker Hub. Try again!");
             }
         } while (empty($tags));
         $tagsAnalyzer = new TagsAnalyzer();
         $proposedTags = $tagsAnalyzer->filterBestTags($tags);
         $default = $proposedTags[0] ?? $tags[0];
-        $this->output->writeln("\nGreat! You may now choose your <info>$image</info> image version.");
+        $this->output->writeln("\nGreat! You may now choose the version of the <info>$image</info> image.");
         if (!empty($proposedTags)) {
             $this->output->writeln('Possible values include: <info>' . \implode('</info>, <info>', $proposedTags) . '</info>');
         }
         $this->output->writeln('Enter "v" to view all available versions, "?" for help');
-        $question = new Question("Your <info>$image</info> image version [$default]: ", $default);
+        $question = new Question("Version [$default]: ", $default);
         $question->setAutocompleterValues($tags);
         $question->setValidator(function (string $response) use ($tags, $image) {
             $response = \trim($response);
