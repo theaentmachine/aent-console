@@ -56,7 +56,7 @@ final class PromptHelper
         if (!empty($proposedTags)) {
             $this->output->writeln('Possible values include: <info>' . \implode('</info>, <info>', $proposedTags) . '</info>');
         }
-        $this->output->writeln('Enter "v" to view all available versions, "?" for help');
+        $this->output->writeln('Enter "v" to view all available versions, "?" for help.');
         $question = new Question("Version [$default]: ", $default);
         $question->setAutocompleterValues($tags);
         $question->setValidator(function (string $response) use ($tags, $image) {
