@@ -59,7 +59,7 @@ class Context implements JsonPayloadInterface, ContextInterface
 
     /**
      * @param array<string,string> $assoc
-     * @return Context
+     * @return self
      */
     public static function fromArray(array $assoc): self
     {
@@ -82,9 +82,9 @@ class Context implements JsonPayloadInterface, ContextInterface
     }
 
     /**
-     * @return Context
+     * @return mixed
      */
-    public static function fromMetadata(): Context
+    public static function fromMetadata()
     {
         $type = Aenthill::metadata('ENVIRONMENT_TYPE');
         $name = Aenthill::metadata('ENVIRONMENT_NAME');
