@@ -27,12 +27,26 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
         $aggregator = $this->process();
         /** @var BootstrapPayload $payload */
         foreach ($aggregator->getBootstrapPayloads() as $payload) {
+            $this->printSettingUp($payload);
             $key = \uniqid();
             Aenthill::register($payload->getOrchestratorAent()->getImage(), \uniqid());
             Aenthill::runJson($key, 'ADD', $payload->toArray());
         }
         $this->after();
         return null;
+    }
+
+    /**
+     * @param BootstrapPayload $payload
+     * @return void
+     */
+    private function printSettingUp(BootstrapPayload $payload): void
+    {
+        $orchastratorName = $payload->getOrchestratorAent()->getName();
+        $context = $payload->getContext();
+        $type = $context->getType();
+        $name = $context->getName();
+        $this->output->writeln("\nSetting up <info>$orchastratorName</info> for <info>$type</info> environment <info>$name</info>");
     }
 
     /**
