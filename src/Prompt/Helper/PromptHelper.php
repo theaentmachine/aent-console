@@ -42,9 +42,9 @@ final class PromptHelper
      * @param ColonyRegistry $registry
      * @param string $text
      * @param null|string $helpText
-     * @return null|AentItemRegistry
+     * @return AentItemRegistry
      */
-    public function getFromColonyRegistry(ColonyRegistry $registry, string $text, ?string $helpText = null): ?AentItemRegistry
+    public function getFromColonyRegistry(ColonyRegistry $registry, string $text, ?string $helpText = null): AentItemRegistry
     {
         $aents = $registry->getAents();
         $assoc = [];
@@ -62,15 +62,16 @@ final class PromptHelper
             ->setItems($items);
         $response = $select->run();
         if ($response === 'Custom') {
-            return null;
+            $image = $this->getDockerHubImage();
+            return new AentItemRegistry($image, $image);
         }
         return $assoc[$response];
     }
 
     /**
-     * @return AentItemRegistry
+     * @return string
      */
-    public function getDockerHubImage(): AentItemRegistry
+    public function getDockerHubImage(): string
     {
         $dockerHubImageInput = new Input($this->input, $this->output, $this->questionHelper);
         $dockerHubImageInput
@@ -109,8 +110,7 @@ final class PromptHelper
             $version = $this->questionHelper->ask($this->input, $this->output, $question);
         } while ($version === 'v' || $version === '?');
         $aent = $image . ':' . $version;
-        $item = new AentItemRegistry($aent, $aent);
         $this->output->writeln("\n👌 Alright, I'm going to use <info>$aent</info>!");
-        return $item;
+        return $aent;
     }
 }
