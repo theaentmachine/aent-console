@@ -68,9 +68,9 @@ final class PromptHelper
     }
 
     /**
-     * @return string
+     * @return AentItemRegistry
      */
-    public function getDockerHubImage(): string
+    public function getDockerHubImage(): AentItemRegistry
     {
         $dockerHubImageInput = new Input($this->input, $this->output, $this->questionHelper);
         $dockerHubImageInput
@@ -109,7 +109,8 @@ final class PromptHelper
             $version = $this->questionHelper->ask($this->input, $this->output, $question);
         } while ($version === 'v' || $version === '?');
         $aent = $image . ':' . $version;
+        $item = new AentItemRegistry($aent, $aent);
         $this->output->writeln("\n👌 Alright, I'm going to use <info>$aent</info>!");
-        return $aent;
+        return $item;
     }
 }
