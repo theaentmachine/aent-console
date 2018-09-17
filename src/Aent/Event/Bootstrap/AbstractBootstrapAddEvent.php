@@ -28,7 +28,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
         /** @var BootstrapPayload $payload */
         foreach ($aggregator->getBootstrapPayloads() as $payload) {
             $key = \uniqid();
-            Aenthill::register($payload->getOrchestratorAent(), \uniqid());
+            Aenthill::register($payload->getOrchestratorAent()->getImage(), \uniqid());
             Aenthill::runJson($key, 'ADD', $payload->toArray());
         }
         $this->after();

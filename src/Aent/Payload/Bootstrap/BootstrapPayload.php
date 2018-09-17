@@ -4,16 +4,17 @@ namespace TheAentMachine\Aent\Payload\Bootstrap;
 
 use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Payload\JsonPayloadInterface;
+use TheAentMachine\Aent\Registry\AentItemRegistry;
 
 final class BootstrapPayload implements JsonPayloadInterface
 {
     /** @var Context */
     private $context;
 
-    /** @var string */
+    /** @var AentItemRegistry */
     private $orchestratorAent;
 
-    /** @var null|string */
+    /** @var null|AentItemRegistry */
     private $CIAent;
 
     /**
@@ -23,8 +24,8 @@ final class BootstrapPayload implements JsonPayloadInterface
     {
         return [
             'context' => $this->context->toArray(),
-            'orchestratorAent' => $this->orchestratorAent,
-            'CIAent' => $this->CIAent,
+            'orchestratorAent' => $this->orchestratorAent->toArray(),
+            'CIAent' => $this->CIAent->toArray(),
         ];
     }
 
@@ -35,8 +36,8 @@ final class BootstrapPayload implements JsonPayloadInterface
     public static function fromArray(array $assoc): self
     {
         $context = Context::fromArray($assoc['context']);
-        $orchestratorAent = $assoc['orchestratorAent'];
-        $CIAent = isset($assoc['CIAent']) ? $assoc['CIAent'] : null;
+        $orchestratorAent = AentItemRegistry::fromArray($assoc['orchestratorAent']);
+        $CIAent = isset($assoc['CIAent']) ? AentItemRegistry::fromArray($assoc['CIAent']) : null;
         $self = new self();
         $self->setContext($context);
         $self->setOrchestratorAent($orchestratorAent);
@@ -61,33 +62,33 @@ final class BootstrapPayload implements JsonPayloadInterface
     }
 
     /**
-     * @return string
+     * @return AentItemRegistry
      */
-    public function getOrchestratorAent(): string
+    public function getOrchestratorAent(): AentItemRegistry
     {
         return $this->orchestratorAent;
     }
 
     /**
-     * @param string $orchestratorAent
+     * @param AentItemRegistry $orchestratorAent
      */
-    public function setOrchestratorAent(string $orchestratorAent): void
+    public function setOrchestratorAent(AentItemRegistry $orchestratorAent): void
     {
         $this->orchestratorAent = $orchestratorAent;
     }
 
     /**
-     * @return null|string
+     * @return null|AentItemRegistry
      */
-    public function getCIAent(): ?string
+    public function getCIAent(): ?AentItemRegistry
     {
         return $this->CIAent;
     }
 
     /**
-     * @param null|string $CIAent
+     * @param null|AentItemRegistry $CIAent
      */
-    public function setCIAent(?string $CIAent): void
+    public function setCIAent(?AentItemRegistry $CIAent): void
     {
         $this->CIAent = $CIAent;
     }

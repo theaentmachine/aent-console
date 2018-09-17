@@ -2,13 +2,15 @@
 
 namespace TheAentMachine\Prompt\Helper;
 
-use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use TheAentMachine\Aent\Registry\AentItemRegistry;
+use TheAentMachine\Aent\Registry\ColonyRegistry;
 use TheAentMachine\Prompt\Input;
+use TheAentMachine\Prompt\Select;
 use TheAentMachine\Registry\RegistryClient;
 use TheAentMachine\Registry\TagsAnalyzer;
 
@@ -34,6 +36,35 @@ final class PromptHelper
         $this->input = $input;
         $this->output = $output;
         $this->questionHelper = $questionHelper;
+    }
+
+    /**
+     * @param ColonyRegistry $registry
+     * @param string $text
+     * @param null|string $helpText
+     * @return null|AentItemRegistry
+     */
+    public function getFromColonyRegistry(ColonyRegistry $registry, string $text, ?string $helpText = null): ?AentItemRegistry
+    {
+        $aents = $registry->getAents();
+        $assoc = [];
+        foreach ($aents as $aent) {
+            $assoc[$aent->getName()] = $aent;
+        }
+        $items = \array_keys($assoc);
+        $items[] = 'Custom';
+        $select = new Select($this->input, $this->output, $this->questionHelper);
+        $select
+            ->setText($text)
+            ->setHelpText($helpText)
+            ->setCompulsory(true);
+        $select
+            ->setItems($items);
+        $response = $select->run();
+        if ($response === 'Custom') {
+            return null;
+        }
+        return $assoc[$response];
     }
 
     /**
