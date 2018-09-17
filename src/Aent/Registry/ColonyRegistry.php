@@ -10,6 +10,9 @@ final class ColonyRegistry
     private const ORCHESTRATOR = 'orchestrator';
     private const CI = 'ci';
 
+    public const DOCKER_COMPOSE = 'Docker Compose';
+    public const KUBERNETES = 'Kubernetes';
+
     /** @var AentItemRegistry[] */
     private $aents;
 
@@ -53,6 +56,21 @@ final class ColonyRegistry
         } catch (\Exception $e) {
             throw new ColonyRegistryException($e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    /**
+     * @param string $name
+     * @return AentItemRegistry
+     * @throws ColonyRegistryException
+     */
+    public function getAent(string $name): AentItemRegistry
+    {
+        foreach ($this->aents as $aent) {
+            if ($aent->getName() === $name) {
+                return $aent;
+            }
+        }
+        throw ColonyRegistryException::aentNotFound($name);
     }
 
     /**
