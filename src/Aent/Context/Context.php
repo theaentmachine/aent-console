@@ -5,14 +5,14 @@ namespace TheAentMachine\Aent\Context;
 use TheAentMachine\Aent\Payload\JsonPayloadInterface;
 use TheAentMachine\Aenthill\Aenthill;
 
-class Context implements JsonPayloadInterface
+class Context implements JsonPayloadInterface, ContextInterface
 {
     public const DEV = 'development';
     public const TEST = 'test';
     public const PROD = 'production';
 
     /** @var string */
-    private $type;
+    protected $type;
 
     /** @var string */
     private $name;
@@ -46,29 +46,6 @@ class Context implements JsonPayloadInterface
     }
 
     /**
-     * @return void
-     */
-    public function toMetadata(): void
-    {
-        Aenthill::update([
-            'ENVIRONMENT_TYPE' => $this->type,
-            'ENVIRONMENT_NAME' => $this->name,
-            'BASE_VIRTUAL_HOST' => $this->baseVirtualHost,
-        ]);
-    }
-
-    /**
-     * @return Context
-     */
-    public static function fromMetadata(): self
-    {
-        $type = Aenthill::metadata('ENVIRONMENT_TYPE');
-        $name = Aenthill::metadata('ENVIRONMENT_NAME');
-        $baseVirtualHost = Aenthill::metadata('BASE_VIRTUAL_HOST');
-        return new self($type, $name, $baseVirtualHost);
-    }
-
-    /**
      * @return array<string,string>
      */
     public function toArray(): array
@@ -89,6 +66,29 @@ class Context implements JsonPayloadInterface
         $type = $assoc['type'];
         $name = $assoc['name'];
         $baseVirtualHost = $assoc['baseVirtualHost'];
+        return new self($type, $name, $baseVirtualHost);
+    }
+
+    /**
+     * @return void
+     */
+    public function toMetadata(): void
+    {
+        Aenthill::update([
+            'ENVIRONMENT_TYPE' => $this->type,
+            'ENVIRONMENT_NAME' => $this->name,
+            'BASE_VIRTUAL_HOST' => $this->baseVirtualHost,
+        ]);
+    }
+
+    /**
+     * @return Context
+     */
+    public static function fromMetadata(): Context
+    {
+        $type = Aenthill::metadata('ENVIRONMENT_TYPE');
+        $name = Aenthill::metadata('ENVIRONMENT_NAME');
+        $baseVirtualHost = Aenthill::metadata('BASE_VIRTUAL_HOST');
         return new self($type, $name, $baseVirtualHost);
     }
 
