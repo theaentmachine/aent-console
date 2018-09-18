@@ -79,12 +79,23 @@ final class PromptHelper
             ->setCompulsory(true)
             ->setValidator(ValidatorHelper::getDockerImageWithoutTagValidator());
         $image = $dockerHubImageInput->run();
+        $version = $this->getVersion($image);
+        $aent = $image . ':' . $version;
+        return $aent;
+    }
+
+    /**
+     * @param string $image
+     * @return string
+     */
+    public function getVersion(string $image): string
+    {
         $registryClient = new RegistryClient();
         $tags = $registryClient->getImageTagsOnDockerHub($image);
         $tagsAnalyzer = new TagsAnalyzer();
         $proposedTags = $tagsAnalyzer->filterBestTags($tags);
         $default = $proposedTags[0] ?? $tags[0];
-        $this->output->writeln("\nGreat! You may now choose the version of the <info>$image</info> image.");
+        $this->output->writeln("\nLet's choose the version of the <info>$image</info> image!");
         if (!empty($proposedTags)) {
             $this->output->writeln('Possible values include: <info>' . \implode('</info>, <info>', $proposedTags) . '</info>');
         }
@@ -111,6 +122,6 @@ final class PromptHelper
         } while ($version === 'v' || $version === '?');
         $aent = $image . ':' . $version;
         $this->output->writeln("\n👌 Alright, I'm going to use <info>$aent</info>!");
-        return $aent;
+        return $version;
     }
 }
