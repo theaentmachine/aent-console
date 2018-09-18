@@ -53,7 +53,7 @@ class Context implements JsonPayloadInterface, ContextInterface
         return [
             'ENVIRONMENT_TYPE' => $this->type,
             'ENVIRONMENT_NAME' => $this->name,
-            'baseVirtualHost' => $this->baseVirtualHost,
+            'BASE_VIRTUAL_HOST' => $this->baseVirtualHost,
         ];
     }
 
