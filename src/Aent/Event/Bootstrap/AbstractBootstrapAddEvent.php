@@ -46,7 +46,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
         $context = $payload->getContext();
         $type = $context->getType();
         $name = $context->getName();
-        $this->prompt->printBlock("\nSetting up $orchestratorName for $type environment $name.");
+        $this->prompt->printBlock("Setting up $orchestratorName for $type environment $name.");
     }
 
     /**
