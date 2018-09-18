@@ -54,10 +54,24 @@ abstract class AbstractEvent extends Command
         $this->output = $output;
         $outputStyle = new OutputFormatterStyle('magenta');
         $this->output->getFormatter()->setStyle('info', $outputStyle);
-        $this->prompt = new Prompt($this->input, $this->output, $this->getHelper('question'));
+        $outputStyle = new OutputFormatterStyle('white', 'magenta', ['bold']);
+        $this->output->getFormatter()->setStyle('block', $outputStyle);
+        $this->prompt = new Prompt($this->input, $this->output, $this->getHelper('question'), $this->getHelper('formatter'));
         $result = $this->executeEvent($input->getArgument('payload'));
         if ($result !== null) {
             Aenthill::reply('REPLY', $result);
         }
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getAllEventNames(): array
+    {
+        return \array_map(function (AbstractEvent $event) {
+            return $event->getEventName();
+        }, \array_filter($this->getApplication()->all(), function (Command $command) {
+            return $command instanceof AbstractEvent && !$command->isHidden();
+        }));
     }
 }

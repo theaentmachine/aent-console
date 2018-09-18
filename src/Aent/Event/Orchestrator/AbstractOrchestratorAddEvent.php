@@ -3,6 +3,7 @@
 namespace TheAentMachine\Aent\Event\Orchestrator;
 
 use TheAentMachine\Aent\Event\AbstractJsonEvent;
+use TheAentMachine\Aent\Event\Helper\EventHelper;
 use TheAentMachine\Aent\Payload\Bootstrap\BootstrapPayload;
 
 abstract class AbstractOrchestratorAddEvent extends AbstractJsonEvent
@@ -12,7 +13,7 @@ abstract class AbstractOrchestratorAddEvent extends AbstractJsonEvent
      */
     protected function getEventName(): string
     {
-        return 'ADD';
+        return 'ADD_ORCHESTRATOR';
     }
 
     /**
@@ -21,6 +22,7 @@ abstract class AbstractOrchestratorAddEvent extends AbstractJsonEvent
      */
     protected function executeJsonEvent(array $payload): ?array
     {
+        EventHelper::registerEvents($this->getAllEventNames());
         $this->before();
         $payload = BootstrapPayload::fromArray($payload);
         $this->process($payload);

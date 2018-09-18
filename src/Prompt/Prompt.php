@@ -2,6 +2,7 @@
 
 namespace TheAentMachine\Prompt;
 
+use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,6 +19,9 @@ final class Prompt
     /** @var QuestionHelper */
     private $questionHelper;
 
+    /** @var FormatterHelper */
+    private $formatterHelper;
+
     /** @var PromptHelper */
     private $promptHelper;
 
@@ -26,13 +30,26 @@ final class Prompt
      * @param InputInterface $input
      * @param OutputInterface $output
      * @param QuestionHelper $questionHelper
+     * @param FormatterHelper $formatterHelper
      */
-    public function __construct(InputInterface $input, OutputInterface $output, QuestionHelper $questionHelper)
+    public function __construct(InputInterface $input, OutputInterface $output, QuestionHelper $questionHelper, FormatterHelper $formatterHelper)
     {
         $this->input = $input;
         $this->output = $output;
         $this->questionHelper = $questionHelper;
+        $this->formatterHelper = $formatterHelper;
         $this->promptHelper = new PromptHelper($input, $output, $questionHelper);
+    }
+
+    /**
+     * @param string $text
+     * @return void
+     */
+    public function printBlock(string $text): void
+    {
+        $this->output->writeln('');
+        $this->output->writeln($this->formatterHelper->formatBlock($text, 'title', true));
+        $this->output->writeln('');
     }
 
     /**

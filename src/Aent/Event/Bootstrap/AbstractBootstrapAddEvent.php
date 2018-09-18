@@ -30,7 +30,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
             $this->printSettingUp($payload);
             $key = \uniqid();
             Aenthill::register($payload->getOrchestratorAent()->getImage(), $key);
-            Aenthill::runJson($key, 'ADD', $payload->toArray());
+            Aenthill::runJson($key, 'ADD_ORCHESTRATOR', $payload->toArray());
         }
         $this->after();
         return null;
@@ -42,11 +42,11 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
      */
     private function printSettingUp(BootstrapPayload $payload): void
     {
-        $orchastratorName = $payload->getOrchestratorAent()->getName();
+        $orchestratorName = $payload->getOrchestratorAent()->getName();
         $context = $payload->getContext();
         $type = $context->getType();
         $name = $context->getName();
-        $this->output->writeln("\nSetting up <info>$orchastratorName</info> for <info>$type</info> environment <info>$name</info>.");
+        $this->prompt->printBlock("Setting up $orchestratorName for $type environment $name.");
     }
 
     /**
