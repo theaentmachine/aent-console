@@ -24,16 +24,17 @@ abstract class AbstractNewVirtualHostEvent extends AbstractJsonEvent
     protected function executeJsonEvent(array $payload): ?array
     {
         $service = Service::parsePayload($payload);
-        $this->before();
+        $this->before($service);
         $service = $this->process($service);
-        $this->after();
+        $this->after($service);
         return $service->jsonSerialize();
     }
 
     /**
+     * @param Service $service
      * @return void
      */
-    abstract protected function before(): void;
+    abstract protected function before(Service $service): void;
 
     /**
      * @param Service $service
@@ -42,7 +43,8 @@ abstract class AbstractNewVirtualHostEvent extends AbstractJsonEvent
     abstract protected function process(Service $service): Service;
 
     /**
+     * @param Service $service
      * @return void
      */
-    abstract protected function after(): void;
+    abstract protected function after(Service $service): void;
 }
