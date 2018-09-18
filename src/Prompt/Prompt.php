@@ -47,7 +47,9 @@ final class Prompt
      */
     public function printBlock(string $text): void
     {
+        $this->output->writeln('');
         $this->output->writeln($this->formatterHelper->formatBlock($text, 'block', true));
+        $this->output->writeln('');
     }
 
     /**

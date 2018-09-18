@@ -54,7 +54,7 @@ abstract class AbstractEvent extends Command
         $this->output = $output;
         $outputStyle = new OutputFormatterStyle('magenta');
         $this->output->getFormatter()->setStyle('info', $outputStyle);
-        $outputStyle = new OutputFormatterStyle('white', 'magenta', ['bold']);
+        $outputStyle = new OutputFormatterStyle('black', 'magenta', ['bold']);
         $this->output->getFormatter()->setStyle('block', $outputStyle);
         $this->prompt = new Prompt($this->input, $this->output, $this->getHelper('question'), $this->getHelper('formatter'));
         $result = $this->executeEvent($input->getArgument('payload'));
