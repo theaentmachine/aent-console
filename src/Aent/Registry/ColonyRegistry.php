@@ -9,10 +9,12 @@ final class ColonyRegistry
 {
     private const ORCHESTRATOR = 'orchestrator';
     private const CI = 'ci';
+    private const BUILDER = 'builder';
     private const REVERSE_PROXY_SERVICE = 'reverseproxyservice';
 
     public const DOCKER_COMPOSE = 'Docker Compose';
     public const KUBERNETES = 'Kubernetes';
+    public const DOCKERFILE = 'Dockerfile';
     public const TRAEFIK = 'Traefik';
 
     /** @var AentItemRegistry[] */
@@ -37,6 +39,17 @@ final class ColonyRegistry
     {
         $self = new ColonyRegistry();
         $self->fetch(self::CI);
+        return $self;
+    }
+
+    /**
+     * @return ColonyRegistry
+     * @throws ColonyRegistryException
+     */
+    public static function builderRegistry(): self
+    {
+        $self = new ColonyRegistry();
+        $self->fetch(self::BUILDER);
         return $self;
     }
 
