@@ -51,8 +51,8 @@ class Context implements JsonPayloadInterface, ContextInterface
     public function toArray(): array
     {
         return [
-            'type' => $this->type,
-            'name' => $this->name,
+            'ENVIRONMENT_TYPE' => $this->type,
+            'ENVIRONMENT_NAME' => $this->name,
             'baseVirtualHost' => $this->baseVirtualHost,
         ];
     }
@@ -63,9 +63,9 @@ class Context implements JsonPayloadInterface, ContextInterface
      */
     public static function fromArray(array $assoc): self
     {
-        $type = $assoc['type'];
-        $name = $assoc['name'];
-        $baseVirtualHost = $assoc['baseVirtualHost'];
+        $type = $assoc['ENVIRONMENT_TYPE'];
+        $name = $assoc['ENVIRONMENT_NAME'];
+        $baseVirtualHost = $assoc['BASE_VIRTUAL_HOST'];
         return new self($type, $name, $baseVirtualHost);
     }
 
@@ -74,11 +74,7 @@ class Context implements JsonPayloadInterface, ContextInterface
      */
     public function toMetadata(): void
     {
-        Aenthill::update([
-            'ENVIRONMENT_TYPE' => $this->type,
-            'ENVIRONMENT_NAME' => $this->name,
-            'BASE_VIRTUAL_HOST' => $this->baseVirtualHost,
-        ]);
+        Aenthill::update($this->toArray());
     }
 
     /**
