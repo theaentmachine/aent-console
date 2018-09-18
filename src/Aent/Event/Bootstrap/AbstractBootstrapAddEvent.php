@@ -32,6 +32,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
             Aenthill::register($payload->getOrchestratorAent()->getImage(), $key);
             Aenthill::runJson($key, 'ADD_ORCHESTRATOR', $payload->toArray());
         }
+        $this->prompt->printBlock('Setup done.');
         $this->after();
         return null;
     }
