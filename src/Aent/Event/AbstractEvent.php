@@ -57,6 +57,9 @@ abstract class AbstractEvent extends Command
         $outputStyle = new OutputFormatterStyle('black', 'magenta', ['bold']);
         $this->output->getFormatter()->setStyle('block', $outputStyle);
         $this->prompt = new Prompt($this->input, $this->output, $this->getHelper('question'), $this->getHelper('formatter'));
+        $outputStyle = new OutputFormatterStyle('black', 'cyan', ['bold']);
+        $this->output->getFormatter()->setStyle('altblock', $outputStyle);
+        $this->prompt = new Prompt($this->input, $this->output, $this->getHelper('question'), $this->getHelper('formatter'));
         $result = $this->executeEvent($input->getArgument('payload'));
         if ($result !== null) {
             Aenthill::reply('REPLY', $result);

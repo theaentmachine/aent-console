@@ -55,6 +55,18 @@ final class Prompt
 
     /**
      * @param string $text
+     * @return void
+     */
+    public function printAltBlock(string $text): void
+    {
+        $this->output->write("\n");
+        $this->output->writeln('');
+        $this->output->writeln($this->formatterHelper->formatBlock($text, 'altblock', false));
+        $this->output->writeln('');
+    }
+
+    /**
+     * @param string $text
      * @param null|string $helpText
      * @param null|string $default
      * @param bool $compulsory
