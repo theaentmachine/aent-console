@@ -3,6 +3,7 @@
 namespace TheAentMachine\Aent\Event\CI;
 
 use TheAentMachine\Aent\Event\AbstractJsonEvent;
+use TheAentMachine\Aent\Event\Helper\EventHelper;
 use TheAentMachine\Aent\Payload\CI\AbstractCIAddPayload;
 use TheAentMachine\Aent\Payload\CI\CIAddDockerComposePayload;
 use TheAentMachine\Aent\Payload\CI\CIAddReplyPayload;
@@ -23,6 +24,7 @@ abstract class AbstractCIAddEvent extends AbstractJsonEvent
      */
     protected function executeJsonEvent(array $payload): ?array
     {
+        EventHelper::registerEvents($this->getAllEventNames());
         $payload = AbstractCIAddPayload::fromArray($payload);
         $this->before($payload);
         if ($payload instanceof CIAddDockerComposePayload) {
