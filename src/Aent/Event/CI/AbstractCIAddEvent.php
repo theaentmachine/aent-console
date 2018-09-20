@@ -14,7 +14,7 @@ abstract class AbstractCIAddEvent extends AbstractJsonEvent
      */
     protected function getEventName(): string
     {
-        return 'ADD_REVERSE_PROXY';
+        return 'ADD_CI';
     }
 
     /**
