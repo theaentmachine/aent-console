@@ -26,21 +26,20 @@ abstract class AbstractCIAddEvent extends AbstractJsonEvent
     {
         EventHelper::registerEvents($this->getAllEventNames());
         $payload = AbstractCIAddPayload::fromArray($payload);
-        $this->before($payload);
+        $this->before();
         if ($payload instanceof CIAddDockerComposePayload) {
             $response = $this->processDockerCompose($payload);
         } else {
             $response = $this->processKubernetes($payload);
         }
-        $this->after($payload);
+        $this->after();
         return $response->toArray();
     }
 
     /**
-     * @param AbstractCIAddPayload $payload
      * @return void
      */
-    abstract protected function before(AbstractCIAddPayload $payload): void;
+    abstract protected function before(): void;
 
     /**
      * @param CIAddDockerComposePayload $payload
@@ -55,8 +54,7 @@ abstract class AbstractCIAddEvent extends AbstractJsonEvent
     abstract protected function processKubernetes(array $payload): CIAddReplyPayload;
 
     /**
-     * @param AbstractCIAddPayload $payload
      * @return void
      */
-    abstract protected function after(AbstractCIAddPayload $payload): void;
+    abstract protected function after(): void;
 }

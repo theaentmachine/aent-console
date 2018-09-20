@@ -108,7 +108,7 @@ final class ValidatorHelper
     {
         return function (string $response) use ($errorMessage) {
             $response = trim($response);
-            if (!\preg_match('/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?:\d*$/im', $response)) {
+            if (!\preg_match('/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?(:\d*)?$/im', $response)) {
                 $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::defaultErrorMessage . '. Hint: the domain name must not start with "http(s)://".'), $response);
                 throw new InvalidArgumentException($message);
             }
