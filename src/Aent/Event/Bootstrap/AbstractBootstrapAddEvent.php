@@ -57,7 +57,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
      */
     protected function executeEvent(?string $payload): ?string
     {
-        $this->prompt->printBlock(sprintf("%s: configuring orchestrators...", $this->getAentName()));
+        $this->prompt->printAltBlock(sprintf("%s: configuring orchestrators...", $this->getAentName()));
         $this->orchestratorsBootstraps = $this->getOrchestratorsBootstraps();
         $this->CIBootstrap = $this->hasOrchestratorsForRemoteEnvironments() ? $this->getCIBootstrap() : null;
         foreach ($this->orchestratorsBootstraps as $bootstrap) {
@@ -96,7 +96,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
      */
     private function getCIBootstrap(): CIBootstrap
     {
-        $this->prompt->printBlock(sprintf("%s: configuring CI/CD provider...", $this->getAentName()));
+        $this->prompt->printAltBlock(sprintf("%s: configuring CI/CD provider...", $this->getAentName()));
         $this->output->writeln("\nHey, you have defined at least one remote environment, so let's configure a CI/CD provider!");
         $text = "\nYour CI/CD provider";
         $helpText = "A CI provider will automatically build the images of your containers and deploy them in your remote environment(s)";
