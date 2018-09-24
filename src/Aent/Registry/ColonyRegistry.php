@@ -3,6 +3,7 @@
 namespace TheAentMachine\Aent\Registry;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use TheAentMachine\Aent\Registry\Exception\ColonyRegistryException;
 
 final class ColonyRegistry
@@ -80,6 +81,8 @@ final class ColonyRegistry
                 $this->aents[] = AentItemRegistry::fromArray($item);
             }
         } catch (\Exception $e) {
+            throw new ColonyRegistryException($e->getMessage(), $e->getCode(), $e);
+        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
             throw new ColonyRegistryException($e->getMessage(), $e->getCode(), $e);
         }
     }
