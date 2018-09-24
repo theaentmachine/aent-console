@@ -97,7 +97,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
      */
     private function getCIBootstrap(): CIBootstrap
     {
-        $this->output->writeln("\nHey, you have defined at least one remote environment, so let's configure a CI/CD provider!");
+        $this->output->writeln("\nHey, you have defined at least one remote environment, so let's configure a <info>CI/CD provider</info>!");
         $text = "\nYour CI/CD provider";
         $helpText = "A CI provider will automatically build the images of your containers and deploy them in your remote environment(s)";
         $aent = $this->prompt->getPromptHelper()->getFromColonyRegistry(ColonyRegistry::CIRegistry(), $text, $helpText);
