@@ -73,7 +73,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
     protected function afterExecute(): void
     {
         $this->output->writeln(sprintf("\n👋 Hello again! This is the aent <info>%s</info> and we have finished your project setup.", $this->getAentName()));
-        $this->printSummary();
+        $this->printSummary($this->orchestratorsBootstraps);
         $this->output->writeln("\nYou may now start adding services with <info>aenthill add [image]</info>. See https://aenthill.github.io/for the complete documentation!");
     }
 
@@ -138,12 +138,13 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
     }
 
     /**
+     * @param OrchestratorBootstrap[] $orchestratorsBootstraps
      * @return void
      */
-    protected function printSummary(): void
+    protected function printSummary(array $orchestratorsBootstraps): void
     {
         $this->output->writeln("\nSetup summary:");
-        foreach ($this->orchestratorsBootstraps as $orchestratorBootstrap) {
+        foreach ($orchestratorsBootstraps as $orchestratorBootstrap) {
             $message = sprintf(
                 " - a <info>%s</info> environment <info>%s</info> with the base virtual host <info>%s</info> with <info>%s</info> as orchestrator",
                 $orchestratorBootstrap->getEnvironmentType(),
