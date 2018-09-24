@@ -12,31 +12,26 @@ class Context implements JsonPayloadInterface, ContextInterface
     public const PROD = 'production';
 
     /** @var string */
-    protected $type;
+    protected $environmentType;
 
     /** @var string */
-    private $name;
-
-    /** @var string */
-    private $baseVirtualHost;
+    private $environmentName;
 
     /**
      * Environment constructor.
-     * @param string $type
-     * @param string $name
-     * @param string $baseVirtualHost
+     * @param string $environmentType
+     * @param string $environmentName
      */
-    public function __construct(string $type, string $name, string $baseVirtualHost)
+    public function __construct(string $environmentType, string $environmentName)
     {
-        $this->type = $type;
-        $this->name = $name;
-        $this->baseVirtualHost = $baseVirtualHost;
+        $this->environmentType = $environmentType;
+        $this->environmentName = $environmentName;
     }
 
     /**
      * @return string[]
      */
-    public static function getList(): array
+    public static function getEnvironmentTypeList(): array
     {
         return [
             self::DEV,
@@ -51,22 +46,20 @@ class Context implements JsonPayloadInterface, ContextInterface
     public function toArray(): array
     {
         return [
-            'ENVIRONMENT_TYPE' => $this->type,
-            'ENVIRONMENT_NAME' => $this->name,
-            'BASE_VIRTUAL_HOST' => $this->baseVirtualHost,
+            'ENVIRONMENT_TYPE' => $this->environmentType,
+            'ENVIRONMENT_NAME' => $this->environmentName,
         ];
     }
 
     /**
      * @param array<string,string> $assoc
-     * @return self
+     * @return mixed
      */
-    public static function fromArray(array $assoc): self
+    public static function fromArray(array $assoc)
     {
-        $type = $assoc['ENVIRONMENT_TYPE'];
-        $name = $assoc['ENVIRONMENT_NAME'];
-        $baseVirtualHost = $assoc['BASE_VIRTUAL_HOST'];
-        return new self($type, $name, $baseVirtualHost);
+        $environmentType = $assoc['ENVIRONMENT_TYPE'];
+        $environmentName = $assoc['ENVIRONMENT_NAME'];
+        return new self($environmentType, $environmentName);
     }
 
     /**
@@ -82,10 +75,9 @@ class Context implements JsonPayloadInterface, ContextInterface
      */
     public static function fromMetadata()
     {
-        $type = Aenthill::metadata('ENVIRONMENT_TYPE');
-        $name = Aenthill::metadata('ENVIRONMENT_NAME');
-        $baseVirtualHost = Aenthill::metadata('BASE_VIRTUAL_HOST');
-        return new self($type, $name, $baseVirtualHost);
+        $environmentType = Aenthill::metadata('ENVIRONMENT_TYPE');
+        $environmentName = Aenthill::metadata('ENVIRONMENT_NAME');
+        return new self($environmentType, $environmentName);
     }
 
     /**
@@ -93,7 +85,7 @@ class Context implements JsonPayloadInterface, ContextInterface
      */
     public function isDevelopment(): bool
     {
-        return $this->type === self::DEV;
+        return $this->environmentType === self::DEV;
     }
 
     /**
@@ -101,7 +93,7 @@ class Context implements JsonPayloadInterface, ContextInterface
      */
     public function isTest(): bool
     {
-        return $this->type === self::TEST;
+        return $this->environmentType === self::TEST;
     }
 
     /**
@@ -109,54 +101,22 @@ class Context implements JsonPayloadInterface, ContextInterface
      */
     public function isProduction(): bool
     {
-        return $this->type === self::PROD;
+        return $this->environmentType === self::PROD;
     }
 
     /**
      * @return string
      */
-    public function getType(): string
+    public function getEnvironmentType(): string
     {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     */
-    public function setType(string $type): void
-    {
-        $this->type = $type;
+        return $this->environmentType;
     }
 
     /**
      * @return string
      */
-    public function getName(): string
+    public function getEnvironmentName(): string
     {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBaseVirtualHost(): string
-    {
-        return $this->baseVirtualHost;
-    }
-
-    /**
-     * @param string $baseVirtualHost
-     */
-    public function setBaseVirtualHost(string $baseVirtualHost): void
-    {
-        $this->baseVirtualHost = $baseVirtualHost;
+        return $this->environmentName;
     }
 }

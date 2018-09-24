@@ -33,6 +33,23 @@ final class ValidatorHelper
      * @param null|string $errorMessage
      * @return callable
      */
+    public static function getFuncShouldReturnTrueValidator(callable $func, ?string $errorMessage = null): callable
+    {
+        return function (string $response) use ($func, $errorMessage) {
+            $response = \trim($response);
+            $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::defaultErrorMessage), $response);
+            if (!$func($response)) {
+                throw new InvalidArgumentException($message);
+            }
+            return $response;
+        };
+    }
+
+    /**
+     * @param callable $func
+     * @param null|string $errorMessage
+     * @return callable
+     */
     public static function getFuncShouldNotReturnTrueValidator(callable $func, ?string $errorMessage = null): callable
     {
         return function (string $response) use ($func, $errorMessage) {

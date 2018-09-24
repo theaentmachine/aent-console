@@ -37,6 +37,22 @@ final class ReplyEvent extends AbstractEvent
     }
 
     /**
+     * @return bool
+     */
+    protected function shouldRegisterEvents(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @return void
+     */
+    protected function beforeExecute(): void
+    {
+        // Let's do nothing.
+    }
+
+    /**
      * @param null|string $payload
      * @return null|string
      */
@@ -44,5 +60,13 @@ final class ReplyEvent extends AbstractEvent
     {
         $this->replyAggregator->storeReply($payload ?? '');
         return null;
+    }
+
+    /**
+     * @return void
+     */
+    protected function afterExecute(): void
+    {
+        // Let's do nothing.
     }
 }

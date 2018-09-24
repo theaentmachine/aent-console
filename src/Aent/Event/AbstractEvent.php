@@ -3,7 +3,6 @@
 namespace TheAentMachine\Aent\Event;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,10 +26,25 @@ abstract class AbstractEvent extends Command
     abstract protected function getEventName(): string;
 
     /**
+     * @return bool
+     */
+    abstract protected function shouldRegisterEvents(): bool;
+
+    /**
+     * return @void
+     */
+    abstract protected function beforeExecute(): void;
+
+    /**
      * @param null|string $payload
      * @return null|string
      */
     abstract protected function executeEvent(?string $payload): ?string;
+
+    /**
+     * return @void
+     */
+    abstract protected function afterExecute(): void;
 
     /**
      * @return void
@@ -39,7 +53,7 @@ abstract class AbstractEvent extends Command
     {
         $this
             ->setName($this->getEventName())
-            ->setDescription('Handles the "' . $this->getEventName() . '" event')
+            ->setDescription(sprintf('Handles the <info>%s</info> event', $this->getEventName()))
             ->addArgument('payload', InputArgument::OPTIONAL, 'The event payload');
     }
 
@@ -50,31 +64,38 @@ abstract class AbstractEvent extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
+        if ($this->shouldRegisterEvents()) {
+            $this->registerEvents();
+        }
         $this->input = $input;
         $this->output = $output;
-        $outputStyle = new OutputFormatterStyle('magenta');
-        $this->output->getFormatter()->setStyle('info', $outputStyle);
-        $outputStyle = new OutputFormatterStyle('black', 'magenta', ['bold']);
-        $this->output->getFormatter()->setStyle('block', $outputStyle);
         $this->prompt = new Prompt($this->input, $this->output, $this->getHelper('question'), $this->getHelper('formatter'));
-        $outputStyle = new OutputFormatterStyle('black', 'cyan', ['bold']);
-        $this->output->getFormatter()->setStyle('altblock', $outputStyle);
-        $this->prompt = new Prompt($this->input, $this->output, $this->getHelper('question'), $this->getHelper('formatter'));
+        $this->beforeExecute();
         $result = $this->executeEvent($input->getArgument('payload'));
+        $this->afterExecute();
         if ($result !== null) {
             Aenthill::reply('REPLY', $result);
         }
     }
 
     /**
-     * @return string[]
+     * @return void
      */
-    protected function getAllEventNames(): array
+    public function registerEvents(): void
     {
-        return \array_map(function (AbstractEvent $event) {
+        $events = \array_map(function (AbstractEvent $event) {
             return $event->getEventName();
         }, \array_filter($this->getApplication()->all(), function (Command $command) {
             return $command instanceof AbstractEvent && !$command->isHidden();
         }));
+        Aenthill::update(null, $events);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getAentName(): string
+    {
+        return $this->getApplication()->getName();
     }
 }

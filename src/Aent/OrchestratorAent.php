@@ -8,11 +8,12 @@ final class OrchestratorAent extends AbstractAent
 {
     /**
      * OrchestratorAent constructor.
+     * @param string $name
      * @param AbstractOrchestratorAddEvent $addEvent
      */
-    public function __construct(AbstractOrchestratorAddEvent $addEvent)
+    public function __construct(string $name, AbstractOrchestratorAddEvent $addEvent)
     {
-        parent::__construct();
+        parent::__construct($name);
         $this->add($addEvent);
     }
 }

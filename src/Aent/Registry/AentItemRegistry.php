@@ -29,8 +29,8 @@ final class AentItemRegistry implements JsonPayloadInterface
     public function toArray(): array
     {
         return [
-            'name' => $this->getName(),
-            'image' => $this->getImage(),
+            'NAME' => $this->getName(),
+            'IMAGE' => $this->getImage(),
         ];
     }
 
@@ -40,8 +40,8 @@ final class AentItemRegistry implements JsonPayloadInterface
      */
     public static function fromArray(array $assoc): self
     {
-        $name = $assoc['name'];
-        $image = $assoc['image'];
+        $name = $assoc['NAME'];
+        $image = $assoc['IMAGE'];
         return new self($name, $image);
     }
 

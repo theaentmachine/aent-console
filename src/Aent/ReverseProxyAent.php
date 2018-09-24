@@ -9,12 +9,13 @@ final class ReverseProxyAent extends AbstractAent
 {
     /**
      * ReverseProxyAent constructor.
+     * @param string $name
      * @param AbstractReverseProxyAddEvent $addEvent
      * @param AbstractNewVirtualHostEvent $newVirtualHostEvent
      */
-    public function __construct(AbstractReverseProxyAddEvent $addEvent, AbstractNewVirtualHostEvent $newVirtualHostEvent)
+    public function __construct(string $name, AbstractReverseProxyAddEvent $addEvent, AbstractNewVirtualHostEvent $newVirtualHostEvent)
     {
-        parent::__construct();
+        parent::__construct($name);
         $this->add($addEvent);
         $this->add($newVirtualHostEvent);
     }

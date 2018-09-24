@@ -2,6 +2,7 @@
 
 namespace TheAentMachine\Aent\Event\ReverseProxy;
 
+use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Event\AbstractJsonEvent;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Service;
@@ -9,11 +10,40 @@ use TheAentMachine\Service\Service;
 abstract class AbstractNewVirtualHostEvent extends AbstractJsonEvent
 {
     /**
+     * @param Service $service
+     * @return Service
+     */
+    abstract protected function populateService(Service $service): Service;
+
+    /**
      * @return string
      */
     protected function getEventName(): string
     {
         return 'NEW_VIRTUAL_HOST';
+    }
+
+    /**
+     * @return bool
+     */
+    protected function shouldRegisterEvents(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @return void
+     */
+    protected function beforeExecute(): void
+    {
+        /** @var Context $context */
+        $context = Context::fromMetadata();
+        $this->output->writeln(sprintf(
+            "\n👋 Hello! I'm the aent <info>%s</info> and I'm going to configure the virtual host of your service on your <info>%s</info> environment <info>%s</info>.",
+            $this->getAentName(),
+            $context->getEnvironmentType(),
+            $context->getEnvironmentName()
+        ));
     }
 
     /**
@@ -24,27 +54,21 @@ abstract class AbstractNewVirtualHostEvent extends AbstractJsonEvent
     protected function executeJsonEvent(array $payload): ?array
     {
         $service = Service::parsePayload($payload);
-        $this->before($service);
-        $service = $this->process($service);
-        $this->after($service);
+        $service = $this->populateService($service);
         return $service->jsonSerialize();
     }
 
     /**
-     * @param Service $service
      * @return void
      */
-    abstract protected function before(Service $service): void;
-
-    /**
-     * @param Service $service
-     * @return Service
-     */
-    abstract protected function process(Service $service): Service;
-
-    /**
-     * @param Service $service
-     * @return void
-     */
-    abstract protected function after(Service $service): void;
+    protected function afterExecute(): void
+    {
+        /** @var Context $context */
+        $context = Context::fromMetadata();
+        $this->output->writeln(sprintf(
+            "\nI've successfully configured the virtual host of your service on your <info>%s</info> environment <info>%s</info>.",
+            $context->getEnvironmentType(),
+            $context->getEnvironmentName()
+        ));
+    }
 }

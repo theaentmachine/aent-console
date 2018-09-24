@@ -2,13 +2,15 @@
 
 namespace TheAentMachine\Aent\Payload\CI;
 
-final class CIAddDockerComposePayload extends AbstractCIAddPayload
+use TheAentMachine\Aent\Payload\JsonPayloadInterface;
+
+final class DockerComposeDeployJobPayload implements JsonPayloadInterface
 {
     /** @var string */
     private $dockerComposeFilename;
 
     /**
-     * CIAddDockerComposePayload constructor.
+     * DockerComposeDeployJobPayload constructor.
      * @param string $dockerComposeFilename
      */
     public function __construct(string $dockerComposeFilename)
@@ -22,18 +24,17 @@ final class CIAddDockerComposePayload extends AbstractCIAddPayload
     public function toArray(): array
     {
         return [
-            'DOCKER_COMPOSE_FILENAME' => $this->dockerComposeFilename
+          'DOCKER_COMPOSE_FILENAME' => $this->dockerComposeFilename,
         ];
     }
 
     /**
      * @param array<string,string> $assoc
-     * @return self
+     * @return DockerComposeDeployJobPayload
      */
-    public static function fromArray(array $assoc): self
+    public static function fromArray(array $assoc): DockerComposeDeployJobPayload
     {
-        $dockerComposeFilename = $assoc['DOCKER_COMPOSE_FILENAME'];
-        return new self($dockerComposeFilename);
+        return new self($assoc['DOCKER_COMPOSE_FILENAME']);
     }
 
     /**

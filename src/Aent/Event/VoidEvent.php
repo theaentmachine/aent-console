@@ -22,6 +22,22 @@ final class VoidEvent extends AbstractEvent
     }
 
     /**
+     * @return bool
+     */
+    protected function shouldRegisterEvents(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @return void
+     */
+    protected function beforeExecute(): void
+    {
+        // Let's do nothing.
+    }
+
+    /**
      * @param null|string $payload
      * @return null|string
      */
@@ -29,5 +45,13 @@ final class VoidEvent extends AbstractEvent
     {
         // Let's do nothing.
         return null;
+    }
+
+    /**
+     * @return void
+     */
+    protected function afterExecute(): void
+    {
+        // Let's do nothing.
     }
 }

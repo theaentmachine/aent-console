@@ -2,20 +2,21 @@
 
 namespace TheAentMachine\Aent;
 
-use TheAentMachine\Aent\Event\CI\AbstractCIAddEvent;
-use TheAentMachine\Aent\Event\CI\AbstractCINewImageEvent;
+use TheAentMachine\Aent\Event\CI\AbstractCIConfigureCIEvent;
+use TheAentMachine\Aent\Event\CI\AbstractCIDockerComposeDeployJobEvent;
 
 final class CIAent extends AbstractAent
 {
     /**
      * CIAent constructor.
-     * @param AbstractCIAddEvent $addEvent
-     * @param AbstractCINewImageEvent $newImageEvent
+     * @param string $name
+     * @param AbstractCIConfigureCIEvent $configureCIEvent
+     * @param AbstractCIDockerComposeDeployJobEvent $dockerComposeDeployJobEvent
      */
-    public function __construct(AbstractCIAddEvent $addEvent, AbstractCINewImageEvent $newImageEvent)
+    public function __construct(string $name, AbstractCIConfigureCIEvent $configureCIEvent, AbstractCIDockerComposeDeployJobEvent $dockerComposeDeployJobEvent)
     {
-        parent::__construct();
-        $this->add($addEvent);
-        $this->add($newImageEvent);
+        parent::__construct($name);
+        $this->add($configureCIEvent);
+        $this->add($dockerComposeDeployJobEvent);
     }
 }
