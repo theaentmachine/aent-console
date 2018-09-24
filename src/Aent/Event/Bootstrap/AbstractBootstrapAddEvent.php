@@ -59,6 +59,8 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
     {
         $this->orchestratorsBootstraps = $this->getOrchestratorsBootstraps();
         $this->CIBootstrap = $this->hasOrchestratorsForRemoteEnvironments() ? $this->getCIBootstrap() : null;
+        $this->output->writeln("\n👌 I'm going to wake up some aents, see you later!");
+        $this->printSummary($this->orchestratorsBootstraps);
         foreach ($this->orchestratorsBootstraps as $bootstrap) {
             $this->addOrchestrator($bootstrap);
         }
