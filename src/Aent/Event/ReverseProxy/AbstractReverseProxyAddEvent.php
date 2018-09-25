@@ -4,15 +4,17 @@ namespace TheAentMachine\Aent\Event\ReverseProxy;
 
 use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Event\AbstractJsonEvent;
+use TheAentMachine\Aent\Payload\ReverseProxy\ReverseProxyAddPayload;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Service;
 
 abstract class AbstractReverseProxyAddEvent extends AbstractJsonEvent
 {
     /**
+     * @param ReverseProxyAddPayload $payload
      * @return Service
      */
-    abstract protected function createService(): Service;
+    abstract protected function createService(ReverseProxyAddPayload $payload): Service;
 
     /**
      * @return string
@@ -52,7 +54,8 @@ abstract class AbstractReverseProxyAddEvent extends AbstractJsonEvent
      */
     protected function executeJsonEvent(array $payload): ?array
     {
-        $service = $this->createService();
+        $payload = ReverseProxyAddPayload::fromArray($payload);
+        $service = $this->createService($payload);
         return $service->jsonSerialize();
     }
 
