@@ -75,7 +75,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
     {
         $this->output->writeln(sprintf("\n👋 Hello again! This is the aent <info>%s</info> and we have finished your project setup.", $this->getAentName()));
         $this->printSummary($this->orchestratorsBootstraps);
-        $this->output->writeln("\nYou may now start adding services with <info>aenthill add [image]</info>. See https://aenthill.github.io/for the complete documentation!");
+        $this->output->writeln("\nYou may now start adding services with <info>aenthill add [image]</info>. See https://aenthill.github.io/ for the complete documentation!");
     }
 
     /**
