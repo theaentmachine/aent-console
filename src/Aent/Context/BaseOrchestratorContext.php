@@ -62,4 +62,21 @@ class BaseOrchestratorContext extends Context
         $baseVirtualHost = Aenthill::metadata('BASE_VIRTUAL_HOST');
         return new self($context->getEnvironmentType(), $context->getEnvironmentName(), $baseVirtualHost);
     }
+
+    /**
+     * @return string
+     */
+    public function getBaseVirtualHost(): string
+    {
+        return $this->baseVirtualHost;
+    }
+
+    /**
+     * @param string $baseVirtualHost
+     * @return void
+     */
+    public function setBaseVirtualHost(string $baseVirtualHost): void
+    {
+        $this->baseVirtualHost = $baseVirtualHost;
+    }
 }
