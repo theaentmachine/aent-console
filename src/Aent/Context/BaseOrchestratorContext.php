@@ -9,7 +9,7 @@ class BaseOrchestratorContext extends Context
     /** @var string */
     private $baseVirtualHost;
 
-    public const BUIlDER_DEPENDENCY_KEY = 'BUIlDER';
+    public const BUIlDER_DEPENDENCY_KEY = 'BUILDER';
     public const CI_DEPENDENCY_KEY = 'CI';
 
     /**
