@@ -54,28 +54,28 @@ abstract class AbstractInput
             $message .= ' (? for help)';
         }
         $question = new Question($message);
-        $validator = ValidatorHelper::merge($this->getHelpTextValidator(), $this->getCompulsoryValidator());
-        $validator = ValidatorHelper::merge($validator, $this->validator);
-        $question->setValidator($validator);
+        $validator = ValidatorHelper::merge($this->getCompulsoryValidator(), $this->validator);
+        $question->setValidator($this->getHelpTextValidator($validator));
         return $question;
     }
 
     /**
+     * @param callable|null
      * @return callable|null
      */
-    private function getHelpTextValidator(): ?callable
+    private function getHelpTextValidator(?callable $else): ?callable
     {
         if (!empty($this->helpText)) {
-            return function (?string $response) {
+            return function (?string $response) use ($else) {
                 $response = $response ?? '';
                 if (\trim($response) === '?') {
                     $this->output->writeln($this->helpText ?: '');
                     return '?';
                 }
-                return $response;
+                return !empty($else) ? $else($response) : $response;
             };
         }
-        return null;
+        return $else;
     }
 
     /**
