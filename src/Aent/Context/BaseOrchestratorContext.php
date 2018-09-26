@@ -9,6 +9,9 @@ class BaseOrchestratorContext extends Context
     /** @var string */
     private $baseVirtualHost;
 
+    /** @var bool */
+    private $singleEnvironment;
+
     public const BUIlDER_DEPENDENCY_KEY = 'BUILDER';
     public const CI_DEPENDENCY_KEY = 'CI';
 
@@ -22,27 +25,32 @@ class BaseOrchestratorContext extends Context
     {
         parent::__construct($environmentType, $environmentName);
         $this->baseVirtualHost = $baseVirtualHost;
+        $this->singleEnvironment = true;
     }
 
     /**
-     * @return array<string,string>
+     * @return array<string,mixed>
      */
     public function toArray(): array
     {
         $assoc = parent::toArray();
         $assoc['BASE_VIRTUAL_HOST'] = $this->baseVirtualHost;
+        $assoc['IS_SINGLE_ENVIRONMENT'] = $this->singleEnvironment;
         return $assoc;
     }
 
     /**
-     * @param array<string,string> $assoc
+     * @param array<string,mixed> $assoc
      * @return mixed
      */
     public static function fromArray(array $assoc)
     {
         $context = parent::fromArray($assoc);
         $baseVirtualHost = $assoc['BASE_VIRTUAL_HOST'];
-        return new self($context->getEnvironmentType(), $context->getEnvironmentName(), $baseVirtualHost);
+        $singleEnvironment = (bool)$assoc['IS_SINGLE_ENVIRONMENT'];
+        $self = new self($context->getEnvironmentType(), $context->getEnvironmentName(), $baseVirtualHost);
+        $self->setSingleEnvironment($singleEnvironment);
+        return $self;
     }
 
     /**
@@ -60,7 +68,10 @@ class BaseOrchestratorContext extends Context
     {
         $context = parent::fromMetadata();
         $baseVirtualHost = Aenthill::metadata('BASE_VIRTUAL_HOST');
-        return new self($context->getEnvironmentType(), $context->getEnvironmentName(), $baseVirtualHost);
+        $singleEnvironment = (bool)Aenthill::metadata('IS_SINGLE_ENVIRONMENT');
+        $self = new self($context->getEnvironmentType(), $context->getEnvironmentName(), $baseVirtualHost);
+        $self->setSingleEnvironment($singleEnvironment);
+        return $self;
     }
 
     /**
@@ -78,5 +89,21 @@ class BaseOrchestratorContext extends Context
     public function setBaseVirtualHost(string $baseVirtualHost): void
     {
         $this->baseVirtualHost = $baseVirtualHost;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSingleEnvironment(): bool
+    {
+        return $this->singleEnvironment;
+    }
+
+    /**
+     * @param bool $singleEnvironment
+     */
+    public function setSingleEnvironment(bool $singleEnvironment): void
+    {
+        $this->singleEnvironment = $singleEnvironment;
     }
 }
