@@ -60,6 +60,7 @@ abstract class AbstractOrchestratorNewServiceEvent extends AbstractJsonEvent
     {
         $service = Service::parsePayload($payload);
         $service = $this->createDockerFileAndBuild($service);
+        $this->prompt->printAltBlock(sprintf("%s: finalizing service...", $this->getAentName()));
         $this->finalizeService($service);
         return null;
     }
