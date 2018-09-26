@@ -41,7 +41,7 @@ final class BootstrapPayload implements JsonPayloadInterface
      */
     public static function fromArray(array $assoc): self
     {
-        $CIAent = $assoc['CI_AENT'];
+        $CIAent = AentItemRegistry::fromArray($assoc['CI_AENT']);
         $CIMetadata = $assoc['CI_METADATA'];
         return new self($CIAent, $CIMetadata);
     }
