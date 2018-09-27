@@ -49,8 +49,7 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
         $this->prompt->printAltBlock(sprintf("%s: configuring service(s)...", $this->getAentName()));
         $services = $this->createServices($environments);
         foreach ($services as $service) {
-            $this->prompt->printBlock(sprintf("Dispatching service %s.", $service->getServiceName()));
-            Aenthill::dispatchJson('NEW_SERVICE', $service);
+            $this->dispatch($environments, $service);
         }
         $this->prompt->printBlock("Dispatch done.");
     }
@@ -93,5 +92,44 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
     {
         $this->output->writeln(sprintf("\n👋 Hello again! This is the aent <info>%s</info> and you have not selected any environment! Bye!", $this->getAentName()));
         exit(0);
+    }
+
+    /**
+     * @param Environments $environments
+     * @param Service $service
+     */
+    private function dispatch(Environments $environments, Service $service): void
+    {
+        $this->prompt->printBlock(sprintf("Dispatching service %s.", $service->getServiceName()));
+        $environmentTypes = $service->getDestEnvTypes();
+        if (empty($environmentTypes)) {
+            $this->dispatchToEnvironments($environments->getDevelopmentEnvironments(), $service);
+            $this->dispatchToEnvironments($environments->getTestEnvironments(), $service);
+            $this->dispatchToEnvironments($environments->getProductionEnvironments(), $service);
+            return;
+        }
+        foreach ($environmentTypes as $environmentType) {
+            switch ($environmentType) {
+                case Context::DEV:
+                    $this->dispatchToEnvironments($environments->getDevelopmentEnvironments(), $service);
+                    break;
+                case Context::TEST:
+                    $this->dispatchToEnvironments($environments->getTestEnvironments(), $service);
+                    break;
+                default:
+                    $this->dispatchToEnvironments($environments->getProductionEnvironments(), $service);
+            }
+        }
+    }
+
+    /**
+     * @param Context[] $environments
+     * @param Service $service
+     */
+    private function dispatchToEnvironments(array $environments, Service $service): void
+    {
+        foreach ($environments as $environment) {
+            Aenthill::dispatchJson('NEW_SERVICE', $service, sprintf('"%s" in Metadata', $environment->getEnvironmentName()));
+        }
     }
 }

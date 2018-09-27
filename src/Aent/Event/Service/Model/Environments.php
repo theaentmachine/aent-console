@@ -66,6 +66,48 @@ final class Environments
     }
 
     /**
+     * @return Context[]
+     */
+    public function getDevelopmentEnvironments(): array
+    {
+        $environments = [];
+        foreach ($this->environments as $environment) {
+            if ($environment->isDevelopment()) {
+                $environments[] = $environment;
+            }
+        }
+        return $environments;
+    }
+
+    /**
+     * @return Context[]
+     */
+    public function getTestEnvironments(): array
+    {
+        $environments = [];
+        foreach ($this->environments as $environment) {
+            if ($environment->isTest()) {
+                $environments[] = $environment;
+            }
+        }
+        return $environments;
+    }
+
+    /**
+     * @return Context[]
+     */
+    public function getProductionEnvironments(): array
+    {
+        $environments = [];
+        foreach ($this->environments as $environment) {
+            if ($environment->isProduction()) {
+                $environments[] = $environment;
+            }
+        }
+        return $environments;
+    }
+
+    /**
      * @return bool
      */
     public function isEmpty(): bool
