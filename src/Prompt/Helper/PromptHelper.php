@@ -9,10 +9,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use TheAentMachine\Aent\Registry\AentItemRegistry;
 use TheAentMachine\Aent\Registry\ColonyRegistry;
+use TheAentMachine\Aenthill\Pheromone;
 use TheAentMachine\Prompt\Input;
 use TheAentMachine\Prompt\Select;
 use TheAentMachine\Registry\RegistryClient;
 use TheAentMachine\Registry\TagsAnalyzer;
+use TheAentMachine\Service\Volume\BindVolume;
 
 final class PromptHelper
 {
@@ -140,5 +142,31 @@ final class PromptHelper
             ->setValidator(ValidatorHelper::getAlphaWithAdditionalCharactersValidator(['_', '.', '-']));
         $response = $input->run();
         return $response ?? '';
+    }
+
+    /**
+     * @param string $text
+     * @param string $target
+     * @param null|string $helpText
+     * @return BindVolume
+     */
+    public function getBindVolume(string $text, string $target, ?string $helpText = null): BindVolume
+    {
+        $input = new Input($this->input, $this->output, $this->questionHelper);
+        $input
+            ->setText($text)
+            ->setHelpText($helpText)
+            ->setCompulsory(true)
+            ->setValidator(function (string $dir) {
+                $dir = trim($dir, '/') ?: '.';
+                $rootDir = Pheromone::getContainerProjectDirectory();
+                $fullDir = $rootDir.'/'.$dir;
+                if (!is_dir($fullDir)) {
+                    mkdir($fullDir);
+                }
+                return $dir;
+            });
+        $source = $input->run() ?? '';
+        return new BindVolume($source, $target);
     }
 }
