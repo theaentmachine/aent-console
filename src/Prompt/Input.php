@@ -47,6 +47,9 @@ class Input extends AbstractInput
         }
         $question = new Question($message, $this->default);
         $question->setValidator($validator);
+        if (!empty($this->autocompleterValues)) {
+            $question->setAutocompleterValues($this->autocompleterValues);
+        }
         return $question;
     }
 
