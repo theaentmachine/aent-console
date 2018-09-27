@@ -54,8 +54,7 @@ abstract class AbstractInput
             $message .= ' (? for help)';
         }
         $question = new Question($message);
-        $validator = ValidatorHelper::merge($this->getCompulsoryValidator(), $this->validator);
-        $question->setValidator($this->getHelpTextValidator($validator));
+        $question->setValidator($this->getHelpTextValidator($this->getCompulsoryValidator($this->validator)));
         return $question;
     }
 
@@ -79,9 +78,10 @@ abstract class AbstractInput
     }
 
     /**
+     * @param callable|null
      * @return callable|null
      */
-    private function getCompulsoryValidator(): ?callable
+    private function getCompulsoryValidator(?callable $else): ?callable
     {
         if ($this->compulsory && empty($this->default)) {
             return function (?string $response) {
@@ -89,15 +89,15 @@ abstract class AbstractInput
                 if (\trim($response) === '') {
                     throw new \InvalidArgumentException('Hey, this field is compulsory!');
                 }
-                return $response;
+                return !empty($else) ? $else($response) : $response;
             };
         }
-        return function (?string $response) {
+        return function (?string $response) use ($else) {
             $response = $response ?? '';
             if (\trim($response) === '') {
-                return $response;
+                return !empty($else) ? $else($response) : $response;
             }
-            return $response;
+            return !empty($else) ? $else($response) : $response;
         };
     }
 
