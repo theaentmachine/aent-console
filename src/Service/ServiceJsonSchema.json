@@ -187,9 +187,9 @@
       "items": {
         "type": "string",
         "enum": [
-          "DEV",
-          "TEST",
-          "PROD"
+          "development",
+          "test",
+          "production"
         ]
       }
     },
