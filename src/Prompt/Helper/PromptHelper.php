@@ -124,4 +124,21 @@ final class PromptHelper
         $this->output->writeln("\n👌 Alright, I'm going to use <info>$aent</info>!");
         return $version;
     }
+
+    /**
+     * @return string
+     */
+    public function getServiceName(): string
+    {
+        $input = new Input($this->input, $this->output, $this->questionHelper);
+        $text = "\nYour service name";
+        $helpText = "The service name is used as an identifier for the container you are creating. It is also bound in Docker internal network DNS and can be used from other containers to reference your container.";
+        $input
+            ->setText($text)
+            ->setHelpText($helpText)
+            ->setCompulsory(true)
+            ->setValidator(ValidatorHelper::getAlphaWithAdditionalCharactersValidator(['_', '.', '-']));
+        $response = $input->run();
+        return $response ?? '';
+    }
 }
