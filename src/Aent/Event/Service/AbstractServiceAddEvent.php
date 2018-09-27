@@ -43,6 +43,10 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
         ));
     }
 
+    /**
+     * @param null|string $payload
+     * @return null|string
+     */
     protected function executeEvent(?string $payload): ?string
     {
         $environments = $this->fetchEnvironments();
@@ -52,6 +56,7 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
             $this->dispatch($environments, $service);
         }
         $this->prompt->printBlock("Dispatch done.");
+        return null;
     }
 
     /**
