@@ -88,6 +88,29 @@ final class Prompt
 
     /**
      * @param string $text
+     * @param string[] $items
+     * @param null|string $helpText
+     * @param null|string $default
+     * @param bool $compulsory
+     * @param callable|null $validator
+     * @return null|string
+     */
+    public function autocompleter(string $text, array $items, ?string $helpText = null, ?string $default = null, bool $compulsory = false, ?callable $validator = null): ?string
+    {
+        $input = new Input($this->input, $this->output, $this->questionHelper);
+        $input
+            ->setText($text)
+            ->setHelpText($helpText)
+            ->setCompulsory($compulsory)
+            ->setValidator($validator);
+        $input
+            ->setDefault($default)
+            ->setAutocompleterValues($items);
+        return $input->run();
+    }
+
+    /**
+     * @param string $text
      * @param null|string $helpText
      * @param null|bool $default
      * @param bool $compulsory
