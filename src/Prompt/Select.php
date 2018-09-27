@@ -30,7 +30,7 @@ class Select extends Input
      */
     protected function build(): Question
     {
-        if (\is_integer($this->default) && isset($this->items[intval($this->default)])) {
+        if (!is_null($this->default) && \is_integer($this->default) && isset($this->items[intval($this->default)])) {
             $this->default = $this->items[intval($this->default)];
         }
         $question = parent::build();

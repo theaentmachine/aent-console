@@ -95,7 +95,7 @@ abstract class AbstractInput
         return function (?string $response) use ($else) {
             $response = $response ?? '';
             if (\trim($response) === '') {
-                return !empty($else) ? $else($response) : $response;
+                return $response;
             }
             return !empty($else) ? $else($response) : $response;
         };
