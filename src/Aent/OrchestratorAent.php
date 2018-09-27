@@ -4,6 +4,7 @@ namespace TheAentMachine\Aent;
 
 use TheAentMachine\Aent\Event\Orchestrator\AbstractOrchestratorAddEvent;
 use TheAentMachine\Aent\Event\Orchestrator\AbstractOrchestratorNewServiceEvent;
+use TheAentMachine\Aent\Event\Orchestrator\OrchestratorChooseEnvironmentEvent;
 
 final class OrchestratorAent extends AbstractAent
 {
@@ -18,5 +19,6 @@ final class OrchestratorAent extends AbstractAent
         parent::__construct($name);
         $this->add($addEvent);
         $this->add($newServiceEvent);
+        $this->add(new OrchestratorChooseEnvironmentEvent());
     }
 }
