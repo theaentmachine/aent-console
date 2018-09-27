@@ -68,7 +68,7 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
     private function fetchEnvironments(): Environments
     {
         $this->prompt->printAltBlock(sprintf("%s: fetching environments...", $this->getAentName()));
-        $responses = Aenthill::dispatchJson('CHOOSE_ENVIRONMENT', null);
+        $responses = Aenthill::dispatchJson('CHOOSE_ENVIRONMENT', []);
         if (empty($responses)) {
             $this->byebye();
         }
