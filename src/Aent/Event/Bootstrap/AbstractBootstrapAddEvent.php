@@ -47,7 +47,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
      */
     protected function beforeExecute(): void
     {
-        $this->output->writeln(sprintf("\n👋 Hello! I'm the aent <info>%s</info> and I'll help you bootstrapping a Docker project for your web application.", $this->getAentName()));
+        $this->output->writeln(sprintf("👋 Hello! I'm the aent <info>%s</info> and I'll help you bootstrapping a Docker project for your web application.", $this->getAentName()));
     }
 
     /**

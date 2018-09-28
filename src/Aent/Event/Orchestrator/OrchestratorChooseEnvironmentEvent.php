@@ -31,7 +31,7 @@ final class OrchestratorChooseEnvironmentEvent extends AbstractJsonEvent
         /** @var Context $context */
         $context = Context::fromMetadata();
         $this->output->writeln(sprintf(
-            "\n👋 Hello! I'm the aent <info>%s</info> and I want to know if you want the service(s) on your <info>%s</info> environment <info>%s</info>.",
+            "\n👋 Hello! I'm the aent <info>%s</info> of your <info>%s</info> environment <info>%s</info>.",
             $this->getAentName(),
             $context->getEnvironmentType(),
             $context->getEnvironmentName()
@@ -44,7 +44,14 @@ final class OrchestratorChooseEnvironmentEvent extends AbstractJsonEvent
      */
     protected function executeJsonEvent(array $payload): ?array
     {
-        $response = $this->prompt->confirm("\nConfirm?", null, true);
+        /** @var Context $context */
+        $context = Context::fromMetadata();
+        $text = sprintf(
+            "\nDo you want to add the service(s) on your <info>%s</info> environment <info>%s</info>?",
+            $context->getEnvironmentType(),
+            $context->getEnvironmentName()
+        );
+        $response = $this->prompt->confirm($text, null, true);
         if ($response) {
             /** @var Context $context */
             $context = Context::fromMetadata();
