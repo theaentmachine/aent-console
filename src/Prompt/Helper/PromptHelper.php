@@ -169,4 +169,26 @@ final class PromptHelper
         $source = $input->run() ?? '';
         return new BindVolume($source, $target);
     }
+
+    /**
+     * @param string $serviceName
+     * @param int $port
+     * @param string $baseVirtualHost
+     * @return string
+     */
+    public function getSubdomain(string $serviceName, int $port, string $baseVirtualHost): string
+    {
+        $input = new Input($this->input, $this->output, $this->questionHelper);
+        $text = sprintf(
+            "\nSubdomain for your service <info>%s</info> on port <info>%s</info> (relative to <info>%s</info>)",
+            $serviceName,
+            $port,
+            $baseVirtualHost
+        );
+        $input
+            ->setText($text)
+            ->setCompulsory(true)
+            ->setValidator(ValidatorHelper::getAlphaWithAdditionalCharactersValidator(['-']));
+        return $input->run() ?? '';
+    }
 }
