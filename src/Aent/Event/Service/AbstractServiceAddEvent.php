@@ -134,7 +134,7 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
     private function dispatchToEnvironments(array $environments, Service $service): void
     {
         foreach ($environments as $environment) {
-            Aenthill::dispatchJson('NEW_SERVICE', $service, sprintf('"%s" in Metadata', $environment->getEnvironmentName()));
+            Aenthill::dispatchJson('NEW_SERVICE', $service, sprintf('"ENVIRONMENT_NAME" in Metadata and Metadata.ENVIRONMENT_NAME == %s', $environment->getEnvironmentName()));
         }
     }
 }
