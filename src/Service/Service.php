@@ -38,9 +38,9 @@ class Service implements \JsonSerializable
     private $environment = [];
     /** @var mixed[] */
     private $volumes = [];
-    /** @var array<int, array<string, string|int>> */
-    private $virtualHosts = [];
-    /** @var null|bool */
+    /** @var bool */
+    private $needVirtualHost;
+    /** @var bool */
     private $needBuild;
     /** @var \stdClass */
     private $validatorSchema;
@@ -54,14 +54,14 @@ class Service implements \JsonSerializable
     private $limitMemory;
     /** @var null|string */
     private $limitCpu;
-    /** @var string[] */
-    private $destEnvTypes = []; // empty === all env types
 
     /**
      * Service constructor.
      */
     public function __construct()
     {
+        $this->needVirtualHost = false;
+        $this->needBuild = false;
         $this->validatorSchema = \GuzzleHttp\json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
 
@@ -100,11 +100,10 @@ class Service implements \JsonSerializable
                     $vol['requestStorage'] ?? null
                 );
             }
-            $service->virtualHosts = $s['virtualHosts'] ?? [];
+            $service->needVirtualHost = $s['needVirtualHost'] ?? [];
             $service->needBuild = $s['needBuild'] ?? null;
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
-        $service->destEnvTypes = $payload['destEnvTypes'] ?? [];
 
         $resources = $payload['resources'] ?? [];
         if (isset($resources['requests'])) {
@@ -154,7 +153,7 @@ class Service implements \JsonSerializable
             'labels' => array_map($labelMap, $this->labels),
             'environment' => array_map($jsonSerializeMap, $this->environment),
             'volumes' => array_map($jsonSerializeMap, $this->volumes),
-            'virtualHosts' => $this->virtualHosts,
+            'needVirtualHost' => $this->needVirtualHost,
             'needBuild' => $this->needBuild,
         ]);
 
@@ -165,8 +164,6 @@ class Service implements \JsonSerializable
         if (!empty($this->dockerfileCommands)) {
             $json['dockerfileCommands'] = $this->dockerfileCommands;
         }
-
-        $json['destEnvTypes'] = $this->destEnvTypes;
 
         $resources = array_filter([
             'requests' => array_filter([
@@ -196,11 +193,6 @@ class Service implements \JsonSerializable
     {
         $dockerfileCommands = [];
         $dockerfileCommands[] = 'FROM ' . $this->image;
-        foreach ($this->environment as $key => $env) {
-            if ($env->getType() === EnvVariableTypeEnum::IMAGE_ENV_VARIABLE) {
-                $dockerfileCommands[] = "ENV $key" . '=' . $env->getValue();
-            }
-        }
         foreach ($this->volumes as $volume) {
             if ($volume->getType() === VolumeTypeEnum::BIND_VOLUME) {
                 $dockerfileCommands[] = 'COPY ' . $volume->getSource() . ' ' . $volume->getTarget();
@@ -216,7 +208,6 @@ class Service implements \JsonSerializable
         return [
             'serviceName' => $this->serviceName,
             'dockerfileCommands' => $dockerfileCommands,
-            'destEnvTypes' => $this->destEnvTypes,
         ];
     }
 
@@ -295,13 +286,12 @@ class Service implements \JsonSerializable
         return $this->volumes;
     }
 
-    /** @return array<int, array<string, string|int>> */
-    public function getVirtualHosts(): array
+    public function getNeedVirtualHost(): bool
     {
-        return $this->virtualHosts;
+        return $this->needVirtualHost;
     }
 
-    public function getNeedBuild(): ?bool
+    public function getNeedBuild(): bool
     {
         return $this->needBuild;
     }
@@ -330,12 +320,6 @@ class Service implements \JsonSerializable
     public function getLimitCpu(): ?string
     {
         return $this->limitCpu;
-    }
-
-    /**  @return string[] */
-    public function getDestEnvTypes(): array
-    {
-        return $this->destEnvTypes;
     }
 
 
@@ -388,7 +372,12 @@ class Service implements \JsonSerializable
         $this->limitCpu = $limitCpu;
     }
 
-    public function setNeedBuild(?bool $needBuild): void
+    public function setNeedVirtualHost(bool $needVirtualHost): void
+    {
+        $this->needVirtualHost = $needVirtualHost;
+    }
+
+    public function setNeedBuild(bool $needBuild): void
     {
         $this->needBuild = $needBuild;
     }
@@ -424,32 +413,6 @@ class Service implements \JsonSerializable
     public function addLabel(string $key, string $value, ?string $comment = null): void
     {
         $this->labels[$key] = new CommentedItem($value, $comment);
-    }
-
-    public function addVirtualHost(?string $host, int $port, ?string $comment = null): void
-    {
-        $array = [];
-        if (null !== $host && '' !== $host) {
-            $array['host'] = $host;
-        }
-        $array['port'] = $port;
-        if (null !== $comment && '' !== $comment) {
-            $array['comment'] = $comment;
-        }
-        $this->virtualHosts[] = $array;
-    }
-
-    public function addVirtualHostPrefix(?string $hostPrefix, int $port, ?string $comment = null): void
-    {
-        $array = [];
-        if (null !== $hostPrefix && '' !== $hostPrefix) {
-            $array['hostPrefix'] = $hostPrefix;
-        }
-        $array['port'] = $port;
-        if (null !== $comment && '' !== $comment) {
-            $array['comment'] = $comment;
-        }
-        $this->virtualHosts[] = $array;
     }
 
     /************************ environment adders & getters by type **********************/
@@ -617,36 +580,5 @@ class Service implements \JsonSerializable
             return $vol->getSource() !== $source;
         };
         $this->volumes = array_values(array_filter($this->volumes, $filterFunction));
-    }
-
-    /************************ destEnvTypes stuffs **********************/
-
-    public function addDestEnvType(string $envType, bool $keepTheOtherEnvTypes = true): void
-    {
-        if (!$keepTheOtherEnvTypes) {
-            $this->destEnvTypes = [];
-        }
-        $this->destEnvTypes[] = $envType;
-    }
-
-    public function isForDevEnvType(): bool
-    {
-        return empty($this->destEnvTypes) || \in_array(Context::DEV, $this->destEnvTypes);
-    }
-
-    public function isForTestEnvType(): bool
-    {
-        return empty($this->destEnvTypes) || \in_array(Context::TEST, $this->destEnvTypes);
-    }
-
-    public function isForProdEnvType(): bool
-    {
-        return empty($this->destEnvTypes) || \in_array(Context::PROD, $this->destEnvTypes);
-    }
-
-    public function isForMyEnvType(): bool
-    {
-        $myEnvType = Manifest::getMetadata(CommonMetadata::ENV_TYPE_KEY);
-        return empty($this->destEnvTypes) || \in_array($myEnvType, $this->destEnvTypes, true);
     }
 }
