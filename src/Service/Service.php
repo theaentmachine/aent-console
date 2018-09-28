@@ -38,8 +38,8 @@ class Service implements \JsonSerializable
     private $environment = [];
     /** @var mixed[] */
     private $volumes = [];
-    /** @var bool */
-    private $needVirtualHost;
+    /** @var int[] */
+    private $virtualHosts;
     /** @var bool */
     private $needBuild;
     /** @var \stdClass */
@@ -60,7 +60,6 @@ class Service implements \JsonSerializable
      */
     public function __construct()
     {
-        $this->needVirtualHost = false;
         $this->needBuild = false;
         $this->validatorSchema = \GuzzleHttp\json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
@@ -100,7 +99,7 @@ class Service implements \JsonSerializable
                     $vol['requestStorage'] ?? null
                 );
             }
-            $service->needVirtualHost = $s['needVirtualHost'] ?? [];
+            $service->virtualHosts = $s['virtualHosts'] ?? [];
             $service->needBuild = $s['needBuild'] ?? null;
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
@@ -153,7 +152,7 @@ class Service implements \JsonSerializable
             'labels' => array_map($labelMap, $this->labels),
             'environment' => array_map($jsonSerializeMap, $this->environment),
             'volumes' => array_map($jsonSerializeMap, $this->volumes),
-            'needVirtualHost' => $this->needVirtualHost,
+            'virtualHosts' => $this->virtualHosts,
             'needBuild' => $this->needBuild,
         ]);
 
@@ -286,9 +285,10 @@ class Service implements \JsonSerializable
         return $this->volumes;
     }
 
-    public function getNeedVirtualHost(): bool
+    /** @return int[] */
+    public function getVirtualHosts(): array
     {
-        return $this->needVirtualHost;
+        return $this->virtualHosts;
     }
 
     public function getNeedBuild(): bool
@@ -372,11 +372,6 @@ class Service implements \JsonSerializable
         $this->limitCpu = $limitCpu;
     }
 
-    public function setNeedVirtualHost(bool $needVirtualHost): void
-    {
-        $this->needVirtualHost = $needVirtualHost;
-    }
-
     public function setNeedBuild(bool $needBuild): void
     {
         $this->needBuild = $needBuild;
@@ -413,6 +408,11 @@ class Service implements \JsonSerializable
     public function addLabel(string $key, string $value, ?string $comment = null): void
     {
         $this->labels[$key] = new CommentedItem($value, $comment);
+    }
+
+    public function addVirtualHost(int $port): void
+    {
+        $this->virtualHosts[] = $port;
     }
 
     /************************ environment adders & getters by type **********************/

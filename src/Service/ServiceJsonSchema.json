@@ -146,8 +146,12 @@
             "additionalProperties": false
           }
         },
-        "needVirtualHost": {
-          "type": "boolean"
+        "virtualHosts": {
+          "type": "array",
+          "items": {
+            "type": "number"
+            }
+          }
         },
         "needBuild": {
           "type": "boolean"
