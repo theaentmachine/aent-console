@@ -41,7 +41,7 @@ class Service implements \JsonSerializable
     /** @var int[] */
     private $virtualHosts = [];
     /** @var bool */
-    private $needBuild;
+    private $needBuild = false;
     /** @var \stdClass */
     private $validatorSchema;
     /** @var string[] */
@@ -60,7 +60,6 @@ class Service implements \JsonSerializable
      */
     public function __construct()
     {
-        $this->needBuild = false;
         $this->validatorSchema = \GuzzleHttp\json_decode((string)file_get_contents(__DIR__ . '/ServiceJsonSchema.json'), false);
     }
 
