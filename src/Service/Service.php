@@ -39,7 +39,7 @@ class Service implements \JsonSerializable
     /** @var mixed[] */
     private $volumes = [];
     /** @var int[] */
-    private $virtualHosts;
+    private $virtualHosts = [];
     /** @var bool */
     private $needBuild;
     /** @var \stdClass */
