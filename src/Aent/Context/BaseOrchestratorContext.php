@@ -12,7 +12,7 @@ class BaseOrchestratorContext extends Context
     /** @var bool */
     private $singleEnvironment;
 
-    public const BUIlDER_DEPENDENCY_KEY = 'BUILDER';
+    public const BUILDER_DEPENDENCY_KEY = 'BUILDER';
     public const CI_DEPENDENCY_KEY = 'CI';
 
     /**

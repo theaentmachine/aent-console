@@ -86,7 +86,7 @@ abstract class AbstractOrchestratorAddEvent extends AbstractJsonEvent
         $aent = $registry->getAent(ColonyRegistry::DOCKERFILE);
         /** @var Context $context */
         $context = Context::fromMetadata();
-        Aenthill::register($aent->getImage(), BaseOrchestratorContext::BUIlDER_DEPENDENCY_KEY, $context->toArray());
+        Aenthill::register($aent->getImage(), BaseOrchestratorContext::BUILDER_DEPENDENCY_KEY, $context->toArray());
     }
 
     /**

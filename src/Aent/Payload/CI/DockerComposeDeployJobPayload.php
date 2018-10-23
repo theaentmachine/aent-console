@@ -30,9 +30,9 @@ final class DockerComposeDeployJobPayload implements JsonPayloadInterface
 
     /**
      * @param array<string,string> $assoc
-     * @return DockerComposeDeployJobPayload
+     * @return self
      */
-    public static function fromArray(array $assoc): DockerComposeDeployJobPayload
+    public static function fromArray(array $assoc): self
     {
         return new self($assoc['DOCKER_COMPOSE_FILENAME']);
     }

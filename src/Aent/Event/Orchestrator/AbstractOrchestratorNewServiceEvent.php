@@ -94,7 +94,7 @@ abstract class AbstractOrchestratorNewServiceEvent extends AbstractJsonEvent
             return $service;
         }
         $this->prompt->printAltBlock(sprintf("%s: creating Dockerfile...", $this->getAentName()));
-        $response = Aenthill::runJson(BaseOrchestratorContext::BUIlDER_DEPENDENCY_KEY, 'NEW_IMAGE', $service->jsonSerialize());
+        $response = Aenthill::runJson(BaseOrchestratorContext::BUILDER_DEPENDENCY_KEY, 'NEW_IMAGE', $service->jsonSerialize());
         $assoc = \GuzzleHttp\json_decode($response[0], true);
         $replyPayload = NewImageReplyPayload::fromArray($assoc);
         return $this->addBuildJobInCI($service, $replyPayload->getDockerfileName());
