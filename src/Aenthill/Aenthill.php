@@ -120,9 +120,10 @@ final class Aenthill
      *
      * @param string $event
      * @param null|string $payload
+     * @param null|string $filters
      * @return string[] the array of replies received from all aents that replied.
      */
-    public static function dispatch(string $event, ?string $payload = null): array
+    public static function dispatch(string $event, ?string $payload = null, ?string $filters = null): array
     {
         $replyAggregator = new ReplyAggregator();
         $replyAggregator->clear();
@@ -132,6 +133,12 @@ final class Aenthill
         if (null !== $payload) {
             $command[] = $payload;
         }
+
+        if (!empty($filters)) {
+            $command[] = '-f';
+            $command[] = $filters;
+        }
+
         $process = new Process($command);
         $process->enableOutput();
         $process->setTty(true);
@@ -142,14 +149,15 @@ final class Aenthill
 
     /**
      * @param mixed[]|object $payload
+     * @param null|string $filters
      * @return mixed[]
      */
-    public static function dispatchJson(string $event, $payload): array
+    public static function dispatchJson(string $event, $payload, ?string $filters = null): array
     {
         if (\is_object($payload) && !$payload instanceof \JsonSerializable) {
             throw new \RuntimeException('Payload object should implement JsonSerializable. Got an instance of ' . \get_class($payload));
         }
-        $replies = self::dispatch($event, \GuzzleHttp\json_encode($payload));
+        $replies = self::dispatch($event, \GuzzleHttp\json_encode($payload), $filters);
         return \array_map(function (string $reply) {
             return \GuzzleHttp\json_decode($reply, true);
         }, $replies);

@@ -2,6 +2,7 @@
 
 namespace TheAentMachine\YamlTools;
 
+use Safe\Exceptions\FilesystemException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
@@ -45,6 +46,7 @@ final class YamlTools
      * Merge yaml content into one file (created if non existent, with its directory's owner and group code)
      * @param string|mixed[] $content
      * @param string $file
+     * @throws FilesystemException
      */
     public static function mergeContentIntoFile($content, string $file): void
     {

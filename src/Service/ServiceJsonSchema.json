@@ -149,25 +149,7 @@
         "virtualHosts": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "host": {
-                "type": "string"
-              },
-              "hostPrefix": {
-                "type": "string"
-              },
-              "port": {
-                "type": "integer"
-              },
-              "comment": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "port"
-            ],
-            "additionalProperties": false
+            "type": "integer"
           }
         },
         "needBuild": {
@@ -180,17 +162,6 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
-    },
-    "destEnvTypes": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "enum": [
-          "DEV",
-          "TEST",
-          "PROD"
-        ]
       }
     },
     "resources": {

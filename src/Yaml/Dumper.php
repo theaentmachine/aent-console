@@ -11,6 +11,8 @@
 
 namespace TheAentMachine\Yaml;
 
+use Safe\Exceptions\PcreException;
+use Safe\Exceptions\StringsException;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Yaml;
 use function Safe\substr;
@@ -58,6 +60,8 @@ class Dumper
      * @param int   $flags  A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
      *
      * @return string The YAML representation of the PHP value
+     * @throws StringsException
+     * @throws PcreException
      */
     public function dump($input, int $inline = 0, int $indent = 0, int $flags = 0): string
     {

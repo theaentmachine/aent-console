@@ -24,6 +24,14 @@ class BindVolume extends Volume
         return VolumeTypeEnum::BIND_VOLUME;
     }
 
+    /**
+     * @return string
+     */
+    public function getSource(): string
+    {
+        return $this->source;
+    }
+
     public function getTarget(): string
     {
         return $this->target;

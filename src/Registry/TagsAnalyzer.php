@@ -2,11 +2,13 @@
 
 namespace TheAentMachine\Registry;
 
+use Safe\Exceptions\ArrayException;
+use Safe\Exceptions\StringsException;
 use function Safe\preg_match;
 use function Safe\usort;
 use function Safe\substr;
 
-class TagsAnalyzer
+final class TagsAnalyzer
 {
 
     /**
@@ -17,6 +19,8 @@ class TagsAnalyzer
      *
      * @param string[] $tags
      * @return string[]
+     * @throws ArrayException
+     * @throws StringsException
      */
     public function filterBestTags(array $tags): array
     {
@@ -101,6 +105,7 @@ class TagsAnalyzer
 
     /**
      * Removes the last digit of a tag. Returns null if there is nothing to remove.
+     * @throws StringsException
      */
     private function shortenTag(string $tag): ?string
     {
@@ -111,7 +116,7 @@ class TagsAnalyzer
         return substr($tag, 0, $lastPos);
     }
 
-    public function compareVersion(string $v1, string $v2): int
+    private function compareVersion(string $v1, string $v2): int
     {
         $level1 = \substr_count($v1, '.');
         $level2 = \substr_count($v2, '.');
