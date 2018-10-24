@@ -33,7 +33,6 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
      */
     protected function getEventName(): string
     {
-        // TODO update event name to ADD_BOOTSTRAP
         return 'ADD';
     }
 
