@@ -25,7 +25,7 @@ before_install:
 install:
 - composer update $DEFAULT_COMPOSER_FLAGS $COMPOSER_FLAGS
 script:
-- composer phpunit
+#- composer phpunit
 - composer phpstan
 - composer cs-check
 after_success:
