@@ -2,9 +2,11 @@
 
 namespace TheAentMachine\Aent\Event\CI;
 
+use Safe\Exceptions\StringsException;
 use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Event\AbstractJsonEvent;
 use TheAentMachine\Aent\Payload\CI\DockerComposeDeployJobPayload;
+use function Safe\sprintf;
 
 abstract class AbstractCIDockerComposeDeployJobEvent extends AbstractJsonEvent
 {
@@ -32,6 +34,7 @@ abstract class AbstractCIDockerComposeDeployJobEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function beforeExecute(): void
     {
@@ -58,6 +61,7 @@ abstract class AbstractCIDockerComposeDeployJobEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function afterExecute(): void
     {

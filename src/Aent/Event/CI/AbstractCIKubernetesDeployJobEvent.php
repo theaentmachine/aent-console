@@ -2,10 +2,12 @@
 
 namespace TheAentMachine\Aent\Event\CI;
 
+use Safe\Exceptions\StringsException;
 use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Event\AbstractJsonEvent;
 use TheAentMachine\Aent\K8SProvider\Provider;
 use TheAentMachine\Aent\Payload\CI\KubernetesDeployJobPayload;
+use function Safe\sprintf;
 
 abstract class AbstractCIKubernetesDeployJobEvent extends AbstractJsonEvent
 {
@@ -34,6 +36,7 @@ abstract class AbstractCIKubernetesDeployJobEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function beforeExecute(): void
     {
@@ -60,6 +63,7 @@ abstract class AbstractCIKubernetesDeployJobEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function afterExecute(): void
     {

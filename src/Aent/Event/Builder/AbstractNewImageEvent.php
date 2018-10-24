@@ -2,11 +2,14 @@
 
 namespace TheAentMachine\Aent\Event\Builder;
 
+use Safe\Exceptions\FilesystemException;
+use Safe\Exceptions\StringsException;
 use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Event\AbstractJsonEvent;
 use TheAentMachine\Aent\Payload\Builder\NewImageReplyPayload;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Service;
+use function Safe\sprintf;
 
 abstract class AbstractNewImageEvent extends AbstractJsonEvent
 {
@@ -37,6 +40,7 @@ abstract class AbstractNewImageEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function beforeExecute(): void
     {
@@ -54,6 +58,8 @@ abstract class AbstractNewImageEvent extends AbstractJsonEvent
      * @param array $payload
      * @return array|null
      * @throws ServiceException
+     * @throws StringsException
+     * @throws FilesystemException
      */
     protected function executeJsonEvent(array $payload): ?array
     {
@@ -65,6 +71,7 @@ abstract class AbstractNewImageEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function afterExecute(): void
     {

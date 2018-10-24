@@ -2,6 +2,8 @@
 
 namespace TheAentMachine\Prompt\Helper;
 
+use Safe\Exceptions\ArrayException;
+use Safe\Exceptions\StringsException;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,6 +17,10 @@ use TheAentMachine\Prompt\Select;
 use TheAentMachine\Registry\RegistryClient;
 use TheAentMachine\Registry\TagsAnalyzer;
 use TheAentMachine\Service\Volume\BindVolume;
+use function Safe\mkdir;
+use function Safe\chown;
+use function Safe\chgrp;
+use function Safe\sprintf;
 
 final class PromptHelper
 {
@@ -45,6 +51,8 @@ final class PromptHelper
      * @param string $text
      * @param null|string $helpText
      * @return AentItemRegistry
+     * @throws ArrayException
+     * @throws StringsException
      */
     public function getFromColonyRegistry(ColonyRegistry $registry, string $text, ?string $helpText = null): AentItemRegistry
     {
@@ -72,6 +80,8 @@ final class PromptHelper
 
     /**
      * @return string
+     * @throws ArrayException
+     * @throws StringsException
      */
     public function getDockerHubImage(): string
     {
@@ -89,6 +99,8 @@ final class PromptHelper
     /**
      * @param string $image
      * @return string
+     * @throws ArrayException
+     * @throws StringsException
      */
     public function getVersion(string $image): string
     {
@@ -161,8 +173,11 @@ final class PromptHelper
                 $dir = trim($dir, '/') ?: '.';
                 $rootDir = Pheromone::getContainerProjectDirectory();
                 $fullDir = $rootDir.'/'.$dir;
-                if (!is_dir($fullDir)) {
+                if (!file_exists($fullDir)) {
                     mkdir($fullDir);
+                    $containerProjectDirInfo = new \SplFileInfo(\dirname($fullDir));
+                    chown($fullDir, $containerProjectDirInfo->getOwner());
+                    chgrp($fullDir, $containerProjectDirInfo->getGroup());
                 }
                 return $dir;
             });
@@ -175,6 +190,7 @@ final class PromptHelper
      * @param int $port
      * @param string $baseVirtualHost
      * @return string
+     * @throws StringsException
      */
     public function getSubdomain(string $serviceName, int $port, string $baseVirtualHost): string
     {

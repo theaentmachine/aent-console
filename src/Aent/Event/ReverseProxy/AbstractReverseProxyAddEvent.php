@@ -2,11 +2,13 @@
 
 namespace TheAentMachine\Aent\Event\ReverseProxy;
 
+use Safe\Exceptions\StringsException;
 use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Event\AbstractJsonEvent;
 use TheAentMachine\Aent\Payload\ReverseProxy\ReverseProxyAddPayload;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Service;
+use function Safe\sprintf;
 
 abstract class AbstractReverseProxyAddEvent extends AbstractJsonEvent
 {
@@ -34,6 +36,7 @@ abstract class AbstractReverseProxyAddEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function beforeExecute(): void
     {
@@ -61,6 +64,7 @@ abstract class AbstractReverseProxyAddEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function afterExecute(): void
     {

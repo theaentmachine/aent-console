@@ -2,8 +2,10 @@
 
 namespace TheAentMachine\Aent\Event\Orchestrator;
 
+use Safe\Exceptions\StringsException;
 use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Event\AbstractJsonEvent;
+use function Safe\sprintf;
 
 final class OrchestratorChooseEnvironmentEvent extends AbstractJsonEvent
 {
@@ -25,6 +27,7 @@ final class OrchestratorChooseEnvironmentEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function beforeExecute(): void
     {
@@ -41,6 +44,7 @@ final class OrchestratorChooseEnvironmentEvent extends AbstractJsonEvent
     /**
      * @param mixed[] $payload
      * @return mixed[]|null
+     * @throws StringsException
      */
     protected function executeJsonEvent(array $payload): ?array
     {

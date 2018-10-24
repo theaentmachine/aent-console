@@ -2,6 +2,8 @@
 
 namespace TheAentMachine\Aent\Event\Bootstrap;
 
+use Safe\Exceptions\ArrayException;
+use Safe\Exceptions\StringsException;
 use TheAentMachine\Aent\Context\BaseOrchestratorContext;
 use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Event\Bootstrap\Model\CIBootstrap;
@@ -11,6 +13,7 @@ use TheAentMachine\Aent\Registry\ColonyRegistry;
 use TheAentMachine\Aent\Registry\Exception\ColonyRegistryException;
 use TheAentMachine\Aenthill\Aenthill;
 use TheAentMachine\Aent\Event\AbstractEvent;
+use function Safe\sprintf;
 
 abstract class AbstractBootstrapAddEvent extends AbstractEvent
 {
@@ -44,6 +47,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function beforeExecute(): void
     {
@@ -54,6 +58,8 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
      * @param null|string $payload
      * @return null|string
      * @throws ColonyRegistryException
+     * @throws StringsException
+     * @throws ArrayException
      */
     protected function executeEvent(?string $payload): ?string
     {
@@ -70,6 +76,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function afterExecute(): void
     {
@@ -94,6 +101,8 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
     /**
      * @return CIBootstrap
      * @throws ColonyRegistryException
+     * @throws StringsException
+     * @throws ArrayException
      */
     private function getCIBootstrap(): CIBootstrap
     {
@@ -118,6 +127,8 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
 
     /**
      * @param OrchestratorBootstrap $bootstrap
+     * @return void
+     * @throws StringsException
      */
     private function addOrchestrator(OrchestratorBootstrap $bootstrap): void
     {
@@ -140,6 +151,7 @@ abstract class AbstractBootstrapAddEvent extends AbstractEvent
     /**
      * @param OrchestratorBootstrap[] $orchestratorsBootstraps
      * @return void
+     * @throws StringsException
      */
     protected function printSummary(array $orchestratorsBootstraps): void
     {

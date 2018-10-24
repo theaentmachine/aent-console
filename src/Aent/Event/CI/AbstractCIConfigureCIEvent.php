@@ -2,7 +2,9 @@
 
 namespace TheAentMachine\Aent\Event\CI;
 
+use Safe\Exceptions\StringsException;
 use TheAentMachine\Aent\Event\AbstractJsonEvent;
+use function Safe\sprintf;
 
 abstract class AbstractCIConfigureCIEvent extends AbstractJsonEvent
 {
@@ -29,6 +31,7 @@ abstract class AbstractCIConfigureCIEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function beforeExecute(): void
     {

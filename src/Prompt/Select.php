@@ -6,6 +6,8 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use TheAentMachine\Prompt\Helper\ValidatorHelper;
+use function Safe\preg_match;
+use function Safe\sprintf;
 
 class Select extends Input
 {
@@ -57,8 +59,8 @@ class Select extends Input
             }
             if ($multiselect) {
                 // Check for a separated comma values
-                if (!\preg_match('/^[^,]+(?:,[^,]+)*$/', $selectedChoices, $matches)) {
-                    throw new InvalidArgumentException(\sprintf($errorMessage, $selected));
+                if (!preg_match('/^[^,]+(?:,[^,]+)*$/', $selectedChoices, $matches)) {
+                    throw new InvalidArgumentException(sprintf($errorMessage, $selected));
                 }
                 $selectedChoices = \explode(',', $selectedChoices);
             } else {
@@ -73,7 +75,7 @@ class Select extends Input
                     }
                 }
                 if (\count($results) > 1) {
-                    throw new InvalidArgumentException(\sprintf('The provided answer is ambiguous. Value should be one of %s.', \implode(' or ', $results)));
+                    throw new InvalidArgumentException(sprintf('The provided answer is ambiguous. Value should be one of %s.', \implode(' or ', $results)));
                 }
                 $result = \array_search($value, $choices);
                 if (!$isAssoc) {
@@ -86,7 +88,7 @@ class Select extends Input
                     $result = $value;
                 }
                 if (false === $result) {
-                    throw new InvalidArgumentException(\sprintf($errorMessage, $value));
+                    throw new InvalidArgumentException(sprintf($errorMessage, $value));
                 }
                 $multiselectChoices[] = (string) $result;
             }

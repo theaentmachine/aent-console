@@ -5,6 +5,8 @@ namespace TheAentMachine\Prompt\Helper;
 use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use TheAentMachine\Registry\RegistryClient;
+use function Safe\sprintf;
+use function Safe\preg_match;
 
 final class ValidatorHelper
 {
@@ -37,7 +39,7 @@ final class ValidatorHelper
     {
         return function (string $response) use ($func, $errorMessage) {
             $response = \trim($response);
-            $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE), $response);
+            $message = sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE), $response);
             if (!$func($response)) {
                 throw new InvalidArgumentException($message);
             }
@@ -54,7 +56,7 @@ final class ValidatorHelper
     {
         return function (string $response) use ($func, $errorMessage) {
             $response = \trim($response);
-            $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE), $response);
+            $message = sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE), $response);
             if ($func($response)) {
                 throw new InvalidArgumentException($message);
             }
@@ -71,8 +73,8 @@ final class ValidatorHelper
         return function (string $response) use ($errorMessage) {
             $response = \trim($response);
             $pattern = '/^[a-zA-Z0-9]+$/';
-            if (!\preg_match($pattern, $response)) {
-                $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE . '. Hint: only alphanumerical characters are allowed'), $response);
+            if (!preg_match($pattern, $response)) {
+                $message = sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE . '. Hint: only alphanumerical characters are allowed'), $response);
                 throw new InvalidArgumentException($message);
             }
             return $response;
@@ -93,8 +95,8 @@ final class ValidatorHelper
                 $pattern .= $character;
             }
             $pattern .= ']+$/';
-            if (!\preg_match($pattern, $response)) {
-                $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE . '. Hint: only alphanumerical characters and "%s" characters are allowed'), $response, \implode(', ', $additionalCharacters));
+            if (!preg_match($pattern, $response)) {
+                $message = sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE . '. Hint: only alphanumerical characters and "%s" characters are allowed'), $response, \implode(', ', $additionalCharacters));
                 throw new InvalidArgumentException($message);
             }
             return $response;
@@ -109,8 +111,8 @@ final class ValidatorHelper
     {
         return function (string $response) use ($errorMessage) {
             $response = trim($response);
-            if (!\preg_match('/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?$/im', $response)) {
-                $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE . '. Hint: the domain name must not start with "http(s)://".'), $response);
+            if (!preg_match('/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?$/im', $response)) {
+                $message = sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE . '. Hint: the domain name must not start with "http(s)://".'), $response);
                 throw new InvalidArgumentException($message);
             }
             return $response;
@@ -125,8 +127,8 @@ final class ValidatorHelper
     {
         return function (string $response) use ($errorMessage) {
             $response = trim($response);
-            if (!\preg_match('/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?(:\d*)?$/im', $response)) {
-                $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE . '. Hint: the domain name must not start with "http(s)://".'), $response);
+            if (!preg_match('/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?(:\d*)?$/im', $response)) {
+                $message = sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE . '. Hint: the domain name must not start with "http(s)://".'), $response);
                 throw new InvalidArgumentException($message);
             }
             return $response;
@@ -140,8 +142,8 @@ final class ValidatorHelper
     {
         return function (string $response) {
             $response = \trim($response);
-            if (!\preg_match('/^[a-z0-9]+\/([a-z0-9]+(?:[._-][a-z0-9]+)*)$/', $response)) {
-                $message = \sprintf(self::DEFAULT_ERROR_MESSAGE . '. Hint: the docker image should be of type "username/repository"', $response);
+            if (!preg_match('/^[a-z0-9]+\/([a-z0-9]+(?:[._-][a-z0-9]+)*)$/', $response)) {
+                $message = sprintf(self::DEFAULT_ERROR_MESSAGE . '. Hint: the docker image should be of type "username/repository"', $response);
                 throw new InvalidArgumentException($message);
             }
             try {
@@ -162,8 +164,8 @@ final class ValidatorHelper
     {
         return function (string $response) use ($errorMessage) {
             $response = \trim($response);
-            if (!\preg_match('/^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/', $response)) {
-                $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE), $response);
+            if (!preg_match('/^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/', $response)) {
+                $message = sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE), $response);
                 throw new InvalidArgumentException($message);
             }
             return $response;
@@ -178,8 +180,8 @@ final class ValidatorHelper
     {
         return function (string $response) use ($errorMessage) {
             $response = \trim($response);
-            if (!\preg_match('/^[\'"]?(?:\/[^\/\n]+)*[\'"]?$/', $response)) {
-                $message = \sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE . '". Hint: path has to be absolute without trailing "/".'), $response);
+            if (!preg_match('/^[\'"]?(?:\/[^\/\n]+)*[\'"]?$/', $response)) {
+                $message = sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE . '". Hint: path has to be absolute without trailing "/".'), $response);
                 throw new InvalidArgumentException($message);
             }
             return $response;

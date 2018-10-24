@@ -2,6 +2,7 @@
 
 namespace TheAentMachine\Aent\Event\Orchestrator;
 
+use Safe\Exceptions\StringsException;
 use TheAentMachine\Aent\Context\BaseOrchestratorContext;
 use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Context\ContextInterface;
@@ -10,6 +11,7 @@ use TheAentMachine\Aent\Payload\Bootstrap\BootstrapPayload;
 use TheAentMachine\Aent\Registry\ColonyRegistry;
 use TheAentMachine\Aent\Registry\Exception\ColonyRegistryException;
 use TheAentMachine\Aenthill\Aenthill;
+use function Safe\sprintf;
 
 abstract class AbstractOrchestratorAddEvent extends AbstractJsonEvent
 {
@@ -42,6 +44,7 @@ abstract class AbstractOrchestratorAddEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function beforeExecute(): void
     {
@@ -59,6 +62,7 @@ abstract class AbstractOrchestratorAddEvent extends AbstractJsonEvent
      * @param mixed[] $payload
      * @return mixed[]|null
      * @throws ColonyRegistryException
+     * @throws StringsException
      */
     protected function executeJsonEvent(array $payload): ?array
     {
@@ -78,6 +82,7 @@ abstract class AbstractOrchestratorAddEvent extends AbstractJsonEvent
     /**
      * @return void
      * @throws ColonyRegistryException
+     * @throws StringsException
      */
     private function registerDockerfileBuilder(): void
     {
@@ -91,6 +96,7 @@ abstract class AbstractOrchestratorAddEvent extends AbstractJsonEvent
 
     /**
      * @param BootstrapPayload $payload
+     * @throws StringsException
      */
     private function registerCI(BootstrapPayload $payload): void
     {
@@ -104,6 +110,7 @@ abstract class AbstractOrchestratorAddEvent extends AbstractJsonEvent
 
     /**
      * @param ContextInterface $context
+     * @throws StringsException
      */
     private function finish(ContextInterface $context): void
     {
@@ -113,6 +120,7 @@ abstract class AbstractOrchestratorAddEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function afterExecute(): void
     {

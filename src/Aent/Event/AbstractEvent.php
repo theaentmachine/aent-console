@@ -2,12 +2,14 @@
 
 namespace TheAentMachine\Aent\Event;
 
+use Safe\Exceptions\StringsException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TheAentMachine\Aenthill\Aenthill;
 use TheAentMachine\Prompt\Prompt;
+use function Safe\sprintf;
 
 abstract class AbstractEvent extends Command
 {
@@ -48,6 +50,7 @@ abstract class AbstractEvent extends Command
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function configure()
     {

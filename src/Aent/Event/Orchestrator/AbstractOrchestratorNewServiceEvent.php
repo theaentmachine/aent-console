@@ -2,6 +2,8 @@
 
 namespace TheAentMachine\Aent\Event\Orchestrator;
 
+use Safe\Exceptions\FilesystemException;
+use Safe\Exceptions\StringsException;
 use TheAentMachine\Aent\Context\BaseOrchestratorContext;
 use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Event\AbstractJsonEvent;
@@ -11,6 +13,7 @@ use TheAentMachine\Aent\Payload\CI\CINewImageReplyPayload;
 use TheAentMachine\Aenthill\Aenthill;
 use TheAentMachine\Service\Exception\ServiceException;
 use TheAentMachine\Service\Service;
+use function Safe\sprintf;
 
 abstract class AbstractOrchestratorNewServiceEvent extends AbstractJsonEvent
 {
@@ -38,6 +41,7 @@ abstract class AbstractOrchestratorNewServiceEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function beforeExecute(): void
     {
@@ -55,6 +59,8 @@ abstract class AbstractOrchestratorNewServiceEvent extends AbstractJsonEvent
      * @param mixed[] $payload
      * @return mixed[]|null
      * @throws ServiceException
+     * @throws StringsException
+     * @throws FilesystemException
      */
     protected function executeJsonEvent(array $payload): ?array
     {
@@ -67,6 +73,7 @@ abstract class AbstractOrchestratorNewServiceEvent extends AbstractJsonEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function afterExecute(): void
     {
@@ -85,6 +92,7 @@ abstract class AbstractOrchestratorNewServiceEvent extends AbstractJsonEvent
      * @param Service $service
      * @return Service
      * @throws ServiceException
+     * @throws StringsException
      */
     private function createDockerFileAndBuild(Service $service): Service
     {
@@ -104,6 +112,7 @@ abstract class AbstractOrchestratorNewServiceEvent extends AbstractJsonEvent
      * @param Service $service
      * @param string $dockerfileName
      * @return Service
+     * @throws StringsException
      */
     private function addBuildJobInCI(Service $service, string $dockerfileName): Service
     {

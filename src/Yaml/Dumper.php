@@ -11,8 +11,13 @@
 
 namespace TheAentMachine\Yaml;
 
+use Safe\Exceptions\PcreException;
+use Safe\Exceptions\StringsException;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Yaml;
+use function Safe\substr;
+use function Safe\sprintf;
+use function Safe\preg_split;
 
 /**
  * Dumper dumps PHP variables to YAML strings.
@@ -55,6 +60,8 @@ class Dumper
      * @param int   $flags  A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
      *
      * @return string The YAML representation of the PHP value
+     * @throws StringsException
+     * @throws PcreException
      */
     public function dump($input, int $inline = 0, int $indent = 0, int $flags = 0): string
     {
@@ -95,9 +102,6 @@ class Dumper
                     $output .= sprintf("%s%s%s |%s\n", $prefix, $dumpAsMap ? Inline::dump($key, $flags).':' : '-', '', $blockIndentationIndicator);
 
                     $pregSplit = preg_split('/\n|\r\n/', $value);
-                    if ($pregSplit === false) {
-                        throw new \RuntimeException('An error occured in preg_split');
-                    }
                     foreach ($pregSplit as $row) {
                         $output .= sprintf("%s%s%s\n", $prefix, str_repeat(' ', $this->indentation), $row);
                     }

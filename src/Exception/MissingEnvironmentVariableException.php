@@ -1,4 +1,5 @@
 <?php
+
 namespace TheAentMachine\Exception;
 
 final class MissingEnvironmentVariableException extends AenthillException

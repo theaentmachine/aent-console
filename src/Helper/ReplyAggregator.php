@@ -2,16 +2,31 @@
 
 namespace TheAentMachine\Helper;
 
+use Safe\Exceptions\FilesystemException;
+use Safe\Exceptions\StringsException;
+use function Safe\mkdir;
+use function Safe\sprintf;
+use function Safe\glob;
+use function Safe\unlink;
+use function Safe\file_put_contents;
+use function Safe\file_get_contents;
+
 /**
  * Class in charge of assembling replies from the different containers.
  */
-class ReplyAggregator
+final class ReplyAggregator
 {
     /**
      * @var string
      */
     private $replyDirectory;
 
+    /**
+     * ReplyAggregator constructor.
+     * @param string|null $replyDirectory
+     * @throws FilesystemException
+     * @throws StringsException
+     */
     public function __construct(string $replyDirectory = null)
     {
         if ($replyDirectory === null) {
@@ -19,7 +34,8 @@ class ReplyAggregator
         }
         $this->replyDirectory = rtrim($replyDirectory, '/').'/';
         if (!\file_exists($replyDirectory)) {
-            if (!mkdir($replyDirectory, 0777, true) && !is_dir($replyDirectory)) {
+            mkdir($replyDirectory, 0777, true);
+            if (!is_dir($replyDirectory)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $replyDirectory));
             }
         }
@@ -27,6 +43,7 @@ class ReplyAggregator
 
     /**
      * Purges all received replies
+     * @throws FilesystemException
      */
     public function clear(): void
     {
@@ -47,21 +64,26 @@ class ReplyAggregator
         return 'tmp'.$i;
     }
 
+    /**
+     * @param string $payload
+     * @throws FilesystemException
+     */
     public function storeReply(string $payload): void
     {
         $path = $this->replyDirectory.$this->getNextFileName();
-        \file_put_contents($path, $payload);
+        file_put_contents($path, $payload);
     }
 
     /**
      * @return string[]
+     * @throws FilesystemException
      */
     public function getReplies(): array
     {
         $i = 0;
         $replies = [];
         while (\file_exists($this->replyDirectory.'tmp'.$i)) {
-            $content = \file_get_contents($this->replyDirectory.'tmp'.$i);
+            $content = file_get_contents($this->replyDirectory.'tmp'.$i);
             if ($content === false) {
                 throw new \RuntimeException('Failed to load file '.$this->replyDirectory.'tmp'.$i);
             }

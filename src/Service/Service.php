@@ -4,9 +4,7 @@ namespace TheAentMachine\Service;
 
 use Opis\JsonSchema\ValidationError;
 use Opis\JsonSchema\Validator;
-use TheAentMachine\Aent\Context\Context;
-use TheAentMachine\Aenthill\CommonMetadata;
-use TheAentMachine\Aenthill\Manifest;
+use Safe\Exceptions\FilesystemException;
 use TheAentMachine\Service\Enum\EnvVariableTypeEnum;
 use TheAentMachine\Service\Enum\VolumeTypeEnum;
 use TheAentMachine\Service\Environment\EnvVariable;
@@ -17,6 +15,7 @@ use TheAentMachine\Service\Volume\NamedVolume;
 use TheAentMachine\Service\Volume\TmpfsVolume;
 use TheAentMachine\Service\Volume\Volume;
 use TheAentMachine\Yaml\CommentedItem;
+use function Safe\file_get_contents;
 
 class Service implements \JsonSerializable
 {
@@ -57,6 +56,7 @@ class Service implements \JsonSerializable
 
     /**
      * Service constructor.
+     * @throws FilesystemException
      */
     public function __construct()
     {
@@ -67,6 +67,7 @@ class Service implements \JsonSerializable
      * @param mixed[] $payload
      * @return Service
      * @throws ServiceException
+     * @throws FilesystemException
      */
     public static function parsePayload(array $payload): Service
     {

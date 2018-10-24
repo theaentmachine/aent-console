@@ -2,12 +2,14 @@
 
 namespace TheAentMachine\Aent\Event\Service;
 
+use Safe\Exceptions\StringsException;
 use TheAentMachine\Aent\Context\Context;
 use TheAentMachine\Aent\Event\AbstractEvent;
 use TheAentMachine\Aent\Event\Service\Model\Environments;
 use TheAentMachine\Aent\Event\Service\Model\ServiceState;
 use TheAentMachine\Aenthill\Aenthill;
 use TheAentMachine\Service\Service;
+use function Safe\sprintf;
 
 abstract class AbstractServiceAddEvent extends AbstractEvent
 {
@@ -35,6 +37,7 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function beforeExecute(): void
     {
@@ -47,6 +50,7 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
     /**
      * @param null|string $payload
      * @return null|string
+     * @throws StringsException
      */
     protected function executeEvent(?string $payload): ?string
     {
@@ -64,6 +68,7 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     protected function afterExecute(): void
     {
@@ -72,6 +77,7 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
 
     /**
      * @return Environments
+     * @throws StringsException
      */
     private function fetchEnvironments(): Environments
     {
@@ -95,6 +101,7 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
 
     /**
      * @return void
+     * @throws StringsException
      */
     private function byebye(): void
     {
@@ -105,6 +112,7 @@ abstract class AbstractServiceAddEvent extends AbstractEvent
     /**
      * @param Context[] $environments
      * @param null|Service $service
+     * @throws StringsException
      */
     private function dispatch(array $environments, ?Service $service): void
     {

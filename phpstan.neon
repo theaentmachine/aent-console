@@ -2,5 +2,7 @@ parameters:
     ignoreErrors:
      - "#should return array.*SharedEnvVariable.*EnvVariable#"
      - "#Cannot call method getConfig\\(\\) on .*ResponseInterface|null#"
+     - "#$payload of method TheAentMachine\\Aent\\Event\\AbstractEvent::executeEvent() expects string|null, array<string>|string|null given.#"
 includes:
     - vendor/thecodingmachine/phpstan-strict-rules/phpstan-strict-rules.neon
+    - vendor/thecodingmachine/phpstan-safe-rule/phpstan-safe-rule.neon

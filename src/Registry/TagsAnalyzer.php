@@ -2,7 +2,13 @@
 
 namespace TheAentMachine\Registry;
 
-class TagsAnalyzer
+use Safe\Exceptions\ArrayException;
+use Safe\Exceptions\StringsException;
+use function Safe\preg_match;
+use function Safe\usort;
+use function Safe\substr;
+
+final class TagsAnalyzer
 {
 
     /**
@@ -13,12 +19,14 @@ class TagsAnalyzer
      *
      * @param string[] $tags
      * @return string[]
+     * @throws ArrayException
+     * @throws StringsException
      */
     public function filterBestTags(array $tags): array
     {
         // filter numeric versions only
         $versions = \array_filter($tags, function (string $tag) {
-            return \preg_match('/^\d+(\.\d+)*$/', $tag);
+            return preg_match('/^\d+(\.\d+)*$/', $tag);
         });
 
         // Let's build a tree of versions.
@@ -54,7 +62,7 @@ class TagsAnalyzer
 
         $interestingVersion = \array_keys($versionsByKey);
 
-        \usort($interestingVersion, [$this, 'compareVersion']);
+        usort($interestingVersion, [$this, 'compareVersion']);
 
         return $interestingVersion;
     }
@@ -97,6 +105,7 @@ class TagsAnalyzer
 
     /**
      * Removes the last digit of a tag. Returns null if there is nothing to remove.
+     * @throws StringsException
      */
     private function shortenTag(string $tag): ?string
     {
@@ -104,7 +113,7 @@ class TagsAnalyzer
         if ($lastPos === false) {
             return null;
         }
-        return \substr($tag, 0, $lastPos);
+        return substr($tag, 0, $lastPos);
     }
 
     private function compareVersion(string $v1, string $v2): int
