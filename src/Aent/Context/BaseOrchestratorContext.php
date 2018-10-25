@@ -20,12 +20,13 @@ class BaseOrchestratorContext extends Context
      * @param string $environmentType
      * @param string $environmentName
      * @param string $baseVirtualHost
+     * @param bool $singleEnvironment
      */
-    public function __construct(string $environmentType, string $environmentName, string $baseVirtualHost)
+    public function __construct(string $environmentType, string $environmentName, string $baseVirtualHost, bool $singleEnvironment = true)
     {
         parent::__construct($environmentType, $environmentName);
         $this->baseVirtualHost = $baseVirtualHost;
-        $this->singleEnvironment = true;
+        $this->singleEnvironment = $singleEnvironment;
     }
 
     /**
@@ -48,8 +49,7 @@ class BaseOrchestratorContext extends Context
         $context = parent::fromArray($assoc);
         $baseVirtualHost = $assoc['BASE_VIRTUAL_HOST'];
         $singleEnvironment = $assoc['IS_SINGLE_ENVIRONMENT'] === 'true';
-        $self = new self($context->getEnvironmentType(), $context->getEnvironmentName(), $baseVirtualHost);
-        $self->setSingleEnvironment($singleEnvironment);
+        $self = new self($context->getEnvironmentType(), $context->getEnvironmentName(), $baseVirtualHost, $singleEnvironment);
         return $self;
     }
 
@@ -69,8 +69,7 @@ class BaseOrchestratorContext extends Context
         $context = parent::fromMetadata();
         $baseVirtualHost = Aenthill::metadata('BASE_VIRTUAL_HOST');
         $singleEnvironment = Aenthill::metadata('IS_SINGLE_ENVIRONMENT') === 'true';
-        $self = new self($context->getEnvironmentType(), $context->getEnvironmentName(), $baseVirtualHost);
-        $self->setSingleEnvironment($singleEnvironment);
+        $self = new self($context->getEnvironmentType(), $context->getEnvironmentName(), $baseVirtualHost, $singleEnvironment);
         return $self;
     }
 
