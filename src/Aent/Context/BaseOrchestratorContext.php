@@ -68,7 +68,7 @@ class BaseOrchestratorContext extends Context
     {
         $context = parent::fromMetadata();
         $baseVirtualHost = Aenthill::metadata('BASE_VIRTUAL_HOST');
-        $singleEnvironment = (bool)Aenthill::metadata('IS_SINGLE_ENVIRONMENT');
+        $singleEnvironment = Aenthill::metadata('IS_SINGLE_ENVIRONMENT') === '1';
         $self = new self($context->getEnvironmentType(), $context->getEnvironmentName(), $baseVirtualHost);
         $self->setSingleEnvironment($singleEnvironment);
         return $self;
