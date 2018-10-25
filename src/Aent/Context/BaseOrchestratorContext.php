@@ -35,7 +35,7 @@ class BaseOrchestratorContext extends Context
     {
         $assoc = parent::toArray();
         $assoc['BASE_VIRTUAL_HOST'] = $this->baseVirtualHost;
-        $assoc['IS_SINGLE_ENVIRONMENT'] = $this->singleEnvironment;
+        $assoc['IS_SINGLE_ENVIRONMENT'] = $this->singleEnvironment ? '1' : '0';
         return $assoc;
     }
 
@@ -47,7 +47,7 @@ class BaseOrchestratorContext extends Context
     {
         $context = parent::fromArray($assoc);
         $baseVirtualHost = $assoc['BASE_VIRTUAL_HOST'];
-        $singleEnvironment = (bool)$assoc['IS_SINGLE_ENVIRONMENT'];
+        $singleEnvironment = $assoc['IS_SINGLE_ENVIRONMENT'] === '1';
         $self = new self($context->getEnvironmentType(), $context->getEnvironmentName(), $baseVirtualHost);
         $self->setSingleEnvironment($singleEnvironment);
         return $self;
