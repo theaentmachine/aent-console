@@ -57,8 +57,8 @@ final class Provider implements ContextInterface, JsonPayloadInterface
     {
         Aenthill::update([
             'PROVIDER_NAME' => $this->name,
-            'CERT_MANAGER' => $this->certManager ? '1' : '0',
-            'USE_NODE_PORT_FOR_INGRESS' => $this->useNodePortForIngress ? '1' : '0',
+            'CERT_MANAGER' => $this->certManager ? 'true' : 'false',
+            'USE_NODE_PORT_FOR_INGRESS' => $this->useNodePortForIngress ? 'true' : 'false',
             'INGRESS_CLASS' => $this->ingressClass,
         ]);
     }
@@ -69,8 +69,8 @@ final class Provider implements ContextInterface, JsonPayloadInterface
     public static function fromMetadata()
     {
         $name = Aenthill::metadata('PROVIDER_NAME');
-        $certManager = Aenthill::metadata('CERT_MANAGER') === '1';
-        $useNodePortForIngress = Aenthill::metadata('USE_NODE_PORT_FOR_INGRESS') === '1';
+        $certManager = Aenthill::metadata('CERT_MANAGER') === 'true';
+        $useNodePortForIngress = Aenthill::metadata('USE_NODE_PORT_FOR_INGRESS') === 'true';
         $ingressClass = Aenthill::metadata('INGRESS_CLASS');
         $self = new self($name);
         $self->certManager = $certManager;
@@ -86,8 +86,8 @@ final class Provider implements ContextInterface, JsonPayloadInterface
     {
         return [
            'PROVIDER_NAME' => $this->name,
-           'CERT_MANAGER' => $this->certManager ? '1' : '0',
-           'USE_NODE_PORT_FOR_INGRESS' => $this->useNodePortForIngress ? '1' : '0',
+           'CERT_MANAGER' => $this->certManager ? 'true' : 'false',
+           'USE_NODE_PORT_FOR_INGRESS' => $this->useNodePortForIngress ? 'true' : 'false',
            'INGRESS_CLASS' => $this->ingressClass,
         ];
     }
@@ -99,8 +99,8 @@ final class Provider implements ContextInterface, JsonPayloadInterface
     public static function fromArray(array $assoc)
     {
         $self = new self($assoc['PROVIDER_NAME']);
-        $self->certManager = $assoc['CERT_MANAGER'] === '1';
-        $self->useNodePortForIngress = $assoc['USE_NODE_PORT_FOR_INGRESS'] === '1';
+        $self->certManager = $assoc['CERT_MANAGER'] === 'true';
+        $self->useNodePortForIngress = $assoc['USE_NODE_PORT_FOR_INGRESS'] === 'true';
         $self->ingressClass = $assoc['INGRESS_CLASS'];
         return $self;
     }
