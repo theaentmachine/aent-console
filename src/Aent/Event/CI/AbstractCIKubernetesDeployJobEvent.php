@@ -8,15 +8,16 @@ use TheAentMachine\Aent\Event\AbstractJsonEvent;
 use TheAentMachine\Aent\K8SProvider\Provider;
 use TheAentMachine\Aent\Payload\CI\KubernetesDeployJobPayload;
 use function Safe\sprintf;
+use TheAentMachine\Aent\Payload\CI\KubernetesReplyDeployJobPayload;
 
 abstract class AbstractCIKubernetesDeployJobEvent extends AbstractJsonEvent
 {
     /**
      * @param string $directoryName
      * @param Provider $provider
-     * @return void
+     * @return KubernetesReplyDeployJobPayload
      */
-    abstract protected function addDeployJob(string $directoryName, Provider $provider): void;
+    abstract protected function addDeployJob(string $directoryName, Provider $provider): KubernetesReplyDeployJobPayload;
 
     /**
      * @return string
@@ -57,8 +58,8 @@ abstract class AbstractCIKubernetesDeployJobEvent extends AbstractJsonEvent
     protected function executeJsonEvent(array $payload): ?array
     {
         $payload = KubernetesDeployJobPayload::fromArray($payload);
-        $this->addDeployJob($payload->getDirectoryName(), $payload->getProvider());
-        return null;
+        $payload = $this->addDeployJob($payload->getDirectoryName(), $payload->getProvider());
+        return $payload->toArray();
     }
 
     /**
