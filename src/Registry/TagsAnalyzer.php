@@ -116,7 +116,7 @@ final class TagsAnalyzer
         return substr($tag, 0, $lastPos);
     }
 
-    public function compareVersion(string $v1, string $v2): int
+    private function compareVersion(string $v1, string $v2): int
     {
         $level1 = \substr_count($v1, '.');
         $level2 = \substr_count($v2, '.');
