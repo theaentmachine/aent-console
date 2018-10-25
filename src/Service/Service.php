@@ -100,7 +100,7 @@ class Service implements \JsonSerializable
                 );
             }
             $service->virtualHosts = $s['virtualHosts'] ?? [];
-            $service->needBuild = $s['needBuild'] ?? null;
+            $service->needBuild = $s['needBuild'] ?? false;
         }
         $service->dockerfileCommands = $payload['dockerfileCommands'] ?? [];
 
