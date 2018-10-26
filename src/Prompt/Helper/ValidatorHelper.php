@@ -6,7 +6,6 @@ use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use TheAentMachine\Registry\RegistryClient;
 use function Safe\sprintf;
-use function Safe\preg_match;
 
 final class ValidatorHelper
 {

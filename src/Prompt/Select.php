@@ -6,7 +6,6 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use TheAentMachine\Prompt\Helper\ValidatorHelper;
-use function Safe\preg_match;
 use function Safe\sprintf;
 
 class Select extends Input
