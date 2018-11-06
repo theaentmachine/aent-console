@@ -157,35 +157,6 @@ final class PromptHelper
     }
 
     /**
-     * @param string $text
-     * @param string $target
-     * @param null|string $helpText
-     * @return BindVolume
-     */
-    public function getBindVolume(string $text, string $target, ?string $helpText = null): BindVolume
-    {
-        $input = new Input($this->input, $this->output, $this->questionHelper);
-        $input
-            ->setText($text)
-            ->setHelpText($helpText)
-            ->setCompulsory(true)
-            ->setValidator(function (string $dir) {
-                $dir = trim($dir, '/') ?: '.';
-                $rootDir = Pheromone::getContainerProjectDirectory();
-                $fullDir = $rootDir.'/'.$dir;
-                if (!file_exists($fullDir)) {
-                    mkdir($fullDir);
-                    $containerProjectDirInfo = new \SplFileInfo(\dirname($fullDir));
-                    chown($fullDir, $containerProjectDirInfo->getOwner());
-                    chgrp($fullDir, $containerProjectDirInfo->getGroup());
-                }
-                return $dir;
-            });
-        $source = $input->run() ?? '';
-        return new BindVolume($source, $target);
-    }
-
-    /**
      * @param string $serviceName
      * @param int $port
      * @param string $baseVirtualHost
