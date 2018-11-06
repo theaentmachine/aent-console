@@ -186,4 +186,20 @@ final class ValidatorHelper
             return $response;
         };
     }
+
+    /**
+     * @param null|string $errorMessage
+     * @return callable
+     */
+    public static function getRelativePathValidator(?string $errorMessage = null): callable
+    {
+        return function (string $response) use ($errorMessage) {
+            $response = \trim($response);
+            if (!preg_match('/^(?!-)[a-z0-9-]+(?<!-)(\/(?!-)[a-z0-9-]+(?<!-))*(\/(?!-\.)[a-z0-9-\.]+(?<!-\.))?$/', $response)) {
+                $message = sprintf((!empty($errorMessage) ? $errorMessage : self::DEFAULT_ERROR_MESSAGE . '". Hint: path has to be relative without trailing "/".'), $response);
+                throw new InvalidArgumentException($message);
+            }
+            return $response;
+        };
+    }
 }
